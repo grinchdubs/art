@@ -13,7 +13,7 @@ export function parseCSV(csvText) {
   // Parse header row
   const headers = parseCSVLine(lines[0]);
 
-  // Expected headers from export format
+  // Expected headers from export format (only require the essential ones)
   const expectedHeaders = [
     'Inventory Number',
     'Title',
@@ -24,9 +24,7 @@ export function parseCSV(csvText) {
     'Sale Status',
     'Price',
     'Location',
-    'Notes',
-    'Added to Catalog',
-    'Last Updated'
+    'Notes'
   ];
 
   // Validate headers

@@ -778,12 +778,12 @@ body.dark-mode .file-placeholder {
 
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 30px;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
   align-items: start;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .detail-grid {
     grid-template-columns: 1fr;
   }
