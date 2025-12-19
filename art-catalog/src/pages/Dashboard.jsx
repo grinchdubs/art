@@ -67,64 +67,30 @@ function Dashboard() {
             gap: '20px',
           }}
         >
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Total Works
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#2c3e50' }}>
+          <div className="stat-card">
+            <div className="stat-label">Total Works</div>
+            <div className="stat-value" style={{ color: '#2c3e50' }}>
               {stats.total}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Available
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#27ae60' }}>
+          <div className="stat-card">
+            <div className="stat-label">Available</div>
+            <div className="stat-value" style={{ color: '#27ae60' }}>
               {stats.available}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>Sold</div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#e74c3c' }}>
+          <div className="stat-card">
+            <div className="stat-label">Sold</div>
+            <div className="stat-value" style={{ color: '#e74c3c' }}>
               {stats.sold}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              On Loan
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#f39c12' }}>
+          <div className="stat-card">
+            <div className="stat-label">On Loan</div>
+            <div className="stat-value" style={{ color: '#f39c12' }}>
               {stats.onLoan}
             </div>
           </div>
@@ -143,99 +109,46 @@ function Dashboard() {
             gap: '20px',
           }}
         >
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Total Digital Works
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#2c3e50' }}>
+          <div className="stat-card">
+            <div className="stat-label">Total Digital Works</div>
+            <div className="stat-value" style={{ color: '#2c3e50' }}>
               {digitalStats.total}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Vimeo Videos
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#1ab7ea' }}>
+          <div className="stat-card">
+            <div className="stat-label">Vimeo Videos</div>
+            <div className="stat-value" style={{ color: '#1ab7ea' }}>
               {digitalStats.vimeo}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              YouTube Videos
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#ff0000' }}>
+          <div className="stat-card">
+            <div className="stat-label">YouTube Videos</div>
+            <div className="stat-value" style={{ color: '#ff0000' }}>
               {digitalStats.youtube}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Available
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#27ae60' }}>
+          <div className="stat-card">
+            <div className="stat-label">Available</div>
+            <div className="stat-value" style={{ color: '#27ae60' }}>
               {digitalStats.available}
             </div>
           </div>
 
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>
-              Sold
-            </div>
-            <div style={{ fontSize: '36px', fontWeight: '600', color: '#e74c3c' }}>
+          <div className="stat-card">
+            <div className="stat-label">Sold</div>
+            <div className="stat-value" style={{ color: '#e74c3c' }}>
               {digitalStats.sold}
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          background: 'white',
-          padding: '40px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          textAlign: 'center',
-        }}
-      >
-        <h3 style={{ marginBottom: '16px', color: '#2c3e50' }}>Welcome to Art Catalog</h3>
-        <p style={{ color: '#7f8c8d', marginBottom: '24px' }}>
+      <div className="welcome-section">
+        <h3>Welcome to Art Catalog</h3>
+        <p>
           Manage your collection with ease. Track inventory, manage exhibitions, and export
           your catalog.
         </p>

@@ -589,21 +589,21 @@ function DigitalWorkList() {
                   </div>
                 )}
 
-                <div style={{ maxHeight: '300px', overflow: 'auto', background: '#f8f9fa', padding: '12px', borderRadius: '6px' }}>
-                  <table style={{ width: '100%', fontSize: '13px' }}>
+                <div className="preview-container">
+                  <table className="preview-table">
                     <thead>
                       <tr>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Title</th>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Format</th>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Status</th>
+                        <th>Title</th>
+                        <th>Format</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {parsedImport.works.map((work, idx) => (
                         <tr key={idx}>
-                          <td style={{ padding: '4px 8px' }}>{work.title}</td>
-                          <td style={{ padding: '4px 8px' }}>{work.file_format || 'N/A'}</td>
-                          <td style={{ padding: '4px 8px' }}>{work.sale_status}</td>
+                          <td>{work.title}</td>
+                          <td>{work.file_format || 'N/A'}</td>
+                          <td>{work.sale_status}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -679,21 +679,21 @@ function DigitalWorkList() {
                   </div>
                 )}
 
-                <div style={{ maxHeight: '300px', overflow: 'auto', background: '#f8f9fa', padding: '12px', borderRadius: '6px' }}>
-                  <table style={{ width: '100%', fontSize: '13px' }}>
+                <div className="preview-container">
+                  <table className="preview-table">
                     <thead>
                       <tr>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Platform</th>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Video ID</th>
-                        <th style={{ textAlign: 'left', padding: '4px 8px' }}>Title</th>
+                        <th>Platform</th>
+                        <th>Video ID</th>
+                        <th>Title</th>
                       </tr>
                     </thead>
                     <tbody>
                       {parsedVideos.videos.map((video, idx) => (
                         <tr key={idx}>
-                          <td style={{ padding: '4px 8px' }}>{video.platform}</td>
-                          <td style={{ padding: '4px 8px', fontFamily: 'monospace' }}>{video.video_id}</td>
-                          <td style={{ padding: '4px 8px' }}>{video.title}</td>
+                          <td>{video.platform}</td>
+                          <td style={{ fontFamily: 'monospace' }}>{video.video_id}</td>
+                          <td>{video.title}</td>
                         </tr>
                       ))}
                     </tbody>
