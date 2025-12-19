@@ -53,6 +53,9 @@ fetchAllVideos()
   .then(videos => {
     console.log(`\n✅ Found ${videos.length} total videos!\n`);
 
+    // Sort by creation date (oldest first)
+    videos.sort((a, b) => new Date(a.created_time) - new Date(b.created_time));
+
     // Create CSV format with URL and Title
     const csvLines = ['URL,Title'];
     videos.forEach(video => {
