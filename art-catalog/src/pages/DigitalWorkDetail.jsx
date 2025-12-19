@@ -162,6 +162,7 @@ function DigitalWorkDetail() {
                         />
                       ) : (
                         <div
+                          className="file-placeholder"
                           style={{
                             width: '100%',
                             height: '150px',
@@ -178,6 +179,7 @@ function DigitalWorkDetail() {
                       )}
                       {file.is_primary === 1 && (
                         <div
+                          className="primary-badge"
                           style={{
                             position: 'absolute',
                             top: '8px',
@@ -246,6 +248,56 @@ function DigitalWorkDetail() {
               <div className="detail-value">{work.license_type || 'Not specified'}</div>
             </div>
 
+            {/* NFT Information */}
+            {(work.nft_token_id || work.nft_contract_address || work.nft_blockchain) && (
+              <>
+                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
+                  <h4 style={{ marginBottom: '12px', fontSize: '14px', fontWeight: '600' }}>NFT Information</h4>
+                </div>
+
+                {work.nft_blockchain && (
+                  <div className="detail-field">
+                    <div className="detail-label">Blockchain</div>
+                    <div className="detail-value">{work.nft_blockchain}</div>
+                  </div>
+                )}
+
+                {work.nft_token_id && (
+                  <div className="detail-field">
+                    <div className="detail-label">Token ID</div>
+                    <div className="detail-value" style={{ fontFamily: 'monospace', fontSize: '12px' }}>
+                      {work.nft_token_id}
+                    </div>
+                  </div>
+                )}
+
+                {work.nft_contract_address && (
+                  <div className="detail-field">
+                    <div className="detail-label">Contract Address</div>
+                    <div className="detail-value" style={{ fontFamily: 'monospace', fontSize: '11px', wordBreak: 'break-all' }}>
+                      {work.nft_contract_address}
+                    </div>
+                  </div>
+                )}
+
+                {work.nft_token_id && work.nft_contract_address && (
+                  <div className="detail-field">
+                    <div className="detail-label">View on objkt.com</div>
+                    <div className="detail-value">
+                      <a
+                        href={`https://objkt.com/asset/${work.nft_contract_address}/${work.nft_token_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#3498db' }}
+                      >
+                        View NFT ↗
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             {work.notes && (
               <div className="detail-field">
                 <div className="detail-label">Notes</div>
@@ -261,7 +313,7 @@ function DigitalWorkDetail() {
         <div style={{ marginTop: '30px' }}>
           <h3 style={{ marginBottom: '16px' }}>Exhibition History</h3>
           {exhibitions.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
+            <div className="empty-exhibition-state" style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
               <p style={{ color: '#7f8c8d' }}>This digital work has not been exhibited yet</p>
             </div>
           ) : (
@@ -269,6 +321,7 @@ function DigitalWorkDetail() {
               {exhibitions.map((exhibition) => (
                 <div
                   key={exhibition.id}
+                  className="exhibition-card"
                   style={{
                     background: 'white',
                     padding: '16px',
@@ -285,8 +338,8 @@ function DigitalWorkDetail() {
                     e.currentTarget.style.transform = 'translateX(0)';
                   }}
                 >
-                  <div style={{ fontWeight: '500', marginBottom: '4px' }}>{exhibition.name}</div>
-                  <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+                  <div className="exhibition-name" style={{ fontWeight: '500', marginBottom: '4px' }}>{exhibition.name}</div>
+                  <div className="exhibition-meta" style={{ fontSize: '14px', color: '#7f8c8d' }}>
                     {exhibition.venue} • {new Date(exhibition.start_date).toLocaleDateString()}
                     {exhibition.end_date && ` - ${new Date(exhibition.end_date).toLocaleDateString()}`}
                   </div>

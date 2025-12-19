@@ -720,3 +720,51 @@ select.form-control {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Exhibition cards in detail pages */
+.exhibition-card {
+  background: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+body.dark-mode .exhibition-card {
+  background: #2d2d2d;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+}
+
+.exhibition-name {
+  color: #2c3e50;
+}
+
+body.dark-mode .exhibition-name {
+  color: #e0e0e0;
+}
+
+.exhibition-meta {
+  color: #7f8c8d;
+}
+
+body.dark-mode .exhibition-meta {
+  color: #a0a0a0;
+}
+
+.empty-exhibition-state {
+  background: #f8f9fa;
+}
+
+body.dark-mode .empty-exhibition-state {
+  background: #2d2d2d !important;
+}
+
+body.dark-mode .empty-exhibition-state p {
+  color: #a0a0a0 !important;
+}
+
+/* File thumbnails */
+.file-placeholder {
+  background: #ecf0f1;
+}
+
+body.dark-mode .file-placeholder {
+  background: #3a3a3a !important;
+}
