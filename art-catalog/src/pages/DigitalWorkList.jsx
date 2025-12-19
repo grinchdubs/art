@@ -212,35 +212,44 @@ function DigitalWorkList() {
       let successCount = 0;
       let failCount = 0;
 
+      // Get all existing works once at the start
+      const allWorks = await digitalWorkOperations.getAll();
+      const year = new Date().getFullYear();
+
+      // Pre-generate all inventory numbers to avoid duplicates
+      const inventoryNumbers = new Map(); // platform -> next number
+
+      // Find max numbers for each platform
+      allWorks.forEach(work => {
+        if (work.inventory_number) {
+          const match = work.inventory_number.match(/GRNCH-DIG-\d+-(\w+)-(\d+)$/);
+          if (match) {
+            const platform = match[1];
+            const num = parseInt(match[2], 10);
+            if (!inventoryNumbers.has(platform) || inventoryNumbers.get(platform) < num) {
+              inventoryNumbers.set(platform, num);
+            }
+          }
+        }
+      });
+
+      // Generate inventory numbers for all videos upfront
+      parsedVideos.videos.forEach(video => {
+        const platform = video.platform.toUpperCase();
+        const currentMax = inventoryNumbers.get(platform) || 0;
+        const nextNumber = currentMax + 1;
+        inventoryNumbers.set(platform, nextNumber);
+
+        const prefix = `GRNCH-DIG-${year}-${platform}-`;
+        const newSeriesNumber = String(nextNumber).padStart(3, '0');
+        video.inventory_number = `${prefix}${newSeriesNumber}`;
+        video.dimensions = 'Variable (Web Video)';
+        video.file_size = 'Hosted externally';
+      });
+
+      // Now import all videos with pre-assigned inventory numbers
       for (const video of parsedVideos.videos) {
         try {
-          // Fetch fresh list of works for each video to ensure unique numbers
-          const allWorks = await digitalWorkOperations.getAll();
-
-          const year = new Date().getFullYear();
-          const namePart = video.platform.toUpperCase();
-          const prefix = `GRNCH-DIG-${year}-${namePart}-`;
-
-          const similarWorks = allWorks.filter(w =>
-            w.inventory_number && w.inventory_number.startsWith(prefix)
-          );
-
-          let maxSeriesNumber = 0;
-          similarWorks.forEach(existing => {
-            const match = existing.inventory_number.match(/-(\d+)$/);
-            if (match) {
-              const num = parseInt(match[1], 10);
-              if (num > maxSeriesNumber) {
-                maxSeriesNumber = num;
-              }
-            }
-          });
-
-          const newSeriesNumber = String(maxSeriesNumber + 1).padStart(3, '0');
-          video.inventory_number = `${prefix}${newSeriesNumber}`;
-          video.dimensions = 'Variable (Web Video)';
-          video.file_size = 'Hosted externally';
-
           const result = await digitalWorkOperations.add(video);
           const workId = result.id;
 
