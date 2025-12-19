@@ -39,10 +39,18 @@ function DigitalWorkList() {
   async function loadWorks() {
     try {
       const data = await digitalWorkOperations.getAll();
-      setWorks(data);
+
+      // Sort by inventory number (oldest first)
+      const sortedData = data.sort((a, b) => {
+        if (!a.inventory_number) return 1;
+        if (!b.inventory_number) return -1;
+        return a.inventory_number.localeCompare(b.inventory_number);
+      });
+
+      setWorks(sortedData);
 
       const images = {};
-      for (const work of data) {
+      for (const work of sortedData) {
         const files = await digitalFileOperations.getFilesForDigitalWork(work.id);
         const primaryFile = files.find(f => f.is_primary === 1) || files[0];
         if (primaryFile) {
