@@ -243,3 +243,30 @@ export function formatTezPrice(price) {
   if (price === null || price === undefined) return 'N/A';
   return `${price.toFixed(2)} ꜩ`;
 }
+
+/**
+ * Fetch current Tezos price in USD
+ * @returns {Promise<number>} Current XTZ/USD price
+ */
+export async function fetchTezosPrice() {
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tezos&vs_currencies=usd');
+    const data = await response.json();
+    return data.tezos?.usd || 0;
+  } catch (error) {
+    console.error('Error fetching Tezos price:', error);
+    return 0;
+  }
+}
+
+/**
+ * Format price with both Tezos and USD
+ * @param {number} tezPrice - Price in Tezos
+ * @param {number} usdRate - Current XTZ/USD rate
+ * @returns {string} Formatted price string
+ */
+export function formatPriceWithUSD(tezPrice, usdRate) {
+  if (!tezPrice || tezPrice === 0) return 'Not for sale';
+  const usdPrice = tezPrice * usdRate;
+  return `${tezPrice.toFixed(2)} ꜩ ($${usdPrice.toFixed(2)})`;
+}

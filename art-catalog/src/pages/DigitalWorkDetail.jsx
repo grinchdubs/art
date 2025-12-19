@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { digitalWorkOperations, digitalFileOperations, digitalExhibitionOperations } from '../db';
 import { getVideoEmbedUrl } from '../utils/videoImportUtils';
+import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
 
 function DigitalWorkDetail() {
   const { id } = useParams();
@@ -10,9 +11,11 @@ function DigitalWorkDetail() {
   const [files, setFiles] = useState([]);
   const [exhibitions, setExhibitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [xtzUsdRate, setXtzUsdRate] = useState(0);
 
   useEffect(() => {
     loadWork();
+    loadTezosPrice();
   }, [id]);
 
   async function loadWork() {
@@ -36,6 +39,15 @@ function DigitalWorkDetail() {
       alert('Error loading digital work');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadTezosPrice() {
+    try {
+      const rate = await fetchTezosPrice();
+      setXtzUsdRate(rate);
+    } catch (error) {
+      console.error('Error loading Tezos price:', error);
     }
   }
 
@@ -87,18 +99,31 @@ function DigitalWorkDetail() {
           <div className="detail-main">
             {work.embed_url && (
               <div className="detail-image-section">
-                <iframe
-                  src={work.embed_url}
-                  title={work.title}
-                  style={{
-                    width: '100%',
-                    height: '600px',
-                    border: 'none',
-                    borderRadius: '8px',
-                  }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  paddingBottom: '56.25%', // 16:9 aspect ratio
+                  height: 0,
+                  overflow: 'hidden',
+                  borderRadius: '8px',
+                  background: '#000'
+                }}>
+                  <iframe
+                    src={work.embed_url}
+                    title={work.title}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                      borderRadius: '8px',
+                    }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
                 {work.video_url && (
                   <div style={{ marginTop: '12px', fontSize: '14px' }}>
                     <a href={work.video_url} target="_blank" rel="noopener noreferrer" style={{ color: '#3498db' }}>
@@ -240,7 +265,13 @@ function DigitalWorkDetail() {
 
             <div className="detail-field">
               <div className="detail-label">Price</div>
-              <div className="detail-value">{work.price || 'Not specified'}</div>
+              <div className="detail-value">
+                {work.price
+                  ? (xtzUsdRate > 0
+                      ? formatPriceWithUSD(parseFloat(work.price), xtzUsdRate)
+                      : work.price)
+                  : 'Not specified'}
+              </div>
             </div>
 
             <div className="detail-field">
