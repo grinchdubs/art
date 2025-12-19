@@ -211,10 +211,12 @@ function DigitalWorkList() {
     try {
       let successCount = 0;
       let failCount = 0;
-      const allWorks = await digitalWorkOperations.getAll();
 
       for (const video of parsedVideos.videos) {
         try {
+          // Fetch fresh list of works for each video to ensure unique numbers
+          const allWorks = await digitalWorkOperations.getAll();
+
           const year = new Date().getFullYear();
           const namePart = video.platform.toUpperCase();
           const prefix = `GRNCH-DIG-${year}-${namePart}-`;
