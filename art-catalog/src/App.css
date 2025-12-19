@@ -773,17 +773,19 @@ body.dark-mode .file-placeholder {
 /* Detail page layout for digital works */
 .detail-container {
   width: 100%;
-  max-width: none;
+  max-width: 100% !important;
 }
 
 .detail-grid {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  width: 100%;
 }
 
 .detail-main {
   width: 100%;
+  max-width: 100%;
 }
 
 .detail-sidebar {
@@ -792,6 +794,7 @@ body.dark-mode .file-placeholder {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   width: 100%;
+  max-width: 100%;
 }
 
 body.dark-mode .detail-sidebar {
@@ -831,6 +834,8 @@ body.dark-mode .detail-sidebar > div[style*="borderTop"] {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 100%;
 }
 
 body.dark-mode .detail-image-section {
