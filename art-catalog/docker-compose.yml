@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  art-catalog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: art-catalog
+    ports:
+      - "3333:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
