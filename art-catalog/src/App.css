@@ -390,8 +390,9 @@ body.dark-mode .search-input::placeholder {
 /* Main Content Area */
 .main-content {
   flex: 1;
-  padding: 30px;
+  padding: 20px 30px;
   overflow-y: auto;
+  max-width: 100%;
 }
 
 .page-header {
@@ -455,8 +456,8 @@ body.dark-mode .search-input::placeholder {
 /* Cards & Grid */
 .artwork-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .artwork-card {

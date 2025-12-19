@@ -102,30 +102,37 @@ function DigitalWorkDetail() {
                 <div style={{
                   position: 'relative',
                   width: '100%',
-                  paddingBottom: '56.25%', // 16:9 aspect ratio
-                  height: 0,
-                  overflow: 'hidden',
-                  borderRadius: '8px',
-                  background: '#000'
+                  maxWidth: '1200px',
+                  margin: '0 auto'
                 }}>
-                  <iframe
-                    src={work.embed_url}
-                    title={work.title}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      border: 'none',
-                      borderRadius: '8px',
-                    }}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    paddingBottom: '56.25%', // 16:9 aspect ratio
+                    height: 0,
+                    overflow: 'hidden',
+                    borderRadius: '8px',
+                    background: '#000'
+                  }}>
+                    <iframe
+                      src={work.embed_url}
+                      title={work.title}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        borderRadius: '8px',
+                      }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
                 </div>
                 {work.video_url && (
-                  <div style={{ marginTop: '12px', fontSize: '14px' }}>
+                  <div style={{ marginTop: '12px', fontSize: '14px', textAlign: 'center' }}>
                     <a href={work.video_url} target="_blank" rel="noopener noreferrer" style={{ color: '#3498db' }}>
                       Open on {work.platform} ↗
                     </a>
@@ -136,28 +143,35 @@ function DigitalWorkDetail() {
 
             {!work.embed_url && primaryFile && (
               <div className="detail-image-section">
-                {primaryFile.file_type.startsWith('image/') ? (
-                  <img
-                    src={primaryFile.file_path}
-                    alt={work.title}
-                    style={{
-                      width: '100%',
-                      maxHeight: '600px',
-                      objectFit: 'contain',
-                      borderRadius: '8px',
-                    }}
-                  />
-                ) : (
-                  <video
-                    src={primaryFile.file_path}
-                    controls
-                    style={{
-                      width: '100%',
-                      maxHeight: '600px',
-                      borderRadius: '8px',
-                    }}
-                  />
-                )}
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '1200px',
+                  margin: '0 auto'
+                }}>
+                  {primaryFile.file_type.startsWith('image/') ? (
+                    <img
+                      src={primaryFile.file_path}
+                      alt={work.title}
+                      style={{
+                        width: '100%',
+                        maxHeight: '900px',
+                        objectFit: 'contain',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  ) : (
+                    <video
+                      src={primaryFile.file_path}
+                      controls
+                      style={{
+                        width: '100%',
+                        maxHeight: '900px',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             )}
 
