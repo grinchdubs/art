@@ -29,6 +29,14 @@ export async function fetchNFTsByCreator(creatorAddress) {
         supply
         timestamp
         metadata
+        listings(
+          where: { status: { _eq: "active" } }
+          order_by: { price: asc }
+          limit: 1
+        ) {
+          price
+          amount_left
+        }
       }
     }
   `;

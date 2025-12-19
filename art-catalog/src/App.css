@@ -777,20 +777,13 @@ body.dark-mode .file-placeholder {
 }
 
 .detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 40px;
-  align-items: start;
-}
-
-@media (max-width: 1400px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .detail-main {
-  min-width: 0;
+  width: 100%;
 }
 
 .detail-sidebar {
@@ -798,8 +791,8 @@ body.dark-mode .file-placeholder {
   padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 30px;
+  width: 100%;
+  max-width: 600px;
 }
 
 body.dark-mode .detail-sidebar {

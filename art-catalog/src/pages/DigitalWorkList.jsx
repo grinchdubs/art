@@ -399,11 +399,17 @@ function DigitalWorkList() {
         if (!match.confirmed) continue;
 
         try {
+          // Get price from listings if available
+          const listings = match.nft.listings || [];
+          const lowestListing = listings.length > 0 ? listings[0] : null;
+          const priceInTez = lowestListing ? parseFloat(lowestListing.price) / 1000000 : null;
+
           await digitalWorkOperations.update(match.work.id, {
             ...match.work,
             nft_token_id: match.nft.token_id,
             nft_contract_address: match.nft.fa_contract,
             nft_blockchain: 'Tezos',
+            price: priceInTez ? priceInTez.toString() : match.work.price,
           });
           successCount++;
         } catch (error) {
