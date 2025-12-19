@@ -53,6 +53,18 @@ db.version(5).stores({
   digital_work_exhibitions: '[digital_work_id+exhibition_id], digital_work_id, exhibition_id',
 });
 
+// Version 6: Add NFT fields to digital_works
+db.version(6).stores({
+  artworks: '++id, inventory_number, title, creation_date, medium, series_name, sale_status, location, price',
+  file_references: '++id, artwork_id, file_path, file_type, is_primary',
+  exhibitions: '++id, name, venue, start_date',
+  artwork_exhibitions: '[artwork_id+exhibition_id], artwork_id, exhibition_id',
+  location_history: '++id, artwork_id, moved_date',
+  digital_works: '++id, inventory_number, title, creation_date, file_format, file_size, dimensions, sale_status, price, license_type, nft_token_id, nft_contract_address, nft_blockchain',
+  digital_file_references: '++id, digital_work_id, file_path, file_type, is_primary',
+  digital_work_exhibitions: '[digital_work_id+exhibition_id], digital_work_id, exhibition_id',
+});
+
 // Artwork operations
 export const artworkOperations = {
   create: async (artwork) => {

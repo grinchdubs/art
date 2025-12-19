@@ -4,6 +4,7 @@ import { digitalWorkOperations, digitalFileOperations } from '../db';
 import { exportDigitalWorksToCSV, exportDigitalWorksToJSON, exportDigitalWorksToText, exportDigitalWorksStats } from '../utils/digitalExportUtils';
 import { parseDigitalWorksCSV, downloadDigitalWorksTemplate } from '../utils/digitalImportUtils';
 import { parseVideoUrls, getVideoImportExample, fetchVideoTitles } from '../utils/videoImportUtils';
+import { fetchNFTsByCreator, matchVideoToNFT } from '../utils/nftUtils';
 
 function DigitalWorkList() {
   const [works, setWorks] = useState([]);
@@ -24,7 +25,12 @@ function DigitalWorkList() {
   const [videoErrors, setVideoErrors] = useState([]);
   const [selectedWorks, setSelectedWorks] = useState(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [nftImporting, setNftImporting] = useState(false);
+  const [showNftDialog, setShowNftDialog] = useState(false);
+  const [nftMatches, setNftMatches] = useState([]);
   const navigate = useNavigate();
+
+  const WALLET_ADDRESS = 'tz1hUfR2FdZSwQQnG4Rj512g2C1R5vF3bUDZ';
 
   useEffect(() => {
     loadWorks();
@@ -342,6 +348,88 @@ function DigitalWorkList() {
     }
   }
 
+  async function handleNFTImport() {
+    setNftImporting(true);
+    try {
+      // Fetch all NFTs for the wallet
+      console.log('Fetching NFTs for wallet:', WALLET_ADDRESS);
+      const nfts = await fetchNFTsByCreator(WALLET_ADDRESS);
+      console.log(`Found ${nfts.length} NFTs`);
+
+      if (nfts.length === 0) {
+        alert('No NFTs found for this wallet address');
+        setNftImporting(false);
+        return;
+      }
+
+      // Get all current digital works
+      const allWorks = await digitalWorkOperations.getAll();
+
+      // Match NFTs to videos by title
+      const matches = [];
+      for (const work of allWorks) {
+        const matchedNFT = matchVideoToNFT(work.title, nfts);
+        if (matchedNFT) {
+          matches.push({
+            work,
+            nft: matchedNFT,
+            confirmed: true, // Auto-confirm good matches
+          });
+        }
+      }
+
+      console.log(`Matched ${matches.length} works to NFTs`);
+      setNftMatches(matches);
+      setShowNftDialog(true);
+      setNftImporting(false);
+    } catch (error) {
+      console.error('Error fetching NFTs:', error);
+      alert(`Error fetching NFTs: ${error.message}`);
+      setNftImporting(false);
+    }
+  }
+
+  async function confirmNFTMatches() {
+    setNftImporting(true);
+    try {
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const match of nftMatches) {
+        if (!match.confirmed) continue;
+
+        try {
+          await digitalWorkOperations.update(match.work.id, {
+            ...match.work,
+            nft_token_id: match.nft.token_id,
+            nft_contract_address: match.nft.fa_contract,
+            nft_blockchain: 'Tezos',
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`Error updating work ${match.work.id}:`, error);
+          failCount++;
+        }
+      }
+
+      alert(`NFT data linked!\nSuccess: ${successCount}\nFailed: ${failCount}`);
+      setShowNftDialog(false);
+      setNftMatches([]);
+      loadWorks();
+    } catch (error) {
+      console.error('Error confirming NFT matches:', error);
+      alert('Error linking NFT data');
+    } finally {
+      setNftImporting(false);
+    }
+  }
+
+  function toggleNFTMatch(index) {
+    const updatedMatches = [...nftMatches];
+    updatedMatches[index].confirmed = !updatedMatches[index].confirmed;
+    setNftMatches(updatedMatches);
+  }
+
   const hasActiveFilters = searchTerm || filterFormat || filterStatus;
 
   if (loading) {
@@ -386,6 +474,13 @@ function DigitalWorkList() {
           </button>
           <button className="btn btn-secondary" onClick={() => setShowVideoImportDialog(true)}>
             Import Videos
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={handleNFTImport}
+            disabled={nftImporting}
+          >
+            {nftImporting ? 'Fetching NFTs...' : 'Import NFT Data'}
           </button>
           <button className="btn btn-primary" onClick={() => navigate('/digital-works/new')}>
             Add New Digital Work
@@ -720,6 +815,85 @@ function DigitalWorkList() {
                 disabled={!parsedVideos || parsedVideos.videos.length === 0 || importing}
               >
                 {importing ? 'Importing...' : `Import ${parsedVideos?.videos.length || 0} Videos`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NFT Matching Dialog */}
+      {showNftDialog && (
+        <div className="modal-overlay" onClick={() => setShowNftDialog(false)}>
+          <div className="modal-content import-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+            <h3>Match NFTs to Digital Works</h3>
+            <p style={{ color: '#7f8c8d', marginBottom: '20px' }}>
+              {nftMatches.length} NFT{nftMatches.length !== 1 ? 's' : ''} matched to your videos. Review and confirm the matches below.
+            </p>
+
+            {nftMatches.length > 0 ? (
+              <div style={{ maxHeight: '400px', overflow: 'auto', marginBottom: '20px' }}>
+                <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#f8f9fa' }}>
+                    <tr>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>
+                        <input
+                          type="checkbox"
+                          checked={nftMatches.every(m => m.confirmed)}
+                          onChange={(e) => {
+                            const allConfirmed = e.target.checked;
+                            setNftMatches(nftMatches.map(m => ({ ...m, confirmed: allConfirmed })));
+                          }}
+                        />
+                      </th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Video Title</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>NFT Name</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Token ID</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Editions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {nftMatches.map((match, idx) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                        <td style={{ padding: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={match.confirmed}
+                            onChange={() => toggleNFTMatch(idx)}
+                          />
+                        </td>
+                        <td style={{ padding: '8px' }}>{match.work.title}</td>
+                        <td style={{ padding: '8px' }}>{match.nft.name}</td>
+                        <td style={{ padding: '8px', fontFamily: 'monospace', fontSize: '11px' }}>
+                          {match.nft.token_id}
+                        </td>
+                        <td style={{ padding: '8px' }}>{match.nft.supply || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p style={{ textAlign: 'center', color: '#7f8c8d', padding: '40px 0' }}>
+                No NFTs could be automatically matched. Try manually editing works to add NFT data.
+              </p>
+            )}
+
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowNftDialog(false);
+                  setNftMatches([]);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={confirmNFTMatches}
+                disabled={nftImporting || !nftMatches.some(m => m.confirmed)}
+              >
+                {nftImporting ? 'Linking...' : `Link ${nftMatches.filter(m => m.confirmed).length} NFT${nftMatches.filter(m => m.confirmed).length !== 1 ? 's' : ''}`}
               </button>
             </div>
           </div>

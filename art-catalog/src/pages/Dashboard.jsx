@@ -163,21 +163,9 @@ function Dashboard() {
       </div>
 
       {/* Debug Panel */}
-      <div
-        style={{
-          background: '#f8f9fa',
-          padding: '20px',
-          borderRadius: '8px',
-          marginTop: '20px',
-          border: '1px solid #dee2e6',
-        }}
-      >
-        <h4 style={{ marginBottom: '12px', color: '#495057', fontSize: '14px' }}>
-          Database Debug Tools
-        </h4>
-        <p style={{ color: '#6c757d', fontSize: '12px', marginBottom: '16px' }}>
-          Use these tools if images aren't uploading or displaying correctly.
-        </p>
+      <div className="debug-panel">
+        <h4>Database Debug Tools</h4>
+        <p>Use these tools if images aren't uploading or displaying correctly.</p>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             className="btn btn-secondary btn-sm"
@@ -202,7 +190,7 @@ function Dashboard() {
             Reset Database
           </button>
         </div>
-        <p style={{ color: '#6c757d', fontSize: '11px', marginTop: '12px', fontStyle: 'italic' }}>
+        <p style={{ fontSize: '11px', marginTop: '12px', fontStyle: 'italic' }}>
           Note: If images aren't working, try "Check Database" first, then "Reset Database" if
           file_references table is missing.
         </p>

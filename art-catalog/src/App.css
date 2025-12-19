@@ -270,6 +270,76 @@ body.dark-mode .preview-table td {
   color: #e0e0e0;
 }
 
+/* Debug panel */
+.debug-panel {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #dee2e6;
+}
+
+body.dark-mode .debug-panel {
+  background: #2d2d2d;
+  border-color: #404040;
+}
+
+.debug-panel h4 {
+  margin-bottom: 12px;
+  color: #495057;
+  font-size: 14px;
+}
+
+body.dark-mode .debug-panel h4 {
+  color: #e0e0e0;
+}
+
+.debug-panel p {
+  color: #6c757d;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+body.dark-mode .debug-panel p {
+  color: #a0a0a0;
+}
+
+/* Search and filter controls */
+.search-filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-input,
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: #2c3e50;
+  transition: border-color 0.2s;
+}
+
+body.dark-mode .search-input,
+body.dark-mode .filter-select {
+  background: #1a1a1a;
+  border-color: #404040;
+  color: #e0e0e0;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+body.dark-mode .search-input::placeholder {
+  color: #707070;
+}
+
 .app {
   display: flex;
   height: 100vh;
