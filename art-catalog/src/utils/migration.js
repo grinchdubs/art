@@ -26,31 +26,40 @@ async function urlToFile(url, filename) {
   }
 }
 
-// Migrate gallery images
+// Migrate images from file_references
 async function migrateImages() {
-  const images = await db.gallery_images.toArray();
-  migrationStatus.progress.images.total = images.length;
+  const fileRefs = await db.file_references.toArray();
+  const digitalFileRefs = await db.digital_file_references.toArray();
+  const allImages = [...fileRefs, ...digitalFileRefs];
 
-  const imageIdMap = new Map(); // Map old IDs to new IDs
+  migrationStatus.progress.images.total = allImages.length;
 
-  for (const image of images) {
+  const imageIdMap = new Map(); // Map old file_path to new image ID
+
+  for (const fileRef of allImages) {
     try {
+      // Skip if we've already uploaded this file path
+      if (imageIdMap.has(fileRef.file_path)) {
+        continue;
+      }
+
       // Convert blob URL to file if needed
       let fileToUpload = null;
+      const filename = fileRef.file_path.split('/').pop() || `image-${Date.now()}.jpg`;
 
-      if (image.file_path && image.file_path.startsWith('blob:')) {
-        fileToUpload = await urlToFile(image.file_path, image.filename);
-      } else if (image.blob) {
-        fileToUpload = new File([image.blob], image.filename, { type: image.mime_type });
+      if (fileRef.file_path && fileRef.file_path.startsWith('blob:')) {
+        fileToUpload = await urlToFile(fileRef.file_path, filename);
       }
 
       if (fileToUpload) {
         const uploadedImage = await galleryAPI.uploadSingle(fileToUpload);
-        imageIdMap.set(image.id, uploadedImage.id);
+        imageIdMap.set(fileRef.file_path, uploadedImage.id);
         migrationStatus.progress.images.migrated++;
+      } else {
+        console.warn(`Could not convert file path to upload: ${fileRef.file_path}`);
       }
     } catch (error) {
-      console.error(`Error migrating image ${image.id}:`, error);
+      console.error(`Error migrating image ${fileRef.file_path}:`, error);
     }
   }
 
@@ -66,21 +75,21 @@ async function migrateArtworks(imageIdMap) {
 
   for (const artwork of artworks) {
     try {
-      // Get associated images
-      const artworkImages = await db.artwork_images
+      // Get associated images from file_references
+      const fileRefs = await db.file_references
         .where('artwork_id')
         .equals(artwork.id)
         .toArray();
 
-      // Map old image IDs to new image IDs
-      const mappedImages = artworkImages
-        .map(ai => {
-          const newImageId = imageIdMap.get(ai.image_id);
+      // Map file paths to new image IDs
+      const mappedImages = fileRefs
+        .map((fr, index) => {
+          const newImageId = imageIdMap.get(fr.file_path);
           if (!newImageId) return null;
           return {
             id: newImageId,
-            is_primary: ai.is_primary,
-            display_order: ai.display_order,
+            is_primary: fr.is_primary || false,
+            display_order: index,
           };
         })
         .filter(img => img !== null);
@@ -113,21 +122,21 @@ async function migrateDigitalWorks(imageIdMap) {
 
   for (const work of digitalWorks) {
     try {
-      // Get associated images
-      const digitalWorkImages = await db.digital_work_images
+      // Get associated images from digital_file_references
+      const fileRefs = await db.digital_file_references
         .where('digital_work_id')
         .equals(work.id)
         .toArray();
 
-      // Map old image IDs to new image IDs
-      const mappedImages = digitalWorkImages
-        .map(dwi => {
-          const newImageId = imageIdMap.get(dwi.image_id);
+      // Map file paths to new image IDs
+      const mappedImages = fileRefs
+        .map((fr, index) => {
+          const newImageId = imageIdMap.get(fr.file_path);
           if (!newImageId) return null;
           return {
             id: newImageId,
-            is_primary: dwi.is_primary,
-            display_order: dwi.display_order,
+            is_primary: fr.is_primary || false,
+            display_order: index,
           };
         })
         .filter(img => img !== null);
@@ -255,12 +264,11 @@ export async function exportIndexedDBData() {
     artworks: await db.artworks.toArray(),
     digital_works: await db.digital_works.toArray(),
     exhibitions: await db.exhibitions.toArray(),
-    artwork_images: await db.artwork_images.toArray(),
-    digital_work_images: await db.digital_work_images.toArray(),
+    file_references: await db.file_references.toArray(),
+    digital_file_references: await db.digital_file_references.toArray(),
     artwork_exhibitions: await db.artwork_exhibitions.toArray(),
     digital_work_exhibitions: await db.digital_work_exhibitions.toArray(),
     location_history: await db.location_history.toArray(),
-    gallery_images: await db.gallery_images.toArray(),
   };
 
   const jsonString = JSON.stringify(data, null, 2);
