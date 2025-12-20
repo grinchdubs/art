@@ -27,13 +27,15 @@ export function parseCSV(csvText) {
     'Notes'
   ];
 
-  // Validate headers
-  const hasValidHeaders = expectedHeaders.every(header =>
-    headers.some(h => h.toLowerCase() === header.toLowerCase())
-  );
+  // Debug: log the headers
+  console.log('Parsed headers:', headers);
+  console.log('Expected headers:', expectedHeaders);
 
-  if (!hasValidHeaders) {
-    throw new Error('CSV headers do not match expected format. Please use the export template.');
+  // Validate headers - check if at least Title is present (most important field)
+  const hasTitle = headers.some(h => h.toLowerCase().trim() === 'title');
+
+  if (!hasTitle) {
+    throw new Error(`CSV headers do not match expected format. Found headers: ${headers.join(', ')}. Please use the export template.`);
   }
 
   // Parse data rows
