@@ -392,7 +392,13 @@ body.dark-mode .search-input::placeholder {
   flex: 1;
   padding: 20px 30px;
   overflow-y: auto;
-  max-width: 100%;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.main-content > div {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .page-header {
@@ -830,15 +836,13 @@ body.dark-mode .detail-sidebar > div[style*="borderTop"] {
 
 /* Detail image section */
 .detail-image-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 body.dark-mode .detail-image-section {
-  background: #2d2d2d;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  background: transparent !important;
 }
