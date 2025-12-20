@@ -1,4 +1,4 @@
-import db from '../db';
+import { db } from '../db';
 import { artworkAPI, digitalWorkAPI, exhibitionAPI, galleryAPI } from './api';
 
 // Migration status tracker
