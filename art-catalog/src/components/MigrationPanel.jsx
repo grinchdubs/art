@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { migrateData, exportIndexedDBData, migrationStatus } from '../utils/migration';
 import './MigrationPanel.css';
 
@@ -7,6 +7,28 @@ function MigrationPanel() {
   const [migrating, setMigrating] = useState(false);
   const [progress, setProgress] = useState('');
   const [result, setResult] = useState(null);
+  const [stats, setStats] = useState({
+    images: { total: 0, migrated: 0 },
+    artworks: { total: 0, migrated: 0 },
+    digitalWorks: { total: 0, migrated: 0 },
+    exhibitions: { total: 0, migrated: 0 },
+  });
+
+  // Poll migration status while migrating
+  useEffect(() => {
+    if (!migrating) return;
+
+    const interval = setInterval(() => {
+      setStats({
+        images: { ...migrationStatus.progress.images },
+        artworks: { ...migrationStatus.progress.artworks },
+        digitalWorks: { ...migrationStatus.progress.digitalWorks },
+        exhibitions: { ...migrationStatus.progress.exhibitions },
+      });
+    }, 100); // Update every 100ms
+
+    return () => clearInterval(interval);
+  }, [migrating]);
 
   const handleMigrate = async () => {
     if (!confirm('This will migrate all your data from browser storage to the PostgreSQL database. Make sure the backend server is running. Continue?')) {
@@ -107,10 +129,10 @@ function MigrationPanel() {
               <p>{progress}</p>
               {migrating && (
                 <div className="progress-stats">
-                  <div>Images: {migrationStatus.progress.images.migrated}/{migrationStatus.progress.images.total}</div>
-                  <div>Artworks: {migrationStatus.progress.artworks.migrated}/{migrationStatus.progress.artworks.total}</div>
-                  <div>Digital Works: {migrationStatus.progress.digitalWorks.migrated}/{migrationStatus.progress.digitalWorks.total}</div>
-                  <div>Exhibitions: {migrationStatus.progress.exhibitions.migrated}/{migrationStatus.progress.exhibitions.total}</div>
+                  <div>Images: {stats.images.migrated}/{stats.images.total}</div>
+                  <div>Artworks: {stats.artworks.migrated}/{stats.artworks.total}</div>
+                  <div>Digital Works: {stats.digitalWorks.migrated}/{stats.digitalWorks.total}</div>
+                  <div>Exhibitions: {stats.exhibitions.migrated}/{stats.exhibitions.total}</div>
                 </div>
               )}
             </div>

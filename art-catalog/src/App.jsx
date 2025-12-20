@@ -13,6 +13,7 @@ import ExhibitionDetail from './pages/ExhibitionDetail';
 import DigitalWorkList from './pages/DigitalWorkList';
 import DigitalWorkForm from './pages/DigitalWorkForm';
 import DigitalWorkDetail from './pages/DigitalWorkDetail';
+import Gallery from './pages/Gallery';
 
 // Import components
 import MigrationPanel from './components/MigrationPanel';
@@ -57,6 +58,13 @@ function Sidebar() {
         </div>
         <Link to="/digital-works" className={`nav-link ${isActive('/digital-works') ? 'active' : ''}`}>
           All Digital Works
+        </Link>
+
+        <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
+          Media
+        </div>
+        <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}>
+          Image Gallery
         </Link>
       </nav>
       <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -110,6 +118,7 @@ function AppContent() {
           <Route path="/digital-works/new" element={<DigitalWorkForm />} />
           <Route path="/digital-works/edit/:id" element={<DigitalWorkForm />} />
           <Route path="/digital-works/:id" element={<DigitalWorkDetail />} />
+          <Route path="/gallery" element={<Gallery />} />
         </Routes>
       </div>
     </div>

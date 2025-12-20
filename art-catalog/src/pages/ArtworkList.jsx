@@ -698,6 +698,17 @@ function ArtworkList() {
 
                 <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
                   <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const selectedWorks = artworks.filter(a => selectedArtworks.has(a.id));
+                      exportToCSV(selectedWorks);
+                    }}
+                    style={{ width: '100%', marginBottom: '12px' }}
+                  >
+                    Export {selectedArtworks.size} Works to CSV
+                  </button>
+
+                  <button
                     className="btn btn-danger"
                     onClick={handleBatchDelete}
                     style={{ width: '100%' }}
