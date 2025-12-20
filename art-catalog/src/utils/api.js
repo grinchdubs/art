@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+// When running in production (Docker), use relative URLs so nginx can proxy
+// When running in development, use localhost:3002
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3002');
 
 // Helper function for API calls
 async function apiCall(endpoint, options = {}) {
