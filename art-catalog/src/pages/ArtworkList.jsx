@@ -255,21 +255,19 @@ function ArtworkList() {
         ? new Date(artwork.creation_date).getFullYear()
         : new Date().getFullYear();
 
-      // Generate NAME part from medium or title
+      // Generate NAME part from title
       let namePart = '';
-      if (artwork.medium) {
-        namePart = artwork.medium.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      } else if (artwork.title) {
-        namePart = artwork.title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 10);
+      if (artwork.title) {
+        namePart = artwork.title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       }
 
       if (!namePart) {
         // Fallback to generic name
-        namePart = 'WORK';
+        namePart = 'UNTITLED';
       }
 
       // Filter artworks with similar inventory pattern
-      const prefix = `GRNCH-${year}-${namePart}-`;
+      const prefix = `GRNCH-${namePart}-${year}-`;
       const similarArtworks = existingArtworks.filter(a =>
         a.inventory_number && a.inventory_number.startsWith(prefix)
       );

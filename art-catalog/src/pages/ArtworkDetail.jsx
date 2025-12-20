@@ -269,19 +269,18 @@ function ArtworkDetail() {
         <div style={{ marginTop: '30px' }}>
           <h3 style={{ marginBottom: '16px' }}>Location History</h3>
           {locationHistory.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>No location changes recorded yet</p>
+            <div className="history-empty-state">
+              <p>No location changes recorded yet</p>
             </div>
           ) : (
             <div style={{ position: 'relative', paddingLeft: '24px' }}>
               {/* Timeline line */}
-              <div style={{
+              <div className="timeline-line" style={{
                 position: 'absolute',
                 left: '8px',
                 top: '8px',
                 bottom: '8px',
-                width: '2px',
-                background: '#e0e0e0'
+                width: '2px'
               }}></div>
 
               {locationHistory.map((entry, index) => (
@@ -306,8 +305,7 @@ function ArtworkDetail() {
                     boxShadow: '0 0 0 2px #e0e0e0'
                   }}></div>
 
-                  <div style={{
-                    background: 'white',
+                  <div className="location-item" style={{
                     padding: '12px 16px',
                     borderRadius: '8px',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -332,16 +330,16 @@ function ArtworkDetail() {
         <div style={{ marginTop: '30px' }}>
           <h3 style={{ marginBottom: '16px' }}>Exhibition History</h3>
           {exhibitions.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>This work has not been exhibited yet</p>
+            <div className="history-empty-state">
+              <p>This work has not been exhibited yet</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {exhibitions.map((exhibition) => (
                 <div
                   key={exhibition.id}
+                  className="exhibition-item"
                   style={{
-                    background: 'white',
                     padding: '16px',
                     borderRadius: '8px',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
