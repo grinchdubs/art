@@ -33,34 +33,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Art Catalog API is running' });
 });
 
-// Initialize database
-async function initializeDatabase() {
-  try {
-    const initSQL = fs.readFileSync(path.join(__dirname, 'init-db.sql'), 'utf8');
-    await pool.query(initSQL);
-    console.log('✅ Database initialized successfully');
-  } catch (error) {
-    console.error('❌ Error initializing database:', error);
-    throw error;
-  }
-}
-
 // Start server
-async function startServer() {
-  try {
-    // Initialize database first
-    await initializeDatabase();
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Art Catalog API server running on http://localhost:${PORT}`);
-      console.log(`📁 Image uploads directory: ${path.join(__dirname, '../uploads')}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`🚀 Art Catalog API server running on http://localhost:${PORT}`);
+  console.log(`📁 Image uploads directory: ${path.join(__dirname, '../uploads')}`);
+});
 
 module.exports = app;
