@@ -78,7 +78,7 @@ function DigitalWorkDetail() {
   const primaryFile = files.find(f => f.is_primary === 1) || files[0];
 
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '100%' }}>
       <div className="page-header">
         <h2>{work.title}</h2>
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -94,9 +94,9 @@ function DigitalWorkDetail() {
         </div>
       </div>
 
-      <div className="detail-container">
-        <div className="detail-grid">
-          <div className="detail-main">
+      <div className="detail-container" style={{ width: '100%', maxWidth: '100%' }}>
+        <div className="detail-grid" style={{ width: '100%', maxWidth: '100%' }}>
+          <div className="detail-main" style={{ width: '100%', maxWidth: '100%' }}>
             {work.embed_url && (
               <div className="detail-image-section">
                 <div style={{
