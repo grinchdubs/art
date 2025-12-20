@@ -14,6 +14,9 @@ import DigitalWorkList from './pages/DigitalWorkList';
 import DigitalWorkForm from './pages/DigitalWorkForm';
 import DigitalWorkDetail from './pages/DigitalWorkDetail';
 
+// Import components
+import MigrationPanel from './components/MigrationPanel';
+
 // Create dark mode context
 const DarkModeContext = createContext();
 
@@ -136,6 +139,7 @@ function App() {
     <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>
       <BrowserRouter>
         <AppContent />
+        <MigrationPanel />
       </BrowserRouter>
     </DarkModeContext.Provider>
   );
