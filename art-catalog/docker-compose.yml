@@ -27,9 +27,9 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://artcatalog:artcatalog123@db:5432/artcatalog
-      - PORT=3001
+      - PORT=3002
     ports:
-      - "3001:3001"
+      - "3002:3002"
     volumes:
       - ./backend/uploads:/app/uploads
     depends_on:
@@ -46,7 +46,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://localhost:3001
+      - VITE_API_URL=http://localhost:3002
     depends_on:
       - backend
 
