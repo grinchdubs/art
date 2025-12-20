@@ -401,6 +401,10 @@ body.dark-mode .search-input::placeholder {
   max-width: 100% !important;
 }
 
+.main-content * {
+  max-width: 100% !important;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -528,7 +532,8 @@ body.dark-mode .search-input::placeholder {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
+  max-width: 100%;
+  width: 100%;
 }
 
 .form-group {
