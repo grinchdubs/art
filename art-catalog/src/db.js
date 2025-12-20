@@ -67,6 +67,15 @@ db.version(6).stores({
 
 // Artwork operations
 export const artworkOperations = {
+  add: async (artwork) => {
+    const id = await db.artworks.add({
+      ...artwork,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    return { id, ...artwork };
+  },
+
   create: async (artwork) => {
     const id = await db.artworks.add({
       ...artwork,
