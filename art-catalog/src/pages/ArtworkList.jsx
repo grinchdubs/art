@@ -266,27 +266,23 @@ function ArtworkList() {
         namePart = 'UNTITLED';
       }
 
-      // Filter artworks with similar inventory pattern
-      const prefix = `GRNCH-${namePart}-${year}-`;
-      const similarArtworks = existingArtworks.filter(a =>
-        a.inventory_number && a.inventory_number.startsWith(prefix)
-      );
-
-      // Extract series numbers and find the max
+      // Find the maximum sequence number across ALL artworks
       let maxSeriesNumber = 0;
-      similarArtworks.forEach(existing => {
-        const match = existing.inventory_number.match(/-(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num > maxSeriesNumber) {
-            maxSeriesNumber = num;
+      existingArtworks.forEach(existing => {
+        if (existing.inventory_number) {
+          const match = existing.inventory_number.match(/-(\d+)$/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxSeriesNumber) {
+              maxSeriesNumber = num;
+            }
           }
         }
       });
 
       // Generate new series number (pad to 3 digits)
       const newSeriesNumber = String(maxSeriesNumber + 1).padStart(3, '0');
-      return `${prefix}${newSeriesNumber}`;
+      return `GRNCH-${namePart}-${year}-${newSeriesNumber}`;
     } catch (error) {
       console.error('Error generating inventory number:', error);
       // Fallback to timestamp-based number
