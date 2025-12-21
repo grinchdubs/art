@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { artworkOperations, fileOperations } from '../db';
+import { artworkAPI, galleryAPI, getImageURL } from '../utils/api';
 
 function ArtworkForm() {
   const { id } = useParams();
@@ -20,10 +20,13 @@ function ArtworkForm() {
     notes: '',
   });
 
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [existingFiles, setExistingFiles] = useState([]);
+  const [allGalleryImages, setAllGalleryImages] = useState([]);
+  const [selectedImageIds, setSelectedImageIds] = useState([]);
+  const [primaryImageId, setPrimaryImageId] = useState(null);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
+    loadGalleryImages();
     if (isEdit) {
       loadArtwork();
     }
@@ -36,37 +39,38 @@ function ArtworkForm() {
     }
   }, [formData.creation_date, formData.medium, formData.title, formData.series_name]);
 
+  async function loadGalleryImages() {
+    try {
+      const images = await galleryAPI.getAll();
+      setAllGalleryImages(images);
+    } catch (error) {
+      console.error('Error loading gallery images:', error);
+    }
+  }
+
   async function generateInventoryNumber() {
     try {
-      // Extract year from creation_date or use current year
       const year = formData.creation_date
         ? new Date(formData.creation_date).getFullYear()
         : new Date().getFullYear();
 
-      // Generate NAME part from medium or title
       let namePart = '';
       if (formData.medium) {
-        // Use medium (e.g., "Pen plot" -> "PENPLOT")
         namePart = formData.medium.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       } else if (formData.title) {
-        // Fallback to title
         namePart = formData.title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 10);
       }
 
       if (!namePart) {
-        return; // Don't generate if we don't have enough info
+        return;
       }
 
-      // Get all existing artworks to find the next series number
-      const allArtworks = await artworkOperations.getAll();
-
-      // Filter artworks with similar inventory pattern
+      const allArtworks = await artworkAPI.getAll();
       const prefix = `GRNCH-${year}-${namePart}-`;
       const similarArtworks = allArtworks.filter(a =>
         a.inventory_number && a.inventory_number.startsWith(prefix)
       );
 
-      // Extract series numbers and find the max
       let maxSeriesNumber = 0;
       similarArtworks.forEach(artwork => {
         const match = artwork.inventory_number.match(/-(\d+)$/);
@@ -78,7 +82,6 @@ function ArtworkForm() {
         }
       });
 
-      // Generate new series number (pad to 3 digits)
       const newSeriesNumber = String(maxSeriesNumber + 1).padStart(3, '0');
       const inventoryNumber = `${prefix}${newSeriesNumber}`;
 
@@ -90,12 +93,19 @@ function ArtworkForm() {
 
   async function loadArtwork() {
     try {
-      const artwork = await artworkOperations.getById(id);
+      const artwork = await artworkAPI.getById(id);
       setFormData(artwork);
 
-      // Load existing files
-      const files = await fileOperations.getFilesForArtwork(id);
-      setExistingFiles(files);
+      // Load associated images
+      if (artwork.images && artwork.images.length > 0 && artwork.images[0].id) {
+        const imageIds = artwork.images.map(img => img.id);
+        setSelectedImageIds(imageIds);
+
+        const primary = artwork.images.find(img => img.is_primary);
+        if (primary) {
+          setPrimaryImageId(primary.id);
+        }
+      }
     } catch (error) {
       console.error('Error loading artwork:', error);
     }
@@ -106,35 +116,28 @@ function ArtworkForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  async function handleFileChange(e) {
-    const files = Array.from(e.target.files);
-    const filePromises = files.map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          resolve({
-            name: file.name,
-            type: file.type,
-            data: event.target.result,
-            preview: event.target.result
-          });
-        };
-        reader.readAsDataURL(file);
-      });
+  function toggleImageSelection(imageId) {
+    setSelectedImageIds(prev => {
+      if (prev.includes(imageId)) {
+        // Removing image
+        if (primaryImageId === imageId) {
+          setPrimaryImageId(null);
+        }
+        return prev.filter(id => id !== imageId);
+      } else {
+        // Adding image - if it's the first one, make it primary
+        const newIds = [...prev, imageId];
+        if (newIds.length === 1) {
+          setPrimaryImageId(imageId);
+        }
+        return newIds;
+      }
     });
-
-    const loadedFiles = await Promise.all(filePromises);
-    setUploadedFiles(prev => [...prev, ...loadedFiles]);
   }
 
-  function removeUploadedFile(index) {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  }
-
-  async function removeExistingFile(fileId) {
-    if (window.confirm('Remove this file?')) {
-      await fileOperations.deleteFile(fileId);
-      setExistingFiles(prev => prev.filter(f => f.id !== fileId));
+  function setPrimaryImage(imageId) {
+    if (selectedImageIds.includes(imageId)) {
+      setPrimaryImageId(imageId);
     }
   }
 
@@ -142,28 +145,22 @@ function ArtworkForm() {
     e.preventDefault();
 
     try {
-      let artworkId = id;
+      // Build images array
+      const images = selectedImageIds.map((imageId, index) => ({
+        id: imageId,
+        is_primary: imageId === primaryImageId,
+        display_order: index
+      }));
+
+      const payload = {
+        ...formData,
+        images
+      };
 
       if (isEdit) {
-        await artworkOperations.update(id, formData);
+        await artworkAPI.update(id, payload);
       } else {
-        const result = await artworkOperations.create(formData);
-        artworkId = result.id;
-        console.log('Created artwork with ID:', artworkId);
-      }
-
-      // Save uploaded files
-      console.log('Uploading', uploadedFiles.length, 'files for artwork', artworkId);
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        const file = uploadedFiles[i];
-        console.log('Uploading file', i + 1, ':', file.name, file.type);
-        const fileId = await fileOperations.addFile(
-          artworkId,
-          file.data,
-          file.type,
-          i === 0 && existingFiles.length === 0 // First file is primary if no existing files
-        );
-        console.log('File uploaded with ID:', fileId);
+        await artworkAPI.create(payload);
       }
 
       navigate('/artworks');
@@ -172,6 +169,8 @@ function ArtworkForm() {
       alert('Error saving work. Please try again.');
     }
   }
+
+  const selectedImages = allGalleryImages.filter(img => selectedImageIds.includes(img.id));
 
   return (
     <div>
@@ -333,75 +332,51 @@ function ArtworkForm() {
             />
           </div>
 
+          {/* Image Selection */}
           <div className="form-group">
-            <label>Images & Videos</label>
-            <input
-              type="file"
-              className="form-control"
-              onChange={handleFileChange}
-              accept="image/*,video/*"
-              multiple
-            />
-            <small style={{ color: '#7f8c8d', fontSize: '12px', display: 'block', marginTop: '8px' }}>
-              Upload images or videos of your work. Multiple files supported.
-            </small>
+            <label>Images</label>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowImagePicker(true)}
+              style={{ display: 'block', marginBottom: '16px' }}
+            >
+              Select from Gallery ({selectedImageIds.length} selected)
+            </button>
 
-            {/* Show existing files */}
-            {existingFiles.length > 0 && (
+            {selectedImages.length > 0 && (
               <div style={{ marginTop: '16px' }}>
                 <strong style={{ fontSize: '14px', display: 'block', marginBottom: '12px' }}>
-                  Existing Files:
+                  Selected Images:
                 </strong>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
-                  {existingFiles.map((file) => (
-                    <div key={file.id} style={{ position: 'relative' }}>
-                      {file.file_type.startsWith('image/') ? (
-                        <img
-                          src={file.file_path}
-                          alt="Work"
-                          style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '6px' }}
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '120px', background: '#ecf0f1', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
-                          🎥
-                        </div>
-                      )}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px' }}>
+                  {selectedImages.map((image) => (
+                    <div key={image.id} style={{ position: 'relative', border: image.id === primaryImageId ? '3px solid #3498db' : '2px solid #ecf0f1', borderRadius: '8px', overflow: 'hidden' }}>
+                      <img
+                        src={getImageURL(image.file_path)}
+                        alt={image.original_name}
+                        style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                      />
+                      <div style={{ padding: '8px', background: 'white' }}>
+                        <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {image.original_name}
+                        </p>
+                        {image.id === primaryImageId && (
+                          <span style={{ fontSize: '10px', color: '#3498db', fontWeight: '600' }}>PRIMARY</span>
+                        )}
+                        {image.id !== primaryImageId && (
+                          <button
+                            type="button"
+                            onClick={() => setPrimaryImage(image.id)}
+                            style={{ fontSize: '10px', background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', padding: 0 }}
+                          >
+                            Set as primary
+                          </button>
+                        )}
+                      </div>
                       <button
                         type="button"
-                        onClick={() => removeExistingFile(file.id)}
-                        style={{ position: 'absolute', top: '4px', right: '4px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', fontSize: '12px' }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Show newly uploaded files */}
-            {uploadedFiles.length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '12px' }}>
-                  New Files to Upload:
-                </strong>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} style={{ position: 'relative' }}>
-                      {file.type.startsWith('image/') ? (
-                        <img
-                          src={file.preview}
-                          alt={file.name}
-                          style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '6px' }}
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '120px', background: '#ecf0f1', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
-                          🎥
-                        </div>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeUploadedFile(index)}
+                        onClick={() => toggleImageSelection(image.id)}
                         style={{ position: 'absolute', top: '4px', right: '4px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', fontSize: '12px' }}
                       >
                         ×
@@ -427,6 +402,97 @@ function ArtworkForm() {
           </div>
         </form>
       </div>
+
+      {/* Image Picker Modal */}
+      {showImagePicker && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Select Images from Gallery</h3>
+
+            {allGalleryImages.length === 0 ? (
+              <p style={{ color: '#7f8c8d', textAlign: 'center', padding: '40px 0' }}>
+                No images in gallery. Upload images in the <a href="/gallery" style={{ color: '#3498db' }}>Image Gallery</a> first.
+              </p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                {allGalleryImages.map((image) => (
+                  <div
+                    key={image.id}
+                    onClick={() => toggleImageSelection(image.id)}
+                    style={{
+                      position: 'relative',
+                      border: selectedImageIds.includes(image.id) ? '3px solid #3498db' : '2px solid #ecf0f1',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <img
+                      src={getImageURL(image.file_path)}
+                      alt={image.original_name}
+                      style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                    />
+                    <div style={{ padding: '8px', background: 'white' }}>
+                      <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {image.original_name}
+                      </p>
+                    </div>
+                    {selectedImageIds.includes(image.id) && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: '#3498db',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                      }}>
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowImagePicker(false)}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { artworkOperations, fileOperations, exhibitionOperations, locationOperations } from '../db';
+import { artworkAPI, getImageURL } from '../utils/api';
 
 function ArtworkDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [artwork, setArtwork] = useState(null);
-  const [files, setFiles] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [exhibitions, setExhibitions] = useState([]);
-  const [locationHistory, setLocationHistory] = useState([]);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [newLocation, setNewLocation] = useState('');
   const [locationNotes, setLocationNotes] = useState('');
@@ -21,24 +18,15 @@ function ArtworkDetail() {
 
   async function loadArtwork() {
     try {
-      const data = await artworkOperations.getById(id);
+      const data = await artworkAPI.getById(id);
       setArtwork(data);
 
-      // Load files
-      const artworkFiles = await fileOperations.getFilesForArtwork(id);
-      setFiles(artworkFiles);
-      if (artworkFiles.length > 0) {
-        const primary = artworkFiles.find(f => f.is_primary === 1) || artworkFiles[0];
-        setSelectedImage(primary.file_path);
+      // Set primary image or first image
+      if (data.images && data.images.length > 0 && data.images[0].id) {
+        const primary = data.images.find(img => img.is_primary);
+        const imageToShow = primary || data.images[0];
+        setSelectedImage(imageToShow.file_path);
       }
-
-      // Load exhibitions
-      const artworkExhibitions = await exhibitionOperations.getExhibitionsForArtwork(id);
-      setExhibitions(artworkExhibitions);
-
-      // Load location history
-      const history = await locationOperations.getHistory(id);
-      setLocationHistory(history);
     } catch (error) {
       console.error('Error loading artwork:', error);
     } finally {
@@ -53,18 +41,12 @@ function ArtworkDetail() {
     }
 
     try {
-      // Add to location history
-      await locationOperations.addHistory(id, newLocation, locationNotes);
+      await artworkAPI.addLocationHistory(id, { location: newLocation, notes: locationNotes });
 
-      // Update artwork's current location
-      await artworkOperations.update(id, { ...artwork, location: newLocation });
-
-      // Reset form and close dialog
       setNewLocation('');
       setLocationNotes('');
       setShowLocationDialog(false);
 
-      // Reload artwork data
       loadArtwork();
     } catch (error) {
       console.error('Error updating location:', error);
@@ -75,7 +57,7 @@ function ArtworkDetail() {
   async function handleDelete() {
     if (window.confirm('Are you sure you want to delete this work? This cannot be undone.')) {
       try {
-        await artworkOperations.delete(id);
+        await artworkAPI.delete(id);
         navigate('/artworks');
       } catch (error) {
         console.error('Error deleting work:', error);
@@ -103,6 +85,9 @@ function ArtworkDetail() {
     );
   }
 
+  const images = artwork.images && artwork.images.length > 0 && artwork.images[0].id ? artwork.images : [];
+  const exhibitions = artwork.exhibitions && artwork.exhibitions.length > 0 && artwork.exhibitions[0].id ? artwork.exhibitions : [];
+
   return (
     <div>
       <div className="detail-view">
@@ -125,57 +110,42 @@ function ArtworkDetail() {
         </div>
 
         {/* Image Gallery */}
-        {files.length > 0 && (
+        {images.length > 0 && (
           <div style={{ marginBottom: '30px' }}>
             {/* Main Image */}
             {selectedImage && (
               <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-                {selectedImage.startsWith('data:video/') ? (
-                  <video
-                    controls
-                    style={{ maxWidth: '100%', maxHeight: '500px', borderRadius: '8px' }}
-                  >
-                    <source src={selectedImage} />
-                  </video>
-                ) : (
-                  <img
-                    src={selectedImage}
-                    alt={artwork.title}
-                    style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px', cursor: 'pointer' }}
-                    onClick={() => window.open(selectedImage, '_blank')}
-                  />
-                )}
+                <img
+                  src={getImageURL(selectedImage)}
+                  alt={artwork.title}
+                  style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px', cursor: 'pointer' }}
+                  onClick={() => window.open(getImageURL(selectedImage), '_blank')}
+                />
               </div>
             )}
 
             {/* Thumbnail Gallery */}
-            {files.length > 1 && (
+            {images.length > 1 && (
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                {files.map((file) => (
+                {images.map((image) => (
                   <div
-                    key={file.id}
-                    onClick={() => setSelectedImage(file.file_path)}
+                    key={image.id}
+                    onClick={() => setSelectedImage(image.file_path)}
                     style={{
                       width: '100px',
                       height: '100px',
                       cursor: 'pointer',
-                      border: selectedImage === file.file_path ? '3px solid #3498db' : '2px solid #ecf0f1',
+                      border: selectedImage === image.file_path ? '3px solid #3498db' : '2px solid #ecf0f1',
                       borderRadius: '6px',
                       overflow: 'hidden',
                       transition: 'all 0.2s'
                     }}
                   >
-                    {file.file_type.startsWith('image/') ? (
-                      <img
-                        src={file.file_path}
-                        alt="Thumbnail"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#ecf0f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>
-                        🎥
-                      </div>
-                    )}
+                    <img
+                      src={getImageURL(image.file_path)}
+                      alt="Thumbnail"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
                 ))}
               </div>
@@ -263,67 +233,6 @@ function ArtworkDetail() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Location History */}
-        <div style={{ marginTop: '30px' }}>
-          <h3 style={{ marginBottom: '16px' }}>Location History</h3>
-          {locationHistory.length === 0 ? (
-            <div className="history-empty-state">
-              <p>No location changes recorded yet</p>
-            </div>
-          ) : (
-            <div style={{ position: 'relative', paddingLeft: '24px' }}>
-              {/* Timeline line */}
-              <div className="timeline-line" style={{
-                position: 'absolute',
-                left: '8px',
-                top: '8px',
-                bottom: '8px',
-                width: '2px'
-              }}></div>
-
-              {locationHistory.map((entry, index) => (
-                <div
-                  key={entry.id}
-                  style={{
-                    position: 'relative',
-                    marginBottom: '20px',
-                    paddingLeft: '20px'
-                  }}
-                >
-                  {/* Timeline dot */}
-                  <div style={{
-                    position: 'absolute',
-                    left: '-8px',
-                    top: '4px',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: index === 0 ? '#3498db' : '#95a5a6',
-                    border: '2px solid white',
-                    boxShadow: '0 0 0 2px #e0e0e0'
-                  }}></div>
-
-                  <div className="location-item" style={{
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}>
-                    <div style={{ fontWeight: '500', marginBottom: '4px' }}>{entry.location}</div>
-                    <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
-                      {new Date(entry.moved_date).toLocaleString()}
-                    </div>
-                    {entry.notes && (
-                      <div style={{ fontSize: '13px', color: '#666', marginTop: '8px', fontStyle: 'italic' }}>
-                        {entry.notes}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Exhibition History */}
