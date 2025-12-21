@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
                'file_path', gi.file_path,
                'is_primary', ai.is_primary,
                'display_order', ai.display_order
-             )) FILTER (WHERE gi.id IS NOT NULL) ORDER BY ai.display_order as images,
+             ) ORDER BY ai.display_order) FILTER (WHERE gi.id IS NOT NULL) as images,
              json_agg(DISTINCT jsonb_build_object(
                'id', e.id,
                'name', e.name,
