@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT a.*,
-             json_agg(DISTINCT jsonb_build_object(
+             json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
                'file_path', gi.file_path,
