@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT dw.*,
-             json_agg(DISTINCT jsonb_build_object(
+             json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
                'file_path', gi.file_path,
@@ -32,13 +32,13 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT dw.*,
-             json_agg(DISTINCT jsonb_build_object(
+             json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
                'file_path', gi.file_path,
                'is_primary', dwi.is_primary,
                'display_order', dwi.display_order
-             )) FILTER (WHERE gi.id IS NOT NULL) ORDER BY dwi.display_order as images,
+             ) ORDER BY dwi.display_order) FILTER (WHERE gi.id IS NOT NULL) as images,
              json_agg(DISTINCT jsonb_build_object(
                'id', e.id,
                'name', e.name,
