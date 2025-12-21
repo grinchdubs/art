@@ -267,9 +267,7 @@ function DigitalWorkList() {
 
           // Note: Thumbnail URLs are stored in the video object
           // The backend will handle saving the file reference
-            }
-          }
-
+          
           successCount++;
         } catch (error) {
           console.error('Error importing video:', error);
