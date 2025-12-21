@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { artworkOperations, fileOperations } from '../db';
+import { artworkAPI, galleryAPI, getImageURL } from '../utils/api';
 import { exportToCSV, exportToJSON, exportToText, exportStats } from '../utils/exportUtils';
 import { parseCSV, downloadTemplate } from '../utils/importUtils';
 
@@ -43,16 +43,15 @@ function ArtworkList() {
 
   async function loadArtworks() {
     try {
-      const data = await artworkOperations.getAll();
+      const data = await artworkAPI.getAll();
       setArtworks(data);
 
       // Load primary image for each artwork
       const images = {};
       for (const artwork of data) {
-        const files = await fileOperations.getFilesForArtwork(artwork.id);
-        const primaryFile = files.find(f => f.is_primary === 1) || files[0];
-        if (primaryFile) {
-          images[artwork.id] = primaryFile.file_path;
+        if (artwork.images && artwork.images.length > 0 && artwork.images[0].id) {
+          const primaryImage = artwork.images.find(img => img.is_primary) || artwork.images[0];
+          images[artwork.id] = getImageURL(primaryImage.file_path);
         }
       }
       setArtworkImages(images);
@@ -159,7 +158,7 @@ function ArtworkList() {
       for (const artworkId of selectedArtworks) {
         const artwork = artworks.find(a => a.id === artworkId);
         if (artwork) {
-          await artworkOperations.update(artworkId, { ...artwork, sale_status: batchStatus });
+          await artworkAPI.update(artworkId, { ...artwork, sale_status: batchStatus });
         }
       }
       await loadArtworks();
@@ -183,7 +182,7 @@ function ArtworkList() {
       for (const artworkId of selectedArtworks) {
         const artwork = artworks.find(a => a.id === artworkId);
         if (artwork) {
-          await artworkOperations.update(artworkId, { ...artwork, location: batchLocation });
+          await artworkAPI.update(artworkId, { ...artwork, location: batchLocation });
         }
       }
       await loadArtworks();
@@ -204,7 +203,7 @@ function ArtworkList() {
 
     try {
       for (const artworkId of selectedArtworks) {
-        await artworkOperations.delete(artworkId);
+        await artworkAPI.delete(artworkId);
       }
       await loadArtworks();
       setSelectedArtworks(new Set());
@@ -303,7 +302,7 @@ function ArtworkList() {
       let errorCount = 0;
 
       // Get all existing artworks for inventory number generation
-      const existingArtworks = await artworkOperations.getAll();
+      const existingArtworks = await artworkAPI.getAll();
 
       for (const artwork of parsedImport) {
         try {
@@ -312,11 +311,8 @@ function ArtworkList() {
             artwork.inventory_number = await generateInventoryNumber(artwork, existingArtworks);
           }
 
-          // Add timestamps
-          artwork.created_at = new Date().toISOString();
-          artwork.updated_at = new Date().toISOString();
-
-          await artworkOperations.add(artwork);
+          // Don't send timestamps - backend will handle them
+          await artworkAPI.create(artwork);
 
           // Add to existing artworks array for next iteration
           existingArtworks.push(artwork);
@@ -794,7 +790,7 @@ function ArtworkList() {
                         onClick={(e) => {
                           e.stopPropagation();
                           if (window.confirm(`Are you sure you want to delete "${artwork.title}"? This cannot be undone.`)) {
-                            artworkOperations.delete(artwork.id).then(() => {
+                            artworkAPI.delete(artwork.id).then(() => {
                               loadArtworks();
                             }).catch((error) => {
                               console.error('Error deleting work:', error);

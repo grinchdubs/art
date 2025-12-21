@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { exhibitionOperations, artworkOperations, fileOperations, digitalExhibitionOperations, digitalWorkOperations, digitalFileOperations } from '../db';
+import { exhibitionAPI, artworkAPI, digitalWorkAPI, getImageURL } from '../utils/api';
 
 function ExhibitionDetail() {
   const { id } = useParams();
@@ -22,44 +22,44 @@ function ExhibitionDetail() {
 
   async function loadExhibition() {
     try {
-      const data = await exhibitionOperations.getById(id);
+      const data = await exhibitionAPI.getById(id);
       setExhibition(data);
 
-      // Get artworks in this exhibition
-      const exhibitionArtworks = await exhibitionOperations.getArtworksForExhibition(id);
-      setArtworks(exhibitionArtworks);
+      // Artworks and digital works are included in the exhibition data from API
+      // Note: Backend would need to support artwork linking for full functionality
+      if (data.artworks && data.artworks.length > 0 && data.artworks[0].id) {
+        setArtworks(data.artworks);
 
-      // Load images for artworks
-      const images = {};
-      for (const artwork of exhibitionArtworks) {
-        const files = await fileOperations.getFilesForArtwork(artwork.id);
-        const primaryFile = files.find(f => f.is_primary === 1) || files[0];
-        if (primaryFile) {
-          images[artwork.id] = primaryFile.file_path;
+        // Extract images from artworks
+        const images = {};
+        for (const artwork of data.artworks) {
+          if (artwork.images && artwork.images.length > 0 && artwork.images[0].id) {
+            const primaryImage = artwork.images.find(img => img.is_primary) || artwork.images[0];
+            images[artwork.id] = getImageURL(primaryImage.file_path);
+          }
         }
+        setArtworkImages(images);
       }
-      setArtworkImages(images);
 
-      // Get digital works in this exhibition
-      const exhibitionDigitalWorks = await digitalExhibitionOperations.getDigitalWorksForExhibition(id);
-      setDigitalWorks(exhibitionDigitalWorks);
+      if (data.digitalWorks && data.digitalWorks.length > 0 && data.digitalWorks[0].id) {
+        setDigitalWorks(data.digitalWorks);
 
-      // Load images for digital works
-      const digitalImages = {};
-      for (const work of exhibitionDigitalWorks) {
-        const files = await digitalFileOperations.getFilesForDigitalWork(work.id);
-        const primaryFile = files.find(f => f.is_primary === 1) || files[0];
-        if (primaryFile) {
-          digitalImages[work.id] = primaryFile.file_path;
+        // Extract images from digital works
+        const digitalImages = {};
+        for (const work of data.digitalWorks) {
+          if (work.images && work.images.length > 0 && work.images[0].id) {
+            const primaryImage = work.images.find(img => img.is_primary) || work.images[0];
+            digitalImages[work.id] = getImageURL(primaryImage.file_path);
+          }
         }
+        setDigitalWorkImages(digitalImages);
       }
-      setDigitalWorkImages(digitalImages);
 
       // Load all artworks and digital works for the add dialogs
-      const all = await artworkOperations.getAll();
+      const all = await artworkAPI.getAll();
       setAllArtworks(all);
 
-      const allDigital = await digitalWorkOperations.getAll();
+      const allDigital = await digitalWorkAPI.getAll();
       setAllDigitalWorks(allDigital);
     } catch (error) {
       console.error('Error loading exhibition:', error);
@@ -71,7 +71,7 @@ function ExhibitionDetail() {
   async function handleDelete() {
     if (window.confirm('Are you sure you want to delete this exhibition? This cannot be undone.')) {
       try {
-        await exhibitionOperations.delete(id);
+        await exhibitionAPI.delete(id);
         navigate('/exhibitions');
       } catch (error) {
         console.error('Error deleting exhibition:', error);
@@ -81,49 +81,66 @@ function ExhibitionDetail() {
   }
 
   async function handleAddArtwork(artworkId) {
+    // Note: Backend API doesn't support linking artworks to exhibitions yet
+    // This would require backend endpoints for artwork_exhibitions table
+    alert('Artwork linking not yet supported in PostgreSQL mode. This feature requires backend updates.');
+    /*
     try {
-      await exhibitionOperations.addArtworkToExhibition(artworkId, id);
+      await exhibitionAPI.addArtworkToExhibition(artworkId, id);
       setShowAddArtwork(false);
-      loadExhibition(); // Reload to show the new artwork
+      loadExhibition();
     } catch (error) {
       console.error('Error adding artwork to exhibition:', error);
       alert('Error adding artwork. Please try again.');
     }
+    */
   }
 
   async function handleRemoveArtwork(artworkId) {
+    // Note: Backend API doesn't support unlinking artworks yet
+    alert('Artwork unlinking not yet supported in PostgreSQL mode. This feature requires backend updates.');
+    /*
     if (window.confirm('Remove this artwork from the exhibition?')) {
       try {
-        await exhibitionOperations.removeArtworkFromExhibition(artworkId, id);
-        loadExhibition(); // Reload to update the list
+        await exhibitionAPI.removeArtworkFromExhibition(artworkId, id);
+        loadExhibition();
       } catch (error) {
         console.error('Error removing artwork:', error);
         alert('Error removing artwork. Please try again.');
       }
     }
+    */
   }
 
   async function handleAddDigitalWork(digitalWorkId) {
+    // Note: Backend API doesn't support linking digital works yet
+    alert('Digital work linking not yet supported in PostgreSQL mode. This feature requires backend updates.');
+    /*
     try {
-      await digitalExhibitionOperations.addDigitalWorkToExhibition(digitalWorkId, id);
+      await exhibitionAPI.addDigitalWorkToExhibition(digitalWorkId, id);
       setShowAddDigitalWork(false);
       loadExhibition();
     } catch (error) {
       console.error('Error adding digital work to exhibition:', error);
       alert('Error adding digital work. Please try again.');
     }
+    */
   }
 
   async function handleRemoveDigitalWork(digitalWorkId) {
+    // Note: Backend API doesn't support unlinking digital works yet
+    alert('Digital work unlinking not yet supported in PostgreSQL mode. This feature requires backend updates.');
+    /*
     if (window.confirm('Remove this digital work from the exhibition?')) {
       try {
-        await digitalExhibitionOperations.removeDigitalWorkFromExhibition(digitalWorkId, id);
+        await exhibitionAPI.removeDigitalWorkFromExhibition(digitalWorkId, id);
         loadExhibition();
       } catch (error) {
         console.error('Error removing digital work:', error);
         alert('Error removing digital work. Please try again.');
       }
     }
+    */
   }
 
   if (loading) {

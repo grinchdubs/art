@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { digitalWorkOperations, digitalFileOperations } from '../db';
+import { digitalWorkAPI, galleryAPI } from '../utils/api';
 
 function DigitalWorkForm() {
   const { id } = useParams();
@@ -33,11 +33,13 @@ function DigitalWorkForm() {
 
   async function loadWork() {
     try {
-      const work = await digitalWorkOperations.getById(id);
+      const work = await digitalWorkAPI.getById(id);
       if (work) {
         setFormData(work);
-        const files = await digitalFileOperations.getFilesForDigitalWork(id);
-        setExistingFiles(files);
+        // Files are included in the work data from API
+        if (work.images && work.images.length > 0 && work.images[0].id) {
+          setExistingFiles(work.images);
+        }
       }
     } catch (error) {
       console.error('Error loading digital work:', error);
@@ -47,7 +49,7 @@ function DigitalWorkForm() {
 
   async function generateInventoryNumber() {
     try {
-      const allWorks = await digitalWorkOperations.getAll();
+      const allWorks = await digitalWorkAPI.getAll();
       const year = new Date().getFullYear();
       const prefix = `GRNCH-DIG-${year}-`;
 
@@ -88,7 +90,7 @@ function DigitalWorkForm() {
   async function handleDeleteFile(fileId) {
     if (window.confirm('Are you sure you want to delete this file?')) {
       try {
-        await digitalFileOperations.deleteFile(fileId);
+        await galleryAPI.delete(fileId);
         setExistingFiles(existingFiles.filter(f => f.id !== fileId));
       } catch (error) {
         console.error('Error deleting file:', error);
@@ -102,36 +104,27 @@ function DigitalWorkForm() {
 
     try {
       let workId;
+      let work;
 
       if (isEdit) {
-        await digitalWorkOperations.update(id, formData);
+        work = await digitalWorkAPI.update(id, formData);
         workId = id;
       } else {
-        const result = await digitalWorkOperations.add(formData);
-        workId = result.id;
+        work = await digitalWorkAPI.create(formData);
+        workId = work.id;
       }
 
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        const file = uploadedFiles[i];
-        const reader = new FileReader();
-
-        await new Promise((resolve, reject) => {
-          reader.onload = async (e) => {
-            try {
-              await digitalFileOperations.addFile(
-                workId,
-                e.target.result,
-                file.type,
-                i === 0 && existingFiles.length === 0
-              );
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+      // Upload new files if any
+      if (uploadedFiles.length > 0) {
+        if (uploadedFiles.length === 1) {
+          // Single file upload
+          await galleryAPI.uploadSingle(uploadedFiles[0]);
+        } else {
+          // Batch upload
+          await galleryAPI.uploadBatch(uploadedFiles);
+        }
+        // Note: The backend would need to be updated to link uploaded images to digital works
+        // For now, images are uploaded to the gallery but not automatically linked
       }
 
       navigate('/digital-works');

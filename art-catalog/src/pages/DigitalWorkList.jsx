@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { digitalWorkOperations, digitalFileOperations } from '../db';
+import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
 import { exportDigitalWorksToCSV, exportDigitalWorksToJSON, exportDigitalWorksToText, exportDigitalWorksStats } from '../utils/digitalExportUtils';
 import { parseDigitalWorksCSV, downloadDigitalWorksTemplate } from '../utils/digitalImportUtils';
 import { parseVideoUrls, getVideoImportExample, fetchVideoTitles } from '../utils/videoImportUtils';
@@ -44,7 +44,7 @@ function DigitalWorkList() {
 
   async function loadWorks() {
     try {
-      const data = await digitalWorkOperations.getAll();
+      const data = await digitalWorkAPI.getAll();
 
       // Sort by inventory number (oldest first)
       const sortedData = data.sort((a, b) => {
@@ -57,10 +57,9 @@ function DigitalWorkList() {
 
       const images = {};
       for (const work of sortedData) {
-        const files = await digitalFileOperations.getFilesForDigitalWork(work.id);
-        const primaryFile = files.find(f => f.is_primary === 1) || files[0];
-        if (primaryFile) {
-          images[work.id] = primaryFile.file_path;
+        if (work.images && work.images.length > 0 && work.images[0].id) {
+          const primaryImage = work.images.find(img => img.is_primary) || work.images[0];
+          images[work.id] = getImageURL(primaryImage.file_path);
         }
       }
       setWorkImages(images);
@@ -138,7 +137,7 @@ function DigitalWorkList() {
     try {
       let successCount = 0;
       let failCount = 0;
-      const allWorks = await digitalWorkOperations.getAll();
+      const allWorks = await digitalWorkAPI.getAll();
 
       for (const work of parsedImport.works) {
         try {
@@ -174,7 +173,7 @@ function DigitalWorkList() {
             work.inventory_number = `${prefix}${newSeriesNumber}`;
           }
 
-          await digitalWorkOperations.add(work);
+          await digitalWorkAPI.create(work);
           successCount++;
         } catch (error) {
           console.error('Error importing work:', error);
@@ -227,7 +226,7 @@ function DigitalWorkList() {
       let failCount = 0;
 
       // Get all existing works once at the start
-      const allWorks = await digitalWorkOperations.getAll();
+      const allWorks = await digitalWorkAPI.getAll();
       const year = new Date().getFullYear();
 
       // Pre-generate all inventory numbers to avoid duplicates
@@ -264,21 +263,10 @@ function DigitalWorkList() {
       // Now import all videos with pre-assigned inventory numbers
       for (const video of parsedVideos.videos) {
         try {
-          const result = await digitalWorkOperations.add(video);
-          const workId = result.id;
+          await digitalWorkAPI.create(video);
 
-          // If we have a thumbnail, save it as a digital file
-          if (video.thumbnail_url) {
-            try {
-              await digitalFileOperations.addFile(
-                workId,
-                video.thumbnail_url, // Use the URL directly
-                'image/jpeg',
-                true // Set as primary file
-              );
-            } catch (error) {
-              console.error('Error saving thumbnail:', error);
-              // Continue anyway - the video work was created successfully
+          // Note: Thumbnail URLs are stored in the video object
+          // The backend will handle saving the file reference
             }
           }
 
@@ -337,7 +325,7 @@ function DigitalWorkList() {
 
     try {
       for (const workId of selectedWorks) {
-        await digitalWorkOperations.delete(workId);
+        await digitalWorkAPI.delete(workId);
       }
       setSelectedWorks(new Set());
       setSelectAll(false);
@@ -363,7 +351,7 @@ function DigitalWorkList() {
       }
 
       // Get all current digital works
-      const allWorks = await digitalWorkOperations.getAll();
+      const allWorks = await digitalWorkAPI.getAll();
 
       // Match NFTs to videos by title
       const matches = [];
@@ -404,7 +392,7 @@ function DigitalWorkList() {
           const lowestListing = listings.length > 0 ? listings[0] : null;
           const priceInTez = lowestListing ? parseFloat(lowestListing.price) / 1000000 : null;
 
-          await digitalWorkOperations.update(match.work.id, {
+          await digitalWorkAPI.update(match.work.id, {
             ...match.work,
             nft_token_id: match.nft.token_id,
             nft_contract_address: match.nft.fa_contract,
@@ -630,7 +618,7 @@ function DigitalWorkList() {
                         onClick={(e) => {
                           e.stopPropagation();
                           if (window.confirm(`Are you sure you want to delete "${work.title}"? This cannot be undone.`)) {
-                            digitalWorkOperations.delete(work.id).then(() => {
+                            digitalWorkAPI.delete(work.id).then(() => {
                               loadWorks();
                             }).catch((error) => {
                               console.error('Error deleting digital work:', error);

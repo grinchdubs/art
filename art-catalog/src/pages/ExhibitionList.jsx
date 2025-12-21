@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { exhibitionOperations } from '../db';
+import { exhibitionAPI } from '../utils/api';
 
 function ExhibitionList() {
   const [exhibitions, setExhibitions] = useState([]);
@@ -13,7 +13,7 @@ function ExhibitionList() {
 
   async function loadExhibitions() {
     try {
-      const data = await exhibitionOperations.getAll();
+      const data = await exhibitionAPI.getAll();
       setExhibitions(data);
     } catch (error) {
       console.error('Error loading exhibitions:', error);

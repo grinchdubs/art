@@ -46,7 +46,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://localhost:3002
+      - VITE_API_URL=
     depends_on:
       - backend
 

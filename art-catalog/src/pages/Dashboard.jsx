@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { artworkOperations, digitalWorkOperations, dbUtils } from '../db';
+import { artworkAPI, digitalWorkAPI } from '../utils/api';
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -25,7 +25,7 @@ function Dashboard() {
   async function loadStats() {
     try {
       // Load physical artworks stats
-      const artworks = await artworkOperations.getAll();
+      const artworks = await artworkAPI.getAll();
       const stats = {
         total: artworks.length,
         available: artworks.filter((a) => a.sale_status === 'available').length,
@@ -35,7 +35,7 @@ function Dashboard() {
       setStats(stats);
 
       // Load digital works stats
-      const digitalWorks = await digitalWorkOperations.getAll();
+      const digitalWorks = await digitalWorkAPI.getAll();
       const digitalStats = {
         total: digitalWorks.length,
         vimeo: digitalWorks.filter((w) => w.inventory_number?.includes('VIMEO')).length,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { digitalWorkOperations, digitalFileOperations, digitalExhibitionOperations } from '../db';
+import { digitalWorkAPI, getImageURL } from '../utils/api';
 import { getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
 
@@ -20,7 +20,7 @@ function DigitalWorkDetail() {
 
   async function loadWork() {
     try {
-      const workData = await digitalWorkOperations.getById(id);
+      const workData = await digitalWorkAPI.getById(id);
       if (!workData) {
         alert('Digital work not found');
         navigate('/digital-works');
@@ -29,11 +29,15 @@ function DigitalWorkDetail() {
 
       setWork(workData);
 
-      const filesData = await digitalFileOperations.getFilesForDigitalWork(id);
-      setFiles(filesData);
+      // Files are now included in the work data from API
+      if (workData.images && workData.images.length > 0 && workData.images[0].id) {
+        setFiles(workData.images);
+      }
 
-      const exhibitionsData = await digitalExhibitionOperations.getExhibitionsForDigitalWork(id);
-      setExhibitions(exhibitionsData);
+      // Exhibitions are included in the work data from API
+      if (workData.exhibitions && workData.exhibitions.length > 0 && workData.exhibitions[0].id) {
+        setExhibitions(workData.exhibitions);
+      }
     } catch (error) {
       console.error('Error loading digital work:', error);
       alert('Error loading digital work');
@@ -54,7 +58,7 @@ function DigitalWorkDetail() {
   async function handleDelete() {
     if (window.confirm(`Are you sure you want to delete "${work.title}"? This cannot be undone.`)) {
       try {
-        await digitalWorkOperations.delete(id);
+        await digitalWorkAPI.delete(id);
         navigate('/digital-works');
       } catch (error) {
         console.error('Error deleting digital work:', error);

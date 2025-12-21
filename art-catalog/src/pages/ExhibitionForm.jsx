@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { exhibitionOperations } from '../db';
+import { exhibitionAPI } from '../utils/api';
 
 function ExhibitionForm() {
   const { id } = useParams();
@@ -25,7 +25,7 @@ function ExhibitionForm() {
 
   async function loadExhibition() {
     try {
-      const exhibition = await exhibitionOperations.getById(id);
+      const exhibition = await exhibitionAPI.getById(id);
       if (exhibition) {
         setFormData(exhibition);
       }
@@ -44,9 +44,9 @@ function ExhibitionForm() {
 
     try {
       if (isEdit) {
-        await exhibitionOperations.update(id, formData);
+        await exhibitionAPI.update(id, formData);
       } else {
-        await exhibitionOperations.create(formData);
+        await exhibitionAPI.create(formData);
       }
       navigate('/exhibitions');
     } catch (error) {
