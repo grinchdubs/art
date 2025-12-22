@@ -261,15 +261,30 @@ export function getVideoThumbnailUrl(url) {
     return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
   }
 
-  // For Vimeo, we need the video ID to construct a thumbnail request
-  // Vimeo requires API call for thumbnails, so we'll return null for now
-  // The list can use the embed as fallback
+  // For Vimeo, construct the thumbnail URL using Vimeo's oembed endpoint
+  // We'll use a data URI approach to fetch it client-side
   const vimeoId = extractVimeoId(url);
   if (vimeoId) {
-    // Vimeo thumbnail URLs require async API call, return a placeholder
-    // that triggers the iframe embed instead
-    return null;
+    // Return a special marker that the component can detect and fetch async
+    return `vimeo:${vimeoId}`;
   }
 
   return null;
+}
+
+/**
+ * Fetch Vimeo thumbnail URL asynchronously
+ */
+export async function fetchVimeoThumbnail(videoId) {
+  try {
+    const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch Vimeo thumbnail');
+    }
+    const data = await response.json();
+    return data.thumbnail_url || null;
+  } catch (error) {
+    console.error('Error fetching Vimeo thumbnail:', error);
+    return null;
+  }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
 import { exportDigitalWorksToCSV, exportDigitalWorksToJSON, exportDigitalWorksToText, exportDigitalWorksStats } from '../utils/digitalExportUtils';
 import { parseDigitalWorksCSV, downloadDigitalWorksTemplate } from '../utils/digitalImportUtils';
-import { parseVideoUrls, getVideoImportExample, fetchVideoTitles, getVideoThumbnailUrl, getVideoEmbedUrl } from '../utils/videoImportUtils';
+import { parseVideoUrls, getVideoImportExample, fetchVideoTitles, getVideoThumbnailUrl, fetchVimeoThumbnail } from '../utils/videoImportUtils';
 import { fetchNFTsByCreator, matchVideoToNFT } from '../utils/nftUtils';
 
 function DigitalWorkList() {
@@ -57,10 +57,29 @@ function DigitalWorkList() {
 
       const images = {};
       for (const work of sortedData) {
+        // First priority: uploaded gallery images
         if (work.images && Array.isArray(work.images) && work.images.length > 0) {
           const primaryImage = work.images.find(img => img.is_primary) || work.images[0];
           if (primaryImage && primaryImage.file_path) {
             images[work.id] = getImageURL(primaryImage.file_path);
+          }
+        } 
+        // Second priority: video thumbnails
+        else if (work.video_url) {
+          const thumbnailUrl = getVideoThumbnailUrl(work.video_url);
+          if (thumbnailUrl) {
+            if (thumbnailUrl.startsWith('vimeo:')) {
+              // Fetch Vimeo thumbnail asynchronously
+              const vimeoId = thumbnailUrl.split(':')[1];
+              fetchVimeoThumbnail(vimeoId).then(url => {
+                if (url) {
+                  setWorkImages(prev => ({ ...prev, [work.id]: url }));
+                }
+              });
+            } else {
+              // YouTube or other direct thumbnail URL
+              images[work.id] = thumbnailUrl;
+            }
           }
         }
       }
@@ -599,33 +618,10 @@ function DigitalWorkList() {
                   <div className="artwork-card-image">
                     {workImages[work.id] ? (
                       <img src={workImages[work.id]} alt={work.title} />
-                    ) : work.video_url ? (
-                      (() => {
-                        const thumbnailUrl = getVideoThumbnailUrl(work.video_url);
-                        if (thumbnailUrl) {
-                          return <img src={thumbnailUrl} alt={work.title} />;
-                        }
-                        // For Vimeo, show a small embedded preview
-                        const embedUrl = getVideoEmbedUrl(work.video_url);
-                        if (embedUrl) {
-                          return (
-                            <iframe
-                              src={embedUrl}
-                              title={work.title}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                border: 'none',
-                                pointerEvents: 'none'
-                              }}
-                              loading="lazy"
-                            />
-                          );
-                        }
-                        return <div className="artwork-card-placeholder">🎬</div>;
-                      })()
                     ) : (
-                      <div className="artwork-card-placeholder">💾</div>
+                      <div className="artwork-card-placeholder">
+                        {work.video_url ? '🎬' : '💾'}
+                      </div>
                     )}
                   </div>
                   <div className="artwork-card-content">`
