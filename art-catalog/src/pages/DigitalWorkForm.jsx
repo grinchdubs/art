@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { digitalWorkAPI, galleryAPI } from '../utils/api';
+import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
 
 function DigitalWorkForm() {
   const { id } = useParams();
@@ -22,14 +22,27 @@ function DigitalWorkForm() {
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [existingFiles, setExistingFiles] = useState([]);
+  const [allGalleryImages, setAllGalleryImages] = useState([]);
+  const [selectedImageIds, setSelectedImageIds] = useState([]);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   useEffect(() => {
+    loadGalleryImages();
     if (isEdit) {
       loadWork();
     } else {
       generateInventoryNumber();
     }
   }, [isEdit, id]);
+
+  async function loadGalleryImages() {
+    try {
+      const images = await galleryAPI.getAll();
+      setAllGalleryImages(images);
+    } catch (error) {
+      console.error('Error loading gallery images:', error);
+    }
+  }
 
   async function loadWork() {
     try {
@@ -39,6 +52,7 @@ function DigitalWorkForm() {
         // Files are included in the work data from API
         if (work.images && work.images.length > 0 && work.images[0].id) {
           setExistingFiles(work.images);
+          setSelectedImageIds(work.images.map(img => img.id));
         }
       }
     } catch (error) {
@@ -87,6 +101,16 @@ function DigitalWorkForm() {
     setUploadedFiles(Array.from(e.target.files));
   }
 
+  function toggleImageSelection(imageId) {
+    setSelectedImageIds(prev => {
+      if (prev.includes(imageId)) {
+        return prev.filter(id => id !== imageId);
+      } else {
+        return [...prev, imageId];
+      }
+    });
+  }
+
   async function handleDeleteFile(fileId) {
     if (window.confirm('Are you sure you want to delete this file?')) {
       try {
@@ -103,28 +127,37 @@ function DigitalWorkForm() {
     e.preventDefault();
 
     try {
+      // Build images array
+      const images = selectedImageIds.map((imageId, index) => ({
+        id: imageId,
+        is_primary: index === 0,
+        display_order: index
+      }));
+
+      const payload = {
+        ...formData,
+        images
+      };
+
       let workId;
       let work;
 
       if (isEdit) {
-        work = await digitalWorkAPI.update(id, formData);
+        work = await digitalWorkAPI.update(id, payload);
         workId = id;
       } else {
-        work = await digitalWorkAPI.create(formData);
+        work = await digitalWorkAPI.create(payload);
         workId = work.id;
       }
 
-      // Upload new files if any
+      // Upload new files if any (these go to gallery but need manual linking)
       if (uploadedFiles.length > 0) {
         if (uploadedFiles.length === 1) {
-          // Single file upload
           await galleryAPI.uploadSingle(uploadedFiles[0]);
         } else {
-          // Batch upload
           await galleryAPI.uploadBatch(uploadedFiles);
         }
-        // Note: The backend would need to be updated to link uploaded images to digital works
-        // For now, images are uploaded to the gallery but not automatically linked
+        alert('Files uploaded to gallery. Refresh to link them to this work.');
       }
 
       navigate('/digital-works');
@@ -355,6 +388,54 @@ function DigitalWorkForm() {
             )}
           </div>
 
+          {/* Gallery Image Selector */}
+          <div className="form-group">
+            <label>Gallery Images</label>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowGalleryModal(true)}
+              style={{ width: '100%', marginBottom: '12px' }}
+            >
+              Select from Gallery ({selectedImageIds.length} selected)
+            </button>
+
+            {selectedImageIds.length > 0 && (
+              <div>
+                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '12px' }}>
+                  Selected Images:
+                </strong>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px' }}>
+                  {allGalleryImages
+                    .filter(img => selectedImageIds.includes(img.id))
+                    .map((image, index) => (
+                      <div key={image.id} style={{ position: 'relative' }}>
+                        <img
+                          src={getImageURL(image.file_path)}
+                          alt={image.original_name}
+                          style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                        {index === 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '4px',
+                            left: '4px',
+                            background: 'rgba(52, 152, 219, 0.9)',
+                            color: 'white',
+                            padding: '2px 6px',
+                            borderRadius: '3px',
+                            fontSize: '10px',
+                          }}>
+                            Primary
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
               {isEdit ? 'Update Digital Work' : 'Add Digital Work'}
@@ -369,6 +450,97 @@ function DigitalWorkForm() {
           </div>
         </form>
       </div>
+
+      {/* Gallery Modal */}
+      {showGalleryModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Select Images from Gallery</h3>
+
+            {allGalleryImages.length === 0 ? (
+              <p style={{ color: '#7f8c8d', textAlign: 'center', padding: '40px 0' }}>
+                No images in gallery. Upload images in the <a href="/gallery" style={{ color: '#3498db' }}>Image Gallery</a> first.
+              </p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                {allGalleryImages.map((image) => (
+                  <div
+                    key={image.id}
+                    onClick={() => toggleImageSelection(image.id)}
+                    style={{
+                      position: 'relative',
+                      border: selectedImageIds.includes(image.id) ? '3px solid #3498db' : '2px solid #ecf0f1',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <img
+                      src={getImageURL(image.file_path)}
+                      alt={image.original_name}
+                      style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                    />
+                    <div style={{ padding: '8px', background: 'white' }}>
+                      <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {image.original_name}
+                      </p>
+                    </div>
+                    {selectedImageIds.includes(image.id) && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: '#3498db',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px'
+                      }}>
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowGalleryModal(false)}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
