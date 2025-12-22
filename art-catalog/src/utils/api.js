@@ -179,6 +179,13 @@ export const galleryAPI = {
     return await response.json();
   },
 
+  update: async (id, data) => {
+    return await apiCall(`/api/gallery/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
   delete: async (id) => {
     return await apiCall(`/api/gallery/${id}`, {
       method: 'DELETE',

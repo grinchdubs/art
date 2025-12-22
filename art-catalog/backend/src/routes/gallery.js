@@ -157,6 +157,34 @@ router.post('/upload/batch', upload.array('images', 50), async (req, res) => {
   }
 });
 
+// Update gallery image (rename)
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { original_name } = req.body;
+
+    if (!original_name || !original_name.trim()) {
+      return res.status(400).json({ error: 'Image name is required' });
+    }
+
+    const result = await pool.query(`
+      UPDATE gallery_images
+      SET original_name = $1
+      WHERE id = $2
+      RETURNING *
+    `, [original_name.trim(), id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating image:', error);
+    res.status(500).json({ error: 'Failed to update image' });
+  }
+});
+
 // Delete gallery image
 router.delete('/:id', async (req, res) => {
   try {

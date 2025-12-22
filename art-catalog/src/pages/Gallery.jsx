@@ -8,6 +8,8 @@ function Gallery() {
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState('');
 
   useEffect(() => {
     loadImages();
@@ -65,6 +67,33 @@ function Gallery() {
     } catch (error) {
       console.error('Error deleting image:', error);
       alert('Failed to delete image');
+    }
+  }
+
+  function startEditing(image) {
+    setEditingId(image.id);
+    setEditingName(image.original_name);
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
+    setEditingName('');
+  }
+
+  async function saveEdit(imageId) {
+    if (!editingName.trim()) {
+      alert('Image name cannot be empty');
+      return;
+    }
+
+    try {
+      await galleryAPI.update(imageId, { original_name: editingName.trim() });
+      await loadImages();
+      setEditingId(null);
+      setEditingName('');
+    } catch (error) {
+      console.error('Error renaming image:', error);
+      alert('Failed to rename image');
     }
   }
 
@@ -139,19 +168,59 @@ function Gallery() {
                   />
                 </div>
                 <div className="gallery-item-info">
-                  <p className="image-name" title={image.original_name}>
-                    {image.original_name}
-                  </p>
-                  <p className="image-meta">
-                    {(image.file_size / 1024).toFixed(1)} KB
-                  </p>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(image.id)}
-                    style={{ width: '100%', marginTop: '8px' }}
-                  >
-                    Delete
-                  </button>
+                  {editingId === image.id ? (
+                    <div className="edit-mode">
+                      <input
+                        type="text"
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && saveEdit(image.id)}
+                        autoFocus
+                        style={{ width: '100%', marginBottom: '8px' }}
+                      />
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => saveEdit(image.id)}
+                          style={{ flex: 1 }}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="btn btn-sm"
+                          onClick={cancelEditing}
+                          style={{ flex: 1 }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="image-name" title={image.original_name}>
+                        {image.original_name}
+                      </p>
+                      <p className="image-meta">
+                        {(image.file_size / 1024).toFixed(1)} KB
+                      </p>
+                      <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => startEditing(image)}
+                          style={{ flex: 1 }}
+                        >
+                          Rename
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDelete(image.id)}
+                          style={{ flex: 1 }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
