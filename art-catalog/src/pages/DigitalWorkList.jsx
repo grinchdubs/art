@@ -57,9 +57,11 @@ function DigitalWorkList() {
 
       const images = {};
       for (const work of sortedData) {
-        if (work.images && work.images.length > 0 && work.images[0].id) {
+        if (work.images && Array.isArray(work.images) && work.images.length > 0) {
           const primaryImage = work.images.find(img => img.is_primary) || work.images[0];
-          images[work.id] = getImageURL(primaryImage.file_path);
+          if (primaryImage && primaryImage.file_path) {
+            images[work.id] = getImageURL(primaryImage.file_path);
+          }
         }
       }
       setWorkImages(images);
