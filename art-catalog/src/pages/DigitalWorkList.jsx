@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
 import { exportDigitalWorksToCSV, exportDigitalWorksToJSON, exportDigitalWorksToText, exportDigitalWorksStats } from '../utils/digitalExportUtils';
 import { parseDigitalWorksCSV, downloadDigitalWorksTemplate } from '../utils/digitalImportUtils';
-import { parseVideoUrls, getVideoImportExample, fetchVideoTitles } from '../utils/videoImportUtils';
+import { parseVideoUrls, getVideoImportExample, fetchVideoTitles, getVideoThumbnailUrl, getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchNFTsByCreator, matchVideoToNFT } from '../utils/nftUtils';
 
 function DigitalWorkList() {
@@ -599,11 +599,36 @@ function DigitalWorkList() {
                   <div className="artwork-card-image">
                     {workImages[work.id] ? (
                       <img src={workImages[work.id]} alt={work.title} />
+                    ) : work.video_url ? (
+                      (() => {
+                        const thumbnailUrl = getVideoThumbnailUrl(work.video_url);
+                        if (thumbnailUrl) {
+                          return <img src={thumbnailUrl} alt={work.title} />;
+                        }
+                        // For Vimeo, show a small embedded preview
+                        const embedUrl = getVideoEmbedUrl(work.video_url);
+                        if (embedUrl) {
+                          return (
+                            <iframe
+                              src={embedUrl}
+                              title={work.title}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                border: 'none',
+                                pointerEvents: 'none'
+                              }}
+                              loading="lazy"
+                            />
+                          );
+                        }
+                        return <div className="artwork-card-placeholder">🎬</div>;
+                      })()
                     ) : (
                       <div className="artwork-card-placeholder">💾</div>
                     )}
                   </div>
-                  <div className="artwork-card-content">
+                  <div className="artwork-card-content">`
                     <div className="artwork-card-title">{work.title}</div>
                     <div className="artwork-card-meta">{work.inventory_number}</div>
                     <div className="artwork-card-meta">{work.file_format}</div>

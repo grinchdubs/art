@@ -249,3 +249,27 @@ export function isVideoUrl(url) {
 export function getVideoEmbedUrl(url) {
   return getEmbedUrl(url);
 }
+
+/**
+ * Get thumbnail URL for a video (synchronous, best-effort)
+ */
+export function getVideoThumbnailUrl(url) {
+  // For YouTube, we can generate thumbnail URLs directly
+  const youtubeId = extractYouTubeId(url);
+  if (youtubeId) {
+    // Use maxresdefault for highest quality, fallback to hqdefault
+    return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  }
+
+  // For Vimeo, we need the video ID to construct a thumbnail request
+  // Vimeo requires API call for thumbnails, so we'll return null for now
+  // The list can use the embed as fallback
+  const vimeoId = extractVimeoId(url);
+  if (vimeoId) {
+    // Vimeo thumbnail URLs require async API call, return a placeholder
+    // that triggers the iframe embed instead
+    return null;
+  }
+
+  return null;
+}
