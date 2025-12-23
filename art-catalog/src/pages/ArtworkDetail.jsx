@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { artworkAPI, getImageURL } from '../utils/api';
+import ImageLightbox from '../components/ImageLightbox';
 
 function ArtworkDetail() {
   const { id } = useParams();
@@ -11,6 +12,8 @@ function ArtworkDetail() {
   const [newLocation, setNewLocation] = useState('');
   const [locationNotes, setLocationNotes] = useState('');
   const [loading, setLoading] = useState(true);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     loadArtwork();
@@ -118,8 +121,12 @@ function ArtworkDetail() {
                 <img
                   src={getImageURL(selectedImage)}
                   alt={artwork.title}
-                  style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px', cursor: 'pointer' }}
-                  onClick={() => window.open(getImageURL(selectedImage), '_blank')}
+                  style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in' }}
+                  onClick={() => {
+                    const index = images.findIndex(img => img.file_path === selectedImage);
+                    setLightboxIndex(index >= 0 ? index : 0);
+                    setLightboxOpen(true);
+                  }}
                 />
               </div>
             )}
@@ -127,7 +134,7 @@ function ArtworkDetail() {
             {/* Thumbnail Gallery */}
             {images.length > 1 && (
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                {images.map((image) => (
+                {images.map((image, index) => (
                   <div
                     key={image.id}
                     onClick={() => setSelectedImage(image.file_path)}
@@ -151,6 +158,19 @@ function ArtworkDetail() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Image Lightbox */}
+        {lightboxOpen && images.length > 0 && (
+          <ImageLightbox
+            images={images.map(img => ({
+              url: getImageURL(img.file_path),
+              alt: artwork.title,
+              name: img.original_name || img.filename
+            }))}
+            initialIndex={lightboxIndex}
+            onClose={() => setLightboxOpen(false)}
+          />
         )}
 
         <div className="detail-content">

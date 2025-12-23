@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { digitalWorkAPI, getImageURL } from '../utils/api';
 import { getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
+import ImageLightbox from '../components/ImageLightbox';
 
 function DigitalWorkDetail() {
   const { id } = useParams();
@@ -12,6 +13,8 @@ function DigitalWorkDetail() {
   const [exhibitions, setExhibitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [xtzUsdRate, setXtzUsdRate] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     loadWork();
@@ -138,31 +141,71 @@ function DigitalWorkDetail() {
               </div>
             )}
 
-            {!work.embed_url && primaryFile && (
+            {!work.embed_url && files.length > 0 && (
               <div className="detail-image-section">
-                {primaryFile.file_type.startsWith('image/') ? (
-                  <img
-                    src={primaryFile.file_path}
-                    alt={work.title}
-                    style={{
-                      width: '100%',
-                      maxHeight: '900px',
-                      objectFit: 'contain',
-                      borderRadius: '8px',
-                    }}
-                  />
-                ) : (
-                  <video
-                    src={primaryFile.file_path}
-                    controls
-                    style={{
-                      width: '100%',
-                      maxHeight: '900px',
-                      borderRadius: '8px',
-                    }}
-                  />
+                {files.filter(f => f.file_path).length > 0 && (
+                  <>
+                    <img
+                      src={getImageURL(files.find(f => f.is_primary)?.file_path || files[0].file_path)}
+                      alt={work.title}
+                      style={{
+                        width: '100%',
+                        maxHeight: '900px',
+                        objectFit: 'contain',
+                        borderRadius: '8px',
+                        cursor: 'zoom-in'
+                      }}
+                      onClick={() => {
+                        setLightboxIndex(0);
+                        setLightboxOpen(true);
+                      }}
+                    />
+                    
+                    {/* Thumbnail strip for multiple images */}
+                    {files.length > 1 && (
+                      <div style={{ display: 'flex', gap: '12px', marginTop: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        {files.map((file, index) => (
+                          <div
+                            key={file.id}
+                            style={{
+                              width: '80px',
+                              height: '80px',
+                              cursor: 'pointer',
+                              border: '2px solid #ecf0f1',
+                              borderRadius: '6px',
+                              overflow: 'hidden',
+                              transition: 'all 0.2s'
+                            }}
+                            onClick={() => {
+                              setLightboxIndex(index);
+                              setLightboxOpen(true);
+                            }}
+                          >
+                            <img
+                              src={getImageURL(file.file_path)}
+                              alt="Thumbnail"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
+            )}
+
+            {/* Image Lightbox */}
+            {lightboxOpen && files.length > 0 && (
+              <ImageLightbox
+                images={files.map(file => ({
+                  url: getImageURL(file.file_path),
+                  alt: work.title,
+                  name: file.original_name || file.filename
+                }))}
+                initialIndex={lightboxIndex}
+                onClose={() => setLightboxOpen(false)}
+              />
             )}
 
             {files.length > 1 && (
