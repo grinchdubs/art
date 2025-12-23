@@ -28,6 +28,7 @@ function ArtworkList() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterSeries, setFilterSeries] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [sortBy, setSortBy] = useState('date-desc');
   const [filterDateTo, setFilterDateTo] = useState('');
 
   useEffect(() => {
@@ -75,7 +76,7 @@ function ArtworkList() {
 
   // Filter artworks based on all criteria
   const filteredArtworks = useMemo(() => {
-    return artworks.filter(artwork => {
+    const filtered = artworks.filter(artwork => {
       // Text search (title, inventory number, notes)
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -116,7 +117,29 @@ function ArtworkList() {
 
       return true;
     });
-  }, [artworks, searchTerm, filterMedium, filterStatus, filterSeries, filterDateFrom, filterDateTo]);
+
+    // Apply sorting
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date-desc':
+          return new Date(b.creation_date || 0) - new Date(a.creation_date || 0);
+        case 'date-asc':
+          return new Date(a.creation_date || 0) - new Date(b.creation_date || 0);
+        case 'title-asc':
+          return (a.title || '').localeCompare(b.title || '');
+        case 'title-desc':
+          return (b.title || '').localeCompare(a.title || '');
+        case 'price-desc':
+          return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+        case 'price-asc':
+          return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+        case 'recent':
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [artworks, searchTerm, filterMedium, filterStatus, filterSeries, filterDateFrom, filterDateTo, sortBy]);
 
   function clearFilters() {
     setSearchTerm('');
@@ -589,6 +612,26 @@ function ArtworkList() {
                   value={filterDateTo}
                   onChange={(e) => setFilterDateTo(e.target.value)}
                 />
+              </div>
+
+              {/* Sort */}
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                  Sort By
+                </label>
+                <select
+                  className="form-control"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="date-desc">Date: Newest First</option>
+                  <option value="date-asc">Date: Oldest First</option>
+                  <option value="recent">Recently Added</option>
+                  <option value="title-asc">Title: A-Z</option>
+                  <option value="title-desc">Title: Z-A</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="price-asc">Price: Low to High</option>
+                </select>
               </div>
             </div>
 

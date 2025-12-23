@@ -13,6 +13,7 @@ function DigitalWorkList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFormat, setFilterFormat] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [sortBy, setSortBy] = useState('inventory-asc');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showVideoImportDialog, setShowVideoImportDialog] = useState(false);
@@ -97,7 +98,7 @@ function DigitalWorkList() {
   }, [works]);
 
   const filteredWorks = useMemo(() => {
-    return works.filter(work => {
+    const filtered = works.filter(work => {
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
         const matchesSearch =
@@ -117,7 +118,33 @@ function DigitalWorkList() {
 
       return true;
     });
-  }, [works, searchTerm, filterFormat, filterStatus]);
+
+    // Apply sorting
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'inventory-asc':
+          return (a.inventory_number || '').localeCompare(b.inventory_number || '');
+        case 'inventory-desc':
+          return (b.inventory_number || '').localeCompare(a.inventory_number || '');
+        case 'date-desc':
+          return new Date(b.creation_date || 0) - new Date(a.creation_date || 0);
+        case 'date-asc':
+          return new Date(a.creation_date || 0) - new Date(b.creation_date || 0);
+        case 'title-asc':
+          return (a.title || '').localeCompare(b.title || '');
+        case 'title-desc':
+          return (b.title || '').localeCompare(a.title || '');
+        case 'price-desc':
+          return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+        case 'price-asc':
+          return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+        case 'recent':
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [works, searchTerm, filterFormat, filterStatus, sortBy]);
 
   function clearFilters() {
     setSearchTerm('');
@@ -559,6 +586,26 @@ function DigitalWorkList() {
                   <option value="available">Available</option>
                   <option value="sold">Sold</option>
                   <option value="not-for-sale">Not for Sale</option>
+                </select>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="sortBy">Sort By</label>
+                <select
+                  id="sortBy"
+                  className="form-control"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="inventory-asc">Inventory: Oldest First</option>
+                  <option value="inventory-desc">Inventory: Newest First</option>
+                  <option value="date-desc">Date: Newest First</option>
+                  <option value="date-asc">Date: Oldest First</option>
+                  <option value="recent">Recently Added</option>
+                  <option value="title-asc">Title: A-Z</option>
+                  <option value="title-desc">Title: Z-A</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="price-asc">Price: Low to High</option>
                 </select>
               </div>
             </div>
