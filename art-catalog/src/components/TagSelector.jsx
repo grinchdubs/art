@@ -36,13 +36,16 @@ export default function TagSelector({ selectedTags = [], onChange }) {
 
     try {
       const newTag = await tagAPI.create({ name: newTagName.trim(), color: newTagColor });
-      setAllTags([...allTags, newTag]);
+      // Reload all tags to get updated counts
+      await loadTags();
       onChange([...selectedTags, newTag.id]);
       setNewTagName('');
       setNewTagColor('#3b82f6');
       setShowNewTagForm(false);
     } catch (error) {
       console.error('Failed to create tag:', error);
+      // Reload tags in case the tag was actually created or already exists
+      await loadTags();
       alert('Failed to create tag. It may already exist.');
     }
   };
