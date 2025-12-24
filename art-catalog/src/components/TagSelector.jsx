@@ -31,8 +31,7 @@ export default function TagSelector({ selectedTags = [], onChange }) {
     }
   };
 
-  const handleCreateTag = async (e) => {
-    e.preventDefault();
+  const handleCreateTag = async () => {
     if (!newTagName.trim()) return;
 
     try {
@@ -45,6 +44,13 @@ export default function TagSelector({ selectedTags = [], onChange }) {
     } catch (error) {
       console.error('Failed to create tag:', error);
       alert('Failed to create tag. It may already exist.');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCreateTag();
     }
   };
 
@@ -125,18 +131,12 @@ export default function TagSelector({ selectedTags = [], onChange }) {
               + Create New Tag
             </button>
           ) : (
-            <form 
-              onSubmit={(e) => {
-                e.stopPropagation();
-                handleCreateTag(e);
-              }} 
-              className="new-tag-form"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="new-tag-form">
               <input
                 type="text"
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Tag name"
                 className="new-tag-input"
                 autoFocus
@@ -148,7 +148,13 @@ export default function TagSelector({ selectedTags = [], onChange }) {
                 className="new-tag-color"
               />
               <div className="new-tag-actions">
-                <button type="submit" className="new-tag-save">Create</button>
+                <button 
+                  type="button" 
+                  onClick={handleCreateTag}
+                  className="new-tag-save"
+                >
+                  Create
+                </button>
                 <button
                   type="button"
                   onClick={() => {
@@ -161,7 +167,7 @@ export default function TagSelector({ selectedTags = [], onChange }) {
                   Cancel
                 </button>
               </div>
-            </form>
+            </div>
           )}
         </div>
       )}
