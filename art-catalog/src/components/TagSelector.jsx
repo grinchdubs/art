@@ -92,7 +92,7 @@ export default function TagSelector({ selectedTags = [], onChange }) {
 
       {/* Tag dropdown */}
       {showDropdown && (
-        <div className="tag-dropdown">
+        <div className="tag-dropdown" onClick={(e) => e.stopPropagation()}>
           <div className="available-tags">
             {allTags.map(tag => (
               <label key={tag.id} className="tag-option">
@@ -116,13 +116,23 @@ export default function TagSelector({ selectedTags = [], onChange }) {
           {!showNewTagForm ? (
             <button
               type="button"
-              onClick={() => setShowNewTagForm(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowNewTagForm(true);
+              }}
               className="create-tag-button"
             >
               + Create New Tag
             </button>
           ) : (
-            <form onSubmit={handleCreateTag} className="new-tag-form">
+            <form 
+              onSubmit={(e) => {
+                e.stopPropagation();
+                handleCreateTag(e);
+              }} 
+              className="new-tag-form"
+              onClick={(e) => e.stopPropagation()}
+            >
               <input
                 type="text"
                 value={newTagName}
