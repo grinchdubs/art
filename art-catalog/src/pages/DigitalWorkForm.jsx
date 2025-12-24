@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
+import TagSelector from '../components/TagSelector';
 
 function DigitalWorkForm() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ function DigitalWorkForm() {
   const [allGalleryImages, setAllGalleryImages] = useState([]);
   const [selectedImageIds, setSelectedImageIds] = useState([]);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
 
   useEffect(() => {
     loadGalleryImages();
@@ -53,6 +55,11 @@ function DigitalWorkForm() {
         if (work.images && work.images.length > 0 && work.images[0].id) {
           setExistingFiles(work.images);
           setSelectedImageIds(work.images.map(img => img.id));
+        }
+        // Load associated tags
+        if (work.tags && work.tags.length > 0 && work.tags[0].id) {
+          const tagIds = work.tags.map(tag => tag.id);
+          setSelectedTagIds(tagIds);
         }
       }
     } catch (error) {
@@ -145,9 +152,13 @@ function DigitalWorkForm() {
       if (isEdit) {
         work = await digitalWorkAPI.update(id, payload);
         workId = id;
+        // Update tags separately
+        await digitalWorkAPI.updateTags(id, selectedTagIds);
       } else {
         work = await digitalWorkAPI.create(payload);
         workId = work.id;
+        // Update tags separately
+        await digitalWorkAPI.updateTags(work.id, selectedTagIds);
       }
 
       // Upload new files if any (these go to gallery but need manual linking)
@@ -316,6 +327,12 @@ function DigitalWorkForm() {
               placeholder="Additional notes about the digital work"
             />
           </div>
+
+          {/* Tags */}
+          <TagSelector
+            selectedTags={selectedTagIds}
+            onChange={setSelectedTagIds}
+          />
 
           <div className="form-group">
             <label>Files & Previews</label>

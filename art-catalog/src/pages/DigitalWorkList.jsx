@@ -671,10 +671,33 @@ function DigitalWorkList() {
                       </div>
                     )}
                   </div>
-                  <div className="artwork-card-content">`
+                  <div className="artwork-card-content">
                     <div className="artwork-card-title">{work.title}</div>
                     <div className="artwork-card-meta">{work.inventory_number}</div>
                     <div className="artwork-card-meta">{work.file_format}</div>
+                    
+                    {/* Tags */}
+                    {work.tags && work.tags.length > 0 && work.tags[0].id && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px' }}>
+                        {work.tags.map(tag => (
+                          <span
+                            key={tag.id}
+                            style={{
+                              display: 'inline-block',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: '500',
+                              color: 'white',
+                              backgroundColor: tag.color
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
                     <div className="artwork-card-meta">
                       <span className={`status-badge status-${work.sale_status}`}>
                         {work.sale_status}

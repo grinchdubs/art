@@ -205,6 +205,30 @@ function ArtworkDetail() {
                 <div className="detail-value">{artwork.notes}</div>
               </div>
             )}
+
+            {artwork.tags && artwork.tags.length > 0 && artwork.tags[0].id && (
+              <div className="detail-section">
+                <h3>Tags</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {artwork.tags.map(tag => (
+                    <span
+                      key={tag.id}
+                      style={{
+                        display: 'inline-block',
+                        padding: '4px 12px',
+                        borderRadius: '16px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: 'white',
+                        backgroundColor: tag.color
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

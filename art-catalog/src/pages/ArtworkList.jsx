@@ -822,6 +822,29 @@ function ArtworkList() {
                     <div className="artwork-card-title">{artwork.title}</div>
                     <div className="artwork-card-meta">{artwork.inventory_number}</div>
                     <div className="artwork-card-meta">{artwork.medium}</div>
+                    
+                    {/* Tags */}
+                    {artwork.tags && artwork.tags.length > 0 && artwork.tags[0].id && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px' }}>
+                        {artwork.tags.map(tag => (
+                          <span
+                            key={tag.id}
+                            style={{
+                              display: 'inline-block',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: '500',
+                              color: 'white',
+                              backgroundColor: tag.color
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
                     <div className="artwork-card-meta">
                       <span className={`status-badge status-${artwork.sale_status}`}>
                         {artwork.sale_status}

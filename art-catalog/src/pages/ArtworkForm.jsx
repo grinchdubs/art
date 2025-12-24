@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { artworkAPI, galleryAPI, getImageURL } from '../utils/api';
+import TagSelector from '../components/TagSelector';
 
 function ArtworkForm() {
   const { id } = useParams();
@@ -24,6 +25,7 @@ function ArtworkForm() {
   const [selectedImageIds, setSelectedImageIds] = useState([]);
   const [primaryImageId, setPrimaryImageId] = useState(null);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
 
   useEffect(() => {
     loadGalleryImages();
@@ -106,6 +108,12 @@ function ArtworkForm() {
           setPrimaryImageId(primary.id);
         }
       }
+
+      // Load associated tags
+      if (artwork.tags && artwork.tags.length > 0 && artwork.tags[0].id) {
+        const tagIds = artwork.tags.map(tag => tag.id);
+        setSelectedTagIds(tagIds);
+      }
     } catch (error) {
       console.error('Error loading artwork:', error);
     }
@@ -157,10 +165,15 @@ function ArtworkForm() {
         images
       };
 
+      let savedArtwork;
       if (isEdit) {
-        await artworkAPI.update(id, payload);
+        savedArtwork = await artworkAPI.update(id, payload);
+        // Update tags separately
+        await artworkAPI.updateTags(id, selectedTagIds);
       } else {
-        await artworkAPI.create(payload);
+        savedArtwork = await artworkAPI.create(payload);
+        // Update tags separately
+        await artworkAPI.updateTags(savedArtwork.id, selectedTagIds);
       }
 
       navigate('/artworks');
@@ -331,6 +344,12 @@ function ArtworkForm() {
               placeholder="Additional notes about the work"
             />
           </div>
+
+          {/* Tags */}
+          <TagSelector
+            selectedTags={selectedTagIds}
+            onChange={setSelectedTagIds}
+          />
 
           {/* Image Selection */}
           <div className="form-group">

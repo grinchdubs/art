@@ -12,10 +12,17 @@ router.get('/', async (req, res) => {
                'filename', gi.filename,
                'file_path', gi.file_path,
                'is_primary', ai.is_primary
-             )) FILTER (WHERE gi.id IS NOT NULL) as images
+             )) FILTER (WHERE gi.id IS NOT NULL) as images,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', t.id,
+               'name', t.name,
+               'color', t.color
+             )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM artworks a
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
       LEFT JOIN gallery_images gi ON ai.image_id = gi.id
+      LEFT JOIN artwork_tags at ON a.id = at.artwork_id
+      LEFT JOIN tags t ON at.tag_id = t.id
       GROUP BY a.id
       ORDER BY a.created_at DESC
     `);
@@ -45,12 +52,19 @@ router.get('/:id', async (req, res) => {
                'venue', e.venue,
                'start_date', e.start_date,
                'end_date', e.end_date
-             )) FILTER (WHERE e.id IS NOT NULL) as exhibitions
+             )) FILTER (WHERE e.id IS NOT NULL) as exhibitions,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', t.id,
+               'name', t.name,
+               'color', t.color
+             )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM artworks a
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
       LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_exhibitions ae ON a.id = ae.artwork_id
       LEFT JOIN exhibitions e ON ae.exhibition_id = e.id
+      LEFT JOIN artwork_tags at ON a.id = at.artwork_id
+      LEFT JOIN tags t ON at.tag_id = t.id
       WHERE a.id = $1
       GROUP BY a.id
     `, [id]);
@@ -227,6 +241,32 @@ router.post('/:id/location-history', async (req, res) => {
   } catch (error) {
     console.error('Error adding location history:', error);
     res.status(500).json({ error: 'Failed to add location history' });
+  }
+});
+
+// Add tags to artwork
+router.post('/:id/tags', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tagIds } = req.body; // Array of tag IDs
+
+    // Delete existing tags first
+    await pool.query('DELETE FROM artwork_tags WHERE artwork_id = $1', [id]);
+
+    // Insert new tags
+    if (tagIds && tagIds.length > 0) {
+      const values = tagIds.map((tagId, index) => `($1, $${index + 2})`).join(',');
+      const params = [id, ...tagIds];
+      await pool.query(
+        `INSERT INTO artwork_tags (artwork_id, tag_id) VALUES ${values}`,
+        params
+      );
+    }
+
+    res.json({ message: 'Tags updated successfully' });
+  } catch (error) {
+    console.error('Error updating artwork tags:', error);
+    res.status(500).json({ error: 'Failed to update tags' });
   }
 });
 

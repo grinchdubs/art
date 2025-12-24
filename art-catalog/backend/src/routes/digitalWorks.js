@@ -12,10 +12,17 @@ router.get('/', async (req, res) => {
                'filename', gi.filename,
                'file_path', gi.file_path,
                'is_primary', dwi.is_primary
-             )) FILTER (WHERE gi.id IS NOT NULL) as images
+             )) FILTER (WHERE gi.id IS NOT NULL) as images,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', t.id,
+               'name', t.name,
+               'color', t.color
+             )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM digital_works dw
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
       LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
+      LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
+      LEFT JOIN tags t ON dwt.tag_id = t.id
       GROUP BY dw.id
       ORDER BY dw.created_at DESC
     `);
@@ -45,12 +52,19 @@ router.get('/:id', async (req, res) => {
                'venue', e.venue,
                'start_date', e.start_date,
                'end_date', e.end_date
-             )) FILTER (WHERE e.id IS NOT NULL) as exhibitions
+             )) FILTER (WHERE e.id IS NOT NULL) as exhibitions,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', t.id,
+               'name', t.name,
+               'color', t.color
+             )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM digital_works dw
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
       LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_exhibitions dwe ON dw.id = dwe.digital_work_id
       LEFT JOIN exhibitions e ON dwe.exhibition_id = e.id
+      LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
+      LEFT JOIN tags t ON dwt.tag_id = t.id
       WHERE dw.id = $1
       GROUP BY dw.id
     `, [id]);
@@ -183,6 +197,32 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting digital work:', error);
     res.status(500).json({ error: 'Failed to delete digital work' });
+  }
+});
+
+// Add tags to digital work
+router.post('/:id/tags', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tagIds } = req.body; // Array of tag IDs
+
+    // Delete existing tags first
+    await pool.query('DELETE FROM digital_work_tags WHERE digital_work_id = $1', [id]);
+
+    // Insert new tags
+    if (tagIds && tagIds.length > 0) {
+      const values = tagIds.map((tagId, index) => `($1, $${index + 2})`).join(',');
+      const params = [id, ...tagIds];
+      await pool.query(
+        `INSERT INTO digital_work_tags (digital_work_id, tag_id) VALUES ${values}`,
+        params
+      );
+    }
+
+    res.json({ message: 'Tags updated successfully' });
+  } catch (error) {
+    console.error('Error updating digital work tags:', error);
+    res.status(500).json({ error: 'Failed to update tags' });
   }
 });
 

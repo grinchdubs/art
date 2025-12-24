@@ -384,6 +384,32 @@ function DigitalWorkDetail() {
                 </div>
               </div>
             )}
+
+            {work.tags && work.tags.length > 0 && work.tags[0].id && (
+              <div className="detail-field">
+                <div className="detail-label">Tags</div>
+                <div className="detail-value">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {work.tags.map(tag => (
+                      <span
+                        key={tag.id}
+                        style={{
+                          display: 'inline-block',
+                          padding: '4px 12px',
+                          borderRadius: '16px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: 'white',
+                          backgroundColor: tag.color
+                        }}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

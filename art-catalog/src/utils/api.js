@@ -67,6 +67,13 @@ export const artworkAPI = {
       body: JSON.stringify(location),
     });
   },
+
+  updateTags: async (id, tagIds) => {
+    return await apiCall(`/api/artworks/${id}/tags`, {
+      method: 'POST',
+      body: JSON.stringify({ tagIds }),
+    });
+  },
 };
 
 // Digital Works API
@@ -98,6 +105,13 @@ export const digitalWorkAPI = {
       method: 'DELETE',
     });
   },
+
+  updateTags: async (id, tagIds) => {
+    return await apiCall(`/api/digital-works/${id}/tags`, {
+      method: 'POST',
+      body: JSON.stringify({ tagIds }),
+    });
+  },
 };
 
 // Exhibitions API
@@ -126,6 +140,68 @@ export const exhibitionAPI = {
 
   delete: async (id) => {
     return await apiCall(`/api/exhibitions/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Tags API
+export const tagAPI = {
+  getAll: async () => {
+    return await apiCall('/api/tags');
+  },
+
+  getById: async (id) => {
+    return await apiCall(`/api/tags/${id}`);
+  },
+
+  create: async (tag) => {
+    return await apiCall('/api/tags', {
+      method: 'POST',
+      body: JSON.stringify(tag),
+    });
+  },
+
+  update: async (id, tag) => {
+    return await apiCall(`/api/tags/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(tag),
+    });
+  },
+
+  delete: async (id) => {
+    return await apiCall(`/api/tags/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Tags API
+export const tagAPI = {
+  getAll: async () => {
+    return await apiCall('/api/tags');
+  },
+
+  getById: async (id) => {
+    return await apiCall(`/api/tags/${id}`);
+  },
+
+  create: async (tag) => {
+    return await apiCall('/api/tags', {
+      method: 'POST',
+      body: JSON.stringify(tag),
+    });
+  },
+
+  update: async (id, tag) => {
+    return await apiCall(`/api/tags/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(tag),
+    });
+  },
+
+  delete: async (id) => {
+    return await apiCall(`/api/tags/${id}`, {
       method: 'DELETE',
     });
   },
