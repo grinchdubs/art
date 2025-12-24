@@ -176,37 +176,6 @@ export const tagAPI = {
   },
 };
 
-// Tags API
-export const tagAPI = {
-  getAll: async () => {
-    return await apiCall('/api/tags');
-  },
-
-  getById: async (id) => {
-    return await apiCall(`/api/tags/${id}`);
-  },
-
-  create: async (tag) => {
-    return await apiCall('/api/tags', {
-      method: 'POST',
-      body: JSON.stringify(tag),
-    });
-  },
-
-  update: async (id, tag) => {
-    return await apiCall(`/api/tags/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(tag),
-    });
-  },
-
-  delete: async (id) => {
-    return await apiCall(`/api/tags/${id}`, {
-      method: 'DELETE',
-    });
-  },
-};
-
 // Gallery API
 export const galleryAPI = {
   getAll: async () => {
