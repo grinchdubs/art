@@ -15,11 +15,70 @@ function DigitalWorkDetail() {
   const [xtzUsdRate, setXtzUsdRate] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [allWorkIds, setAllWorkIds] = useState([]);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   useEffect(() => {
     loadWork();
     loadTezosPrice();
+    loadAllWorkIds();
   }, [id]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger shortcuts if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          if (lightboxOpen) {
+            setLightboxOpen(false);
+          } else if (showShortcuts) {
+            setShowShortcuts(false);
+          } else {
+            navigate('/digital-works');
+          }
+          break;
+        case 'ArrowLeft':
+          navigateToPrevious();
+          break;
+        case 'ArrowRight':
+          navigateToNext();
+          break;
+        case '?':
+          setShowShortcuts(true);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [id, lightboxOpen, showShortcuts, allWorkIds]);
+
+  async function loadAllWorkIds() {
+    try {
+      const works = await digitalWorkAPI.getAll();
+      setAllWorkIds(works.map(w => w.id));
+    } catch (error) {
+      console.error('Error loading work IDs:', error);
+    }
+  }
+
+  function navigateToPrevious() {
+    const currentIndex = allWorkIds.indexOf(parseInt(id));
+    if (currentIndex > 0) {
+      navigate(`/digital-works/${allWorkIds[currentIndex - 1]}`);
+    }
+  }
+
+  function navigateToNext() {
+    const currentIndex = allWorkIds.indexOf(parseInt(id));
+    if (currentIndex < allWorkIds.length - 1) {
+      navigate(`/digital-works/${allWorkIds[currentIndex + 1]}`);
+    }
+  }
 
   async function loadWork() {
     try {
@@ -453,6 +512,70 @@ function DigitalWorkDetail() {
           )}
         </div>
       </div>
+
+      {/* Keyboard Shortcuts Help Modal */}
+      {showShortcuts && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+          }}
+          onClick={() => setShowShortcuts(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '32px',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ marginTop: 0, marginBottom: '24px' }}>Keyboard Shortcuts</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <kbd style={{ padding: '4px 8px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#f5f5f5', fontFamily: 'monospace' }}>ESC</kbd>
+                <span>Close lightbox / Go back to list</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <kbd style={{ padding: '4px 8px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#f5f5f5', fontFamily: 'monospace' }}>←</kbd>
+                <span>Previous digital work</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <kbd style={{ padding: '4px 8px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#f5f5f5', fontFamily: 'monospace' }}>→</kbd>
+                <span>Next digital work</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <kbd style={{ padding: '4px 8px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#f5f5f5', fontFamily: 'monospace' }}>?</kbd>
+                <span>Show this help</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowShortcuts(false)}
+              style={{
+                marginTop: '24px',
+                padding: '8px 16px',
+                backgroundColor: '#3498db',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

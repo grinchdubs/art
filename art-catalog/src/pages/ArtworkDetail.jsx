@@ -14,10 +14,71 @@ function ArtworkDetail() {
   const [loading, setLoading] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [allArtworkIds, setAllArtworkIds] = useState([]);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   useEffect(() => {
     loadArtwork();
+    loadAllArtworkIds();
   }, [id]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger shortcuts if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          if (lightboxOpen) {
+            setLightboxOpen(false);
+          } else if (showLocationDialog) {
+            setShowLocationDialog(false);
+          } else if (showShortcuts) {
+            setShowShortcuts(false);
+          } else {
+            navigate('/artworks');
+          }
+          break;
+        case 'ArrowLeft':
+          navigateToPrevious();
+          break;
+        case 'ArrowRight':
+          navigateToNext();
+          break;
+        case '?':
+          setShowShortcuts(true);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [id, lightboxOpen, showLocationDialog, showShortcuts, allArtworkIds]);
+
+  async function loadAllArtworkIds() {
+    try {
+      const artworks = await artworkAPI.getAll();
+      setAllArtworkIds(artworks.map(a => a.id));
+    } catch (error) {
+      console.error('Error loading artwork IDs:', error);
+    }
+  }
+
+  function navigateToPrevious() {
+    const currentIndex = allArtworkIds.indexOf(parseInt(id));
+    if (currentIndex > 0) {
+      navigate(`/artworks/${allArtworkIds[currentIndex - 1]}`);
+    }
+  }
+
+  function navigateToNext() {
+    const currentIndex = allArtworkIds.indexOf(parseInt(id));
+    if (currentIndex < allArtworkIds.length - 1) {
+      navigate(`/artworks/${allArtworkIds[currentIndex + 1]}`);
+    }
+  }
 
   async function loadArtwork() {
     try {
@@ -381,6 +442,59 @@ function ArtworkDetail() {
                   Save Location
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Keyboard Shortcuts Help */}
+        {showShortcuts && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.7)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 2000,
+            }}
+            onClick={() => setShowShortcuts(false)}
+          >
+            <div
+              style={{
+                background: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                maxWidth: '400px',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Keyboard Shortcuts</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '500' }}>ESC</span>
+                  <span style={{ color: '#7f8c8d' }}>Go back or close dialogs</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '500' }}>← →</span>
+                  <span style={{ color: '#7f8c8d' }}>Navigate artworks</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: '500' }}>?</span>
+                  <span style={{ color: '#7f8c8d' }}>Show this help</span>
+                </div>
+              </div>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowShortcuts(false)}
+                style={{ marginTop: '20px', width: '100%' }}
+              >
+                Got it
+              </button>
             </div>
           </div>
         )}
