@@ -13,6 +13,7 @@ function DigitalWorkList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFormat, setFilterFormat] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterSeries, setFilterSeries] = useState('');
   const [sortBy, setSortBy] = useState('inventory-asc');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -101,6 +102,11 @@ function DigitalWorkList() {
     return formats.sort();
   }, [works]);
 
+  const uniqueSeries = useMemo(() => {
+    const series = [...new Set(works.map(w => w.series_name).filter(Boolean))];
+    return series.sort();
+  }, [works]);
+
   const filteredWorks = useMemo(() => {
     const filtered = works.filter(work => {
       if (searchTerm) {
@@ -117,6 +123,10 @@ function DigitalWorkList() {
       }
 
       if (filterStatus && work.sale_status !== filterStatus) {
+        return false;
+      }
+
+      if (filterSeries && work.series_name !== filterSeries) {
         return false;
       }
 
@@ -148,12 +158,13 @@ function DigitalWorkList() {
           return 0;
       }
     });
-  }, [works, searchTerm, filterFormat, filterStatus, sortBy]);
+  }, [works, searchTerm, filterFormat, filterStatus, filterSeries, sortBy]);
 
   function clearFilters() {
     setSearchTerm('');
     setFilterFormat('');
     setFilterStatus('');
+    setFilterSeries('');
   }
 
   function handleFileSelect(e) {
@@ -531,7 +542,7 @@ function DigitalWorkList() {
     setNftMatches(updatedMatches);
   }
 
-  const hasActiveFilters = searchTerm || filterFormat || filterStatus;
+  const hasActiveFilters = searchTerm || filterFormat || filterStatus || filterSeries;
 
   if (loading) {
     return (
@@ -652,6 +663,21 @@ function DigitalWorkList() {
                   <option value="available">Available</option>
                   <option value="sold">Sold</option>
                   <option value="not-for-sale">Not for Sale</option>
+                </select>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="filterSeries">Series</label>
+                <select
+                  id="filterSeries"
+                  className="form-control"
+                  value={filterSeries}
+                  onChange={(e) => setFilterSeries(e.target.value)}
+                >
+                  <option value="">All Series</option>
+                  {uniqueSeries.map(series => (
+                    <option key={series} value={series}>{series}</option>
+                  ))}
                 </select>
               </div>
 
