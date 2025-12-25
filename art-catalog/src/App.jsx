@@ -14,6 +14,9 @@ import DigitalWorkList from './pages/DigitalWorkList';
 import DigitalWorkForm from './pages/DigitalWorkForm';
 import DigitalWorkDetail from './pages/DigitalWorkDetail';
 import Gallery from './pages/Gallery';
+import SeriesList from './pages/SeriesList';
+import SeriesForm from './pages/SeriesForm';
+import SeriesDetail from './pages/SeriesDetail';
 
 // Import components
 import MigrationPanel from './components/MigrationPanel';
@@ -51,6 +54,9 @@ function Sidebar() {
         </Link>
         <Link to="/exhibitions" className={`nav-link ${isActive('/exhibitions') ? 'active' : ''}`}>
           Exhibitions
+        </Link>
+        <Link to="/series" className={`nav-link ${isActive('/series') ? 'active' : ''}`}>
+          Series & Collections
         </Link>
 
         <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
@@ -114,6 +120,10 @@ function AppContent() {
           <Route path="/exhibitions/new" element={<ExhibitionForm />} />
           <Route path="/exhibitions/edit/:id" element={<ExhibitionForm />} />
           <Route path="/exhibitions/:id" element={<ExhibitionDetail />} />
+          <Route path="/series" element={<SeriesList />} />
+          <Route path="/series/new" element={<SeriesForm />} />
+          <Route path="/series/:id/edit" element={<SeriesForm />} />
+          <Route path="/series/:id" element={<SeriesDetail />} />
           <Route path="/digital-works" element={<DigitalWorkList />} />
           <Route path="/digital-works/new" element={<DigitalWorkForm />} />
           <Route path="/digital-works/edit/:id" element={<DigitalWorkForm />} />

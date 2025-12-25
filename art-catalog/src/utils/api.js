@@ -190,6 +190,37 @@ export const tagAPI = {
   },
 };
 
+// Series API
+export const seriesAPI = {
+  getAll: async () => {
+    return await apiCall('/api/series');
+  },
+
+  getById: async (id) => {
+    return await apiCall(`/api/series/${id}`);
+  },
+
+  create: async (series) => {
+    return await apiCall('/api/series', {
+      method: 'POST',
+      body: JSON.stringify(series),
+    });
+  },
+
+  update: async (id, series) => {
+    return await apiCall(`/api/series/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(series),
+    });
+  },
+
+  delete: async (id) => {
+    return await apiCall(`/api/series/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 // Gallery API
 export const galleryAPI = {
   getAll: async () => {
