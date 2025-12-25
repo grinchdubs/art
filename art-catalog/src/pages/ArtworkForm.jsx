@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { artworkAPI, galleryAPI, getImageURL } from '../utils/api';
+import { artworkAPI, galleryAPI, getImageURL, seriesAPI } from '../utils/api';
 import TagSelector from '../components/TagSelector';
 
 function ArtworkForm() {
@@ -14,7 +14,7 @@ function ArtworkForm() {
     creation_date: '',
     dimensions: '',
     medium: '',
-    series_name: '',
+    series_id: '',
     sale_status: 'available',
     location: '',
     price: '',
@@ -26,9 +26,11 @@ function ArtworkForm() {
   const [primaryImageId, setPrimaryImageId] = useState(null);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
+  const [allSeries, setAllSeries] = useState([]);
 
   useEffect(() => {
     loadGalleryImages();
+    loadSeries();
     if (isEdit) {
       loadArtwork();
     }
@@ -39,7 +41,7 @@ function ArtworkForm() {
     if (!isEdit && (formData.creation_date || formData.medium || formData.title)) {
       generateInventoryNumber();
     }
-  }, [formData.creation_date, formData.medium, formData.title, formData.series_name]);
+  }, [formData.creation_date, formData.medium, formData.title, formData.series_id]);
 
   async function loadGalleryImages() {
     try {
@@ -47,6 +49,15 @@ function ArtworkForm() {
       setAllGalleryImages(images);
     } catch (error) {
       console.error('Error loading gallery images:', error);
+    }
+  }
+
+  async function loadSeries() {
+    try {
+      const series = await seriesAPI.getAll();
+      setAllSeries(series);
+    } catch (error) {
+      console.error('Error loading series:', error);
     }
   }
 
@@ -270,16 +281,24 @@ function ArtworkForm() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="series_name">Series/Collection</label>
-              <input
-                type="text"
-                id="series_name"
-                name="series_name"
+              <label htmlFor="series_id">Series/Collection</label>
+              <select
+                id="series_id"
+                name="series_id"
                 className="form-control"
-                value={formData.series_name}
+                value={formData.series_id || ''}
                 onChange={handleChange}
-                placeholder="Series or collection name"
-              />
+              >
+                <option value="">No Series</option>
+                {allSeries.map(series => (
+                  <option key={series.id} value={series.id}>
+                    {series.name}
+                  </option>
+                ))}
+              </select>
+              <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+                Group this artwork into a series or collection. <a href="/series/new" target="_blank" style={{ color: '#3498db' }}>Create new series</a>
+              </small>
             </div>
           </div>
 

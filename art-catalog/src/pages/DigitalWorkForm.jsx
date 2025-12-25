@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
+import { digitalWorkAPI, galleryAPI, getImageURL, seriesAPI } from '../utils/api';
 import TagSelector from '../components/TagSelector';
 
 function DigitalWorkForm() {
@@ -19,6 +19,7 @@ function DigitalWorkForm() {
     price: '',
     license_type: '',
     notes: '',
+    series_id: '',
   });
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -27,9 +28,11 @@ function DigitalWorkForm() {
   const [selectedImageIds, setSelectedImageIds] = useState([]);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
+  const [allSeries, setAllSeries] = useState([]);
 
   useEffect(() => {
     loadGalleryImages();
+    loadSeries();
     if (isEdit) {
       loadWork();
     } else {
@@ -43,6 +46,15 @@ function DigitalWorkForm() {
       setAllGalleryImages(images);
     } catch (error) {
       console.error('Error loading gallery images:', error);
+    }
+  }
+
+  async function loadSeries() {
+    try {
+      const series = await seriesAPI.getAll();
+      setAllSeries(series);
+    } catch (error) {
+      console.error('Error loading series:', error);
     }
   }
 
@@ -314,6 +326,27 @@ function DigitalWorkForm() {
               onChange={handleChange}
               placeholder="e.g., CC BY-SA, NFT, Exclusive Rights"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="series_id">Series/Collection</label>
+            <select
+              id="series_id"
+              name="series_id"
+              className="form-control"
+              value={formData.series_id || ''}
+              onChange={handleChange}
+            >
+              <option value="">No Series</option>
+              {allSeries.map(series => (
+                <option key={series.id} value={series.id}>
+                  {series.name}
+                </option>
+              ))}
+            </select>
+            <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+              Group this work into a series or collection. <a href="/series/new" target="_blank" style={{ color: '#3498db' }}>Create new series</a>
+            </small>
           </div>
 
           <div className="form-group">
