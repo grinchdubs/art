@@ -226,4 +226,84 @@ router.post('/:id/tags', async (req, res) => {
   }
 });
 
+// Bulk update digital works
+router.patch('/bulk', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { ids, updates } = req.body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'Invalid or empty digital work IDs' });
+    }
+
+    if (!updates || typeof updates !== 'object') {
+      return res.status(400).json({ error: 'Invalid updates object' });
+    }
+
+    // Build dynamic UPDATE query
+    const allowedFields = ['sale_status', 'price'];
+    const updateFields = [];
+    const values = [];
+    let paramCount = 1;
+
+    for (const [field, value] of Object.entries(updates)) {
+      if (allowedFields.includes(field) && value !== undefined && value !== null) {
+        if (field === 'price' && updates.priceAdjustment) {
+          // Handle price adjustment (percentage or fixed amount)
+          const adjustment = updates.priceAdjustment;
+          if (adjustment.type === 'percentage') {
+            updateFields.push(`${field} = ${field} * (1 + $${paramCount} / 100)`);
+            values.push(parseFloat(adjustment.value));
+          } else if (adjustment.type === 'fixed') {
+            updateFields.push(`${field} = ${field} + $${paramCount}`);
+            values.push(parseFloat(adjustment.value));
+          }
+          paramCount++;
+        } else if (field === 'price' && !updates.priceAdjustment) {
+          // Direct price update
+          updateFields.push(`${field} = $${paramCount}`);
+          values.push(parseFloat(value));
+          paramCount++;
+        } else {
+          // Regular field update
+          updateFields.push(`${field} = $${paramCount}`);
+          values.push(value);
+          paramCount++;
+        }
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
+
+    // Add the IDs to the query
+    const placeholders = ids.map((_, index) => `$${paramCount + index}`).join(',');
+    values.push(...ids);
+
+    const query = `
+      UPDATE digital_works
+      SET ${updateFields.join(', ')}
+      WHERE id IN (${placeholders})
+    `;
+
+    const result = await client.query(query, values);
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: `Successfully updated ${result.rowCount} digital works`,
+      count: result.rowCount
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error bulk updating digital works:', error);
+    res.status(500).json({ error: 'Failed to bulk update digital works' });
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;

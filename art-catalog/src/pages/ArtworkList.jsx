@@ -21,6 +21,8 @@ function ArtworkList() {
   const [showBatchActions, setShowBatchActions] = useState(false);
   const [batchStatus, setBatchStatus] = useState('');
   const [batchLocation, setBatchLocation] = useState('');
+  const [priceAdjustmentType, setPriceAdjustmentType] = useState('percentage');
+  const [priceAdjustmentValue, setPriceAdjustmentValue] = useState('');
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -178,12 +180,8 @@ function ArtworkList() {
     }
 
     try {
-      for (const artworkId of selectedArtworks) {
-        const artwork = artworks.find(a => a.id === artworkId);
-        if (artwork) {
-          await artworkAPI.update(artworkId, { ...artwork, sale_status: batchStatus });
-        }
-      }
+      const ids = Array.from(selectedArtworks);
+      await artworkAPI.bulkUpdate(ids, { sale_status: batchStatus });
       await loadArtworks();
       setShowBatchActions(false);
       setBatchStatus('');
@@ -202,12 +200,8 @@ function ArtworkList() {
     }
 
     try {
-      for (const artworkId of selectedArtworks) {
-        const artwork = artworks.find(a => a.id === artworkId);
-        if (artwork) {
-          await artworkAPI.update(artworkId, { ...artwork, location: batchLocation });
-        }
-      }
+      const ids = Array.from(selectedArtworks);
+      await artworkAPI.bulkUpdate(ids, { location: batchLocation });
       await loadArtworks();
       setShowBatchActions(false);
       setBatchLocation('');
@@ -216,6 +210,41 @@ function ArtworkList() {
     } catch (error) {
       console.error('Error updating artworks:', error);
       alert('Error updating artworks. Please try again.');
+    }
+  }
+
+  async function handleBatchPriceAdjustment() {
+    if (!priceAdjustmentValue || isNaN(priceAdjustmentValue)) {
+      alert('Please enter a valid number');
+      return;
+    }
+
+    const value = parseFloat(priceAdjustmentValue);
+    const confirmMsg = priceAdjustmentType === 'percentage'
+      ? `Adjust prices by ${value}% for ${selectedArtworks.size} artworks?`
+      : `Adjust prices by $${value} for ${selectedArtworks.size} artworks?`;
+
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      const ids = Array.from(selectedArtworks);
+      await artworkAPI.bulkUpdate(ids, {
+        price: null,
+        priceAdjustment: {
+          type: priceAdjustmentType,
+          value: value
+        }
+      });
+      await loadArtworks();
+      setShowBatchActions(false);
+      setPriceAdjustmentValue('');
+      setSelectedArtworks(new Set());
+      alert(`Updated prices for ${selectedArtworks.size} artworks`);
+    } catch (error) {
+      console.error('Error adjusting prices:', error);
+      alert('Error adjusting prices. Please try again.');
     }
   }
 
@@ -735,6 +764,41 @@ function ArtworkList() {
                   </div>
                 </div>
 
+                <div className="form-group">
+                  <label>Adjust Prices</label>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <select
+                      className="form-control"
+                      value={priceAdjustmentType}
+                      onChange={(e) => setPriceAdjustmentType(e.target.value)}
+                      style={{ width: '120px' }}
+                    >
+                      <option value="percentage">% Change</option>
+                      <option value="fixed">$ Amount</option>
+                    </select>
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder={priceAdjustmentType === 'percentage' ? 'e.g., 10 or -10' : 'e.g., 50 or -50'}
+                      value={priceAdjustmentValue}
+                      onChange={(e) => setPriceAdjustmentValue(e.target.value)}
+                      step={priceAdjustmentType === 'percentage' ? '1' : '0.01'}
+                    />
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={handleBatchPriceAdjustment}
+                      disabled={!priceAdjustmentValue}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+                    {priceAdjustmentType === 'percentage'
+                      ? 'Enter percentage (positive to increase, negative to decrease)'
+                      : 'Enter dollar amount (positive to increase, negative to decrease)'}
+                  </small>
+                </div>
+
                 <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
                   <button
                     className="btn btn-primary"
@@ -763,6 +827,7 @@ function ArtworkList() {
                       setShowBatchActions(false);
                       setBatchStatus('');
                       setBatchLocation('');
+                      setPriceAdjustmentValue('');
                     }}
                   >
                     Close

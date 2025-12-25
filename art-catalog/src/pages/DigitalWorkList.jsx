@@ -29,6 +29,10 @@ function DigitalWorkList() {
   const [nftImporting, setNftImporting] = useState(false);
   const [showNftDialog, setShowNftDialog] = useState(false);
   const [nftMatches, setNftMatches] = useState([]);
+  const [showBatchActions, setShowBatchActions] = useState(false);
+  const [batchStatus, setBatchStatus] = useState('');
+  const [priceAdjustmentType, setPriceAdjustmentType] = useState('percentage');
+  const [priceAdjustmentValue, setPriceAdjustmentValue] = useState('');
   const navigate = useNavigate();
 
   const WALLET_ADDRESS = 'tz1hUfR2FdZSwQQnG4Rj512g2C1R5vF3bUDZ';
@@ -382,6 +386,63 @@ function DigitalWorkList() {
     }
   }
 
+  async function handleBatchUpdateStatus() {
+    if (!batchStatus) {
+      alert('Please select a status');
+      return;
+    }
+
+    try {
+      const ids = Array.from(selectedWorks);
+      await digitalWorkAPI.bulkUpdate(ids, { sale_status: batchStatus });
+      await loadWorks();
+      setShowBatchActions(false);
+      setBatchStatus('');
+      setSelectedWorks(new Set());
+      setSelectAll(false);
+      alert(`Updated ${selectedWorks.size} digital works`);
+    } catch (error) {
+      console.error('Error updating digital works:', error);
+      alert('Error updating digital works. Please try again.');
+    }
+  }
+
+  async function handleBatchPriceAdjustment() {
+    if (!priceAdjustmentValue || isNaN(priceAdjustmentValue)) {
+      alert('Please enter a valid number');
+      return;
+    }
+
+    const value = parseFloat(priceAdjustmentValue);
+    const confirmMsg = priceAdjustmentType === 'percentage'
+      ? `Adjust prices by ${value}% for ${selectedWorks.size} digital works?`
+      : `Adjust prices by $${value} for ${selectedWorks.size} digital works?`;
+
+    if (!window.confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      const ids = Array.from(selectedWorks);
+      await digitalWorkAPI.bulkUpdate(ids, {
+        price: null,
+        priceAdjustment: {
+          type: priceAdjustmentType,
+          value: value
+        }
+      });
+      await loadWorks();
+      setShowBatchActions(false);
+      setPriceAdjustmentValue('');
+      setSelectedWorks(new Set());
+      setSelectAll(false);
+      alert(`Updated prices for ${selectedWorks.size} digital works`);
+    } catch (error) {
+      console.error('Error adjusting prices:', error);
+      alert('Error adjusting prices. Please try again.');
+    }
+  }
+
   async function handleNFTImport() {
     setNftImporting(true);
     try {
@@ -486,9 +547,14 @@ function DigitalWorkList() {
         <h2>All Digital Works</h2>
         <div style={{ display: 'flex', gap: '12px', position: 'relative' }}>
           {selectedWorks.size > 0 && (
-            <button className="btn btn-danger" onClick={handleBatchDelete}>
-              Delete Selected ({selectedWorks.size})
-            </button>
+            <>
+              <button className="btn btn-primary" onClick={() => setShowBatchActions(true)}>
+                Batch Actions ({selectedWorks.size})
+              </button>
+              <button className="btn btn-danger" onClick={handleBatchDelete}>
+                Delete Selected ({selectedWorks.size})
+              </button>
+            </>
           )}
           <button className="btn btn-secondary" onClick={() => setShowExportMenu(!showExportMenu)}>
             Export
@@ -728,6 +794,126 @@ function DigitalWorkList() {
             </>
           )}
         </>
+      )}
+
+      {/* Batch Actions Dialog */}
+      {showBatchActions && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div className="batch-dialog" style={{
+            background: 'white',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '500px',
+            width: '90%',
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>
+              Batch Actions ({selectedWorks.size} works)
+            </h3>
+
+            <div className="form-group">
+              <label>Update Status</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <select
+                  className="form-control"
+                  value={batchStatus}
+                  onChange={(e) => setBatchStatus(e.target.value)}
+                >
+                  <option value="">Select status...</option>
+                  <option value="available">Available</option>
+                  <option value="sold">Sold</option>
+                  <option value="not-for-sale">Not for Sale</option>
+                </select>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleBatchUpdateStatus}
+                  disabled={!batchStatus}
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Adjust Prices</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <select
+                  className="form-control"
+                  value={priceAdjustmentType}
+                  onChange={(e) => setPriceAdjustmentType(e.target.value)}
+                  style={{ width: '120px' }}
+                >
+                  <option value="percentage">% Change</option>
+                  <option value="fixed">$ Amount</option>
+                </select>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder={priceAdjustmentType === 'percentage' ? 'e.g., 10 or -10' : 'e.g., 50 or -50'}
+                  value={priceAdjustmentValue}
+                  onChange={(e) => setPriceAdjustmentValue(e.target.value)}
+                  step={priceAdjustmentType === 'percentage' ? '1' : '0.01'}
+                />
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleBatchPriceAdjustment}
+                  disabled={!priceAdjustmentValue}
+                >
+                  Apply
+                </button>
+              </div>
+              <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+                {priceAdjustmentType === 'percentage'
+                  ? 'Enter percentage (positive to increase, negative to decrease)'
+                  : 'Enter dollar amount (positive to increase, negative to decrease)'}
+              </small>
+            </div>
+
+            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  const selectedDigitalWorks = works.filter(w => selectedWorks.has(w.id));
+                  exportDigitalWorksToCSV(selectedDigitalWorks);
+                }}
+                style={{ width: '100%', marginBottom: '12px' }}
+              >
+                Export {selectedWorks.size} Works to CSV
+              </button>
+
+              <button
+                className="btn btn-danger"
+                onClick={handleBatchDelete}
+                style={{ width: '100%' }}
+              >
+                Delete {selectedWorks.size} Works
+              </button>
+            </div>
+
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowBatchActions(false);
+                  setBatchStatus('');
+                  setPriceAdjustmentValue('');
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showImportDialog && (

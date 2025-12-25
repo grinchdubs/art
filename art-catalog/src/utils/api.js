@@ -74,6 +74,13 @@ export const artworkAPI = {
       body: JSON.stringify({ tagIds }),
     });
   },
+
+  bulkUpdate: async (ids, updates) => {
+    return await apiCall('/api/artworks/bulk', {
+      method: 'PATCH',
+      body: JSON.stringify({ ids, updates }),
+    });
+  },
 };
 
 // Digital Works API
@@ -110,6 +117,13 @@ export const digitalWorkAPI = {
     return await apiCall(`/api/digital-works/${id}/tags`, {
       method: 'POST',
       body: JSON.stringify({ tagIds }),
+    });
+  },
+
+  bulkUpdate: async (ids, updates) => {
+    return await apiCall('/api/digital-works/bulk', {
+      method: 'PATCH',
+      body: JSON.stringify({ ids, updates }),
     });
   },
 };
