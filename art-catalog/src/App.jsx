@@ -74,6 +74,13 @@ function Sidebar() {
         <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}>
           Image Gallery
         </Link>
+
+        <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
+          Public View
+        </div>
+        <Link to="/public" className={`nav-link ${isActive('/public') ? 'active' : ''}`}>
+          🌐 Public Portfolio
+        </Link>
       </nav>
       <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button
