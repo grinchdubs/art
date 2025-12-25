@@ -291,6 +291,25 @@ export const galleryAPI = {
   },
 };
 
+// Public API (read-only, for public gallery)
+export const publicAPI = {
+  getArtworks: async () => {
+    return await apiCall('/api/public/artworks');
+  },
+
+  getArtworkById: async (id) => {
+    return await apiCall(`/api/public/artworks/${id}`);
+  },
+
+  getDigitalWorks: async () => {
+    return await apiCall('/api/public/digital-works');
+  },
+
+  getDigitalWorkById: async (id) => {
+    return await apiCall(`/api/public/digital-works/${id}`);
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;

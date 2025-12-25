@@ -17,6 +17,8 @@ import Gallery from './pages/Gallery';
 import SeriesList from './pages/SeriesList';
 import SeriesForm from './pages/SeriesForm';
 import SeriesDetail from './pages/SeriesDetail';
+import PublicGallery from './pages/PublicGallery';
+import PublicWorkDetail from './pages/PublicWorkDetail';
 
 // Import components
 import MigrationPanel from './components/MigrationPanel';
@@ -129,6 +131,8 @@ function AppContent() {
           <Route path="/digital-works/edit/:id" element={<DigitalWorkForm />} />
           <Route path="/digital-works/:id" element={<DigitalWorkDetail />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/public" element={<PublicGallery />} />
+          <Route path="/public/:type/:id" element={<PublicWorkDetail />} />
         </Routes>
       </div>
     </div>
