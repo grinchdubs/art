@@ -7,6 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT dw.*,
+             s.name as series_name,
              json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
@@ -19,11 +20,12 @@ router.get('/', async (req, res) => {
                'color', t.color
              )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM digital_works dw
+      LEFT JOIN series s ON dw.series_id = s.id
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
       LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
-      GROUP BY dw.id
+      GROUP BY dw.id, s.name
       ORDER BY dw.created_at DESC
     `);
     res.json(result.rows);
@@ -39,6 +41,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT dw.*,
+             s.name as series_name,
              json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
@@ -59,6 +62,7 @@ router.get('/:id', async (req, res) => {
                'color', t.color
              )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM digital_works dw
+      LEFT JOIN series s ON dw.series_id = s.id
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
       LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_exhibitions dwe ON dw.id = dwe.digital_work_id
@@ -66,7 +70,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
       WHERE dw.id = $1
-      GROUP BY dw.id
+      GROUP BY dw.id, s.name
     `, [id]);
 
     if (result.rows.length === 0) {
@@ -89,19 +93,19 @@ router.post('/', async (req, res) => {
     const {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
-      nft_token_id, nft_contract_address, nft_blockchain, notes, images
+      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id
     } = req.body;
 
     const result = await client.query(`
       INSERT INTO digital_works (
         inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status || 'available', price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes]);
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null]);
 
     const digitalWork = result.rows[0];
 
@@ -137,7 +141,7 @@ router.put('/:id', async (req, res) => {
     const {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
-      nft_token_id, nft_contract_address, nft_blockchain, notes, images
+      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id
     } = req.body;
 
     const result = await client.query(`
@@ -145,12 +149,13 @@ router.put('/:id', async (req, res) => {
       SET inventory_number = $1, title = $2, creation_date = $3, file_format = $4,
           file_size = $5, dimensions = $6, sale_status = $7, price = $8,
           license_type = $9, video_url = $10, embed_url = $11, platform = $12,
-          nft_token_id = $13, nft_contract_address = $14, nft_blockchain = $15, notes = $16
-      WHERE id = $17
+          nft_token_id = $13, nft_contract_address = $14, nft_blockchain = $15, notes = $16,
+          series_id = $17
+      WHERE id = $18
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes, id]);
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');

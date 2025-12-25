@@ -22,6 +22,7 @@ const digitalWorksRoutes = require('./routes/digitalWorks');
 const exhibitionsRoutes = require('./routes/exhibitions');
 const galleryRoutes = require('./routes/gallery');
 const tagsRoutes = require('./routes/tags');
+const seriesRoutes = require('./routes/series');
 
 // Use routes
 app.use('/api/artworks', artworksRoutes);
@@ -29,6 +30,7 @@ app.use('/api/digital-works', digitalWorksRoutes);
 app.use('/api/exhibitions', exhibitionsRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/tags', tagsRoutes);
+app.use('/api/series', seriesRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -7,6 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT a.*,
+             s.name as series_name,
              json_agg(DISTINCT jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
@@ -19,11 +20,12 @@ router.get('/', async (req, res) => {
                'color', t.color
              )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM artworks a
+      LEFT JOIN series s ON a.series_id = s.id
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
       LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
-      GROUP BY a.id
+      GROUP BY a.id, s.name
       ORDER BY a.created_at DESC
     `);
     res.json(result.rows);
@@ -39,6 +41,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(`
       SELECT a.*,
+             s.name as series_name,
              json_agg(jsonb_build_object(
                'id', gi.id,
                'filename', gi.filename,
@@ -59,6 +62,7 @@ router.get('/:id', async (req, res) => {
                'color', t.color
              )) FILTER (WHERE t.id IS NOT NULL) as tags
       FROM artworks a
+      LEFT JOIN series s ON a.series_id = s.id
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
       LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_exhibitions ae ON a.id = ae.artwork_id
@@ -66,7 +70,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
       WHERE a.id = $1
-      GROUP BY a.id
+      GROUP BY a.id, s.name
     `, [id]);
 
     if (result.rows.length === 0) {
@@ -88,18 +92,18 @@ router.post('/', async (req, res) => {
 
     const {
       inventory_number, title, creation_date, medium, dimensions,
-      series_name, sale_status, price, location, notes, images
+      series_name, series_id, sale_status, price, location, notes, images
     } = req.body;
 
     // Insert artwork
     const artworkResult = await client.query(`
       INSERT INTO artworks (
         inventory_number, title, creation_date, medium, dimensions,
-        series_name, sale_status, price, location, notes
+        series_id, sale_status, price, location, notes
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
-        series_name, sale_status || 'available', price, location, notes]);
+        series_id || null, sale_status || 'available', price, location, notes]);
 
     const artwork = artworkResult.rows[0];
 
@@ -142,18 +146,18 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const {
       inventory_number, title, creation_date, medium, dimensions,
-      series_name, sale_status, price, location, notes, images
+      series_name, series_id, sale_status, price, location, notes, images
     } = req.body;
 
     const result = await client.query(`
       UPDATE artworks
       SET inventory_number = $1, title = $2, creation_date = $3,
-          medium = $4, dimensions = $5, series_name = $6,
+          medium = $4, dimensions = $5, series_id = $6,
           sale_status = $7, price = $8, location = $9, notes = $10
       WHERE id = $11
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
-        series_name, sale_status, price, location, notes, id]);
+        series_id || null, sale_status, price, location, notes, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');
