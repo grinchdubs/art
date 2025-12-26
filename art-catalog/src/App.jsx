@@ -21,6 +21,7 @@ import PublicGallery from './pages/PublicGallery';
 import PublicWorkDetail from './pages/PublicWorkDetail';
 import SalesList from './pages/SalesList';
 import BackupRestore from './pages/BackupRestore';
+import Reports from './pages/Reports';
 
 // Import components
 import MigrationPanel from './components/MigrationPanel';
@@ -82,6 +83,9 @@ function Sidebar() {
         </div>
         <Link to="/sales" className={`nav-link ${isActive('/sales') ? 'active' : ''}`}>
           Sales Records
+        </Link>
+        <Link to="/reports" className={`nav-link ${isActive('/reports') ? 'active' : ''}`}>
+          Reports & Analytics
         </Link>
 
         <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
@@ -155,6 +159,7 @@ function AppContent() {
           <Route path="/digital-works/:id" element={<DigitalWorkDetail />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/sales" element={<SalesList />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/backup" element={<BackupRestore />} />
           <Route path="/public" element={<PublicGallery />} />
           <Route path="/public/:type/:id" element={<PublicWorkDetail />} />
