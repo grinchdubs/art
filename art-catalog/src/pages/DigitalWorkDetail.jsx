@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { digitalWorkAPI, getImageURL } from '../utils/api';
+import { digitalWorkAPI, salesAPI, getImageURL } from '../utils/api';
 import { getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
 import ImageLightbox from '../components/ImageLightbox';
@@ -129,6 +129,34 @@ function DigitalWorkDetail() {
     }
   }
 
+  async function handleRecordSale() {
+    const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!saleDate) return;
+
+    const salePrice = prompt('Sale price (optional):');
+    const buyerName = prompt('Buyer name (optional):');
+    const buyerEmail = prompt('Buyer email (optional):');
+    const platform = prompt('Platform (optional - e.g., fxhash, Tezos marketplace, Direct):');
+    const notes = prompt('Notes (optional):');
+
+    try {
+      await salesAPI.create({
+        digital_work_id: id,
+        sale_date: saleDate,
+        sale_price: salePrice || null,
+        buyer_name: buyerName || null,
+        buyer_email: buyerEmail || null,
+        platform: platform || null,
+        notes: notes || null,
+      });
+      alert('Sale recorded successfully!');
+      loadWork(); // Reload to update status
+    } catch (error) {
+      console.error('Error recording sale:', error);
+      alert('Failed to record sale. Please try again.');
+    }
+  }
+
   if (loading) {
     return (
       <div className="loading">
@@ -157,6 +185,11 @@ function DigitalWorkDetail() {
           <button className="btn btn-danger" onClick={handleDelete}>
             Delete
           </button>
+          {work.sale_status !== 'sold' && (
+            <button className="btn btn-success" onClick={handleRecordSale}>
+              Record Sale
+            </button>
+          )}
         </div>
       </div>
 

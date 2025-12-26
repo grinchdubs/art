@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { artworkAPI, getImageURL } from '../utils/api';
+import { artworkAPI, salesAPI, getImageURL } from '../utils/api';
 import ImageLightbox from '../components/ImageLightbox';
 
 function ArtworkDetail() {
@@ -130,6 +130,34 @@ function ArtworkDetail() {
     }
   }
 
+  async function handleRecordSale() {
+    const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!saleDate) return;
+
+    const salePrice = prompt('Sale price (optional):');
+    const buyerName = prompt('Buyer name (optional):');
+    const buyerEmail = prompt('Buyer email (optional):');
+    const platform = prompt('Platform (optional - e.g., Etsy, Direct, Gallery):');
+    const notes = prompt('Notes (optional):');
+
+    try {
+      await salesAPI.create({
+        artwork_id: id,
+        sale_date: saleDate,
+        sale_price: salePrice || null,
+        buyer_name: buyerName || null,
+        buyer_email: buyerEmail || null,
+        platform: platform || null,
+        notes: notes || null,
+      });
+      alert('Sale recorded successfully!');
+      loadArtwork(); // Reload to update status
+    } catch (error) {
+      console.error('Error recording sale:', error);
+      alert('Failed to record sale. Please try again.');
+    }
+  }
+
   if (loading) {
     return (
       <div className="loading">
@@ -170,6 +198,11 @@ function ArtworkDetail() {
             <button className="btn btn-danger btn-sm" onClick={handleDelete}>
               Delete
             </button>
+            {artwork.sale_status !== 'sold' && (
+              <button className="btn btn-success btn-sm" onClick={handleRecordSale}>
+                Record Sale
+              </button>
+            )}
           </div>
         </div>
 
