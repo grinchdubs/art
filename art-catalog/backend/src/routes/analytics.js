@@ -92,20 +92,24 @@ router.get('/price-ranges', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
-        CASE 
-          WHEN CAST(price AS DECIMAL) < 100 THEN '< $100'
-          WHEN CAST(price AS DECIMAL) >= 100 AND CAST(price AS DECIMAL) < 500 THEN '$100-$500'
-          WHEN CAST(price AS DECIMAL) >= 500 AND CAST(price AS DECIMAL) < 1000 THEN '$500-$1K'
-          WHEN CAST(price AS DECIMAL) >= 1000 AND CAST(price AS DECIMAL) < 5000 THEN '$1K-$5K'
-          WHEN CAST(price AS DECIMAL) >= 5000 AND CAST(price AS DECIMAL) < 10000 THEN '$5K-$10K'
-          ELSE '$10K+'
-        END as range,
+        price_range as range,
         COUNT(*) as count
-      FROM artworks
-      WHERE price IS NOT NULL AND price != '' AND price ~ '^[0-9.]+$'
-      GROUP BY range
+      FROM (
+        SELECT 
+          CASE 
+            WHEN CAST(price AS DECIMAL) < 100 THEN '< $100'
+            WHEN CAST(price AS DECIMAL) >= 100 AND CAST(price AS DECIMAL) < 500 THEN '$100-$500'
+            WHEN CAST(price AS DECIMAL) >= 500 AND CAST(price AS DECIMAL) < 1000 THEN '$500-$1K'
+            WHEN CAST(price AS DECIMAL) >= 1000 AND CAST(price AS DECIMAL) < 5000 THEN '$1K-$5K'
+            WHEN CAST(price AS DECIMAL) >= 5000 AND CAST(price AS DECIMAL) < 10000 THEN '$5K-$10K'
+            ELSE '$10K+'
+          END as price_range
+        FROM artworks
+        WHERE price IS NOT NULL AND price != '' AND price ~ '^[0-9.]+$'
+      ) ranges
+      GROUP BY price_range
       ORDER BY 
-        CASE range
+        CASE price_range
           WHEN '< $100' THEN 1
           WHEN '$100-$500' THEN 2
           WHEN '$500-$1K' THEN 3
