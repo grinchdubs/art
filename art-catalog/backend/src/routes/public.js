@@ -36,6 +36,7 @@ router.get('/artworks', async (req, res) => {
       LEFT JOIN gallery_images gi ON agi.gallery_image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
+      WHERE a.is_public = true
       GROUP BY a.id, s.name
       ORDER BY a.creation_date DESC NULLS LAST, a.id DESC
     `);
@@ -81,7 +82,7 @@ router.get('/artworks/:id', async (req, res) => {
       LEFT JOIN gallery_images gi ON agi.gallery_image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
-      WHERE a.id = $1
+      WHERE a.id = $1 AND a.is_public = true
       GROUP BY a.id, s.name
     `, [id]);
 
@@ -130,6 +131,7 @@ router.get('/digital-works', async (req, res) => {
       LEFT JOIN gallery_images gi ON dwgi.gallery_image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
+      WHERE dw.is_public = true
       GROUP BY dw.id, s.name
       ORDER BY dw.creation_date DESC NULLS LAST, dw.id DESC
     `);
@@ -175,7 +177,7 @@ router.get('/digital-works/:id', async (req, res) => {
       LEFT JOIN gallery_images gi ON dwgi.gallery_image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
-      WHERE dw.id = $1
+      WHERE dw.id = $1 AND dw.is_public = true
       GROUP BY dw.id, s.name
     `, [id]);
 

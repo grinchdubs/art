@@ -20,6 +20,7 @@ function DigitalWorkForm() {
     license_type: '',
     notes: '',
     series_id: '',
+    is_public: true,
   });
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -359,6 +360,23 @@ function DigitalWorkForm() {
               onChange={handleChange}
               placeholder="Additional notes about the digital work"
             />
+          </div>
+
+          {/* Public Visibility */}
+          <div className="form-group" style={{ marginTop: '16px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                name="is_public"
+                checked={formData.is_public}
+                onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
+                style={{ width: 'auto', cursor: 'pointer' }}
+              />
+              <span style={{ fontWeight: '500' }}>🌐 Show in Public Gallery</span>
+            </label>
+            <small style={{ display: 'block', color: '#7f8c8d', marginTop: '4px', marginLeft: '24px' }}>
+              When checked, this digital work will be visible in the public portfolio view
+            </small>
           </div>
 
           {/* Tags */}

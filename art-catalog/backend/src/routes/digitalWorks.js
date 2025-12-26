@@ -100,12 +100,13 @@ router.post('/', async (req, res) => {
       INSERT INTO digital_works (
         inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id, is_public
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status || 'available', price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null]);
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
+        req.body.is_public !== undefined ? req.body.is_public : true]);
 
     const digitalWork = result.rows[0];
 
@@ -150,12 +151,13 @@ router.put('/:id', async (req, res) => {
           file_size = $5, dimensions = $6, sale_status = $7, price = $8,
           license_type = $9, video_url = $10, embed_url = $11, platform = $12,
           nft_token_id = $13, nft_contract_address = $14, nft_blockchain = $15, notes = $16,
-          series_id = $17
-      WHERE id = $18
+          series_id = $17, is_public = $18
+      WHERE id = $19
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null, id]);
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
+        req.body.is_public !== undefined ? req.body.is_public : true, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');
@@ -248,7 +250,7 @@ router.patch('/bulk', async (req, res) => {
     }
 
     // Build dynamic UPDATE query
-    const allowedFields = ['sale_status', 'price'];
+    const allowedFields = ['sale_status', 'price', 'is_public'];
     const updateFields = [];
     const values = [];
     let paramCount = 1;
