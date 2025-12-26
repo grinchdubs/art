@@ -17,6 +17,8 @@ function DigitalWorkForm() {
     dimensions: '',
     sale_status: 'available',
     price: '',
+    edition_number: '',
+    edition_total: '',
     license_type: '',
     notes: '',
     series_id: '',
@@ -312,6 +314,36 @@ function DigitalWorkForm() {
                 value={formData.price}
                 onChange={handleChange}
                 placeholder="e.g., $500, €1000, or negotiable"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="edition_number">Edition Number (optional)</label>
+              <input
+                type="number"
+                id="edition_number"
+                name="edition_number"
+                className="form-control"
+                value={formData.edition_number}
+                onChange={handleChange}
+                placeholder="e.g., 1"
+                min="1"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edition_total">Edition Total (optional)</label>
+              <input
+                type="number"
+                id="edition_total"
+                name="edition_total"
+                className="form-control"
+                value={formData.edition_total}
+                onChange={handleChange}
+                placeholder="e.g., 10"
+                min="1"
               />
             </div>
           </div>

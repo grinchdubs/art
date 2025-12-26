@@ -184,19 +184,22 @@ router.post('/', async (req, res) => {
 
     const {
       inventory_number, title, creation_date, medium, dimensions,
-      series_name, series_id, sale_status, price, location, notes, images
+      series_name, series_id, sale_status, price, location, notes, images,
+      edition_number, edition_total
     } = req.body;
 
     // Insert artwork
     const artworkResult = await client.query(`
       INSERT INTO artworks (
         inventory_number, title, creation_date, medium, dimensions,
-        series_id, sale_status, price, location, notes, is_public
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        series_id, sale_status, price, location, notes, is_public,
+        edition_number, edition_total
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
         series_id || null, sale_status || 'available', price, location, notes,
-        req.body.is_public !== undefined ? req.body.is_public : true]);
+        req.body.is_public !== undefined ? req.body.is_public : true,
+        edition_number || null, edition_total || null]);
 
     const artwork = artworkResult.rows[0];
 
@@ -239,19 +242,22 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const {
       inventory_number, title, creation_date, medium, dimensions,
-      series_name, series_id, sale_status, price, location, notes, images
+      series_name, series_id, sale_status, price, location, notes, images,
+      edition_number, edition_total
     } = req.body;
 
     const result = await client.query(`
       UPDATE artworks
       SET inventory_number = $1, title = $2, creation_date = $3,
           medium = $4, dimensions = $5, series_id = $6,
-          sale_status = $7, price = $8, location = $9, notes = $10, is_public = $11
-      WHERE id = $12
+          sale_status = $7, price = $8, location = $9, notes = $10, is_public = $11,
+          edition_number = $12, edition_total = $13
+      WHERE id = $14
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
         series_id || null, sale_status, price, location, notes,
-        req.body.is_public !== undefined ? req.body.is_public : true, id]);
+        req.body.is_public !== undefined ? req.body.is_public : true,
+        edition_number || null, edition_total || null, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');

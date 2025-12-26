@@ -139,6 +139,19 @@ function DigitalWorkDetail() {
     const buyerName = prompt('Buyer name (optional):');
     const buyerEmail = prompt('Buyer email (optional):');
     const platform = prompt('Platform (optional - e.g., fxhash, Tezos marketplace, Direct):');
+    
+    let editionNumber = null;
+    if (work.edition_total) {
+      const editionInput = prompt(`Edition number (1-${work.edition_total}):`);
+      if (editionInput) {
+        editionNumber = parseInt(editionInput);
+        if (isNaN(editionNumber) || editionNumber < 1 || editionNumber > work.edition_total) {
+          alert(`Edition number must be between 1 and ${work.edition_total}`);
+          return;
+        }
+      }
+    }
+    
     const notes = prompt('Notes (optional):');
 
     try {
@@ -149,6 +162,7 @@ function DigitalWorkDetail() {
         buyer_name: buyerName || null,
         buyer_email: buyerEmail || null,
         platform: platform || null,
+        edition_number: editionNumber,
         notes: notes || null,
       });
       alert('Sale recorded successfully!');
@@ -418,6 +432,15 @@ function DigitalWorkDetail() {
                   : 'Not specified'}
               </div>
             </div>
+
+            {work.edition_total && (
+              <div className="detail-field">
+                <div className="detail-label">Edition</div>
+                <div className="detail-value">
+                  {work.edition_number ? `${work.edition_number} of ${work.edition_total}` : `Limited edition of ${work.edition_total}`}
+                </div>
+              </div>
+            )}
 
             <div className="detail-field">
               <div className="detail-label">License Type</div>

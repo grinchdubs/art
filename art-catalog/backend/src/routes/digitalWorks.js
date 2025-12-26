@@ -193,20 +193,23 @@ router.post('/', async (req, res) => {
     const {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
-      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id
+      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id,
+      edition_number, edition_total
     } = req.body;
 
     const result = await client.query(`
       INSERT INTO digital_works (
         inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
-        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id, is_public
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        nft_token_id, nft_contract_address, nft_blockchain, notes, series_id, is_public,
+        edition_number, edition_total
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status || 'available', price, license_type, video_url, embed_url, platform,
         nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
-        req.body.is_public !== undefined ? req.body.is_public : true]);
+        req.body.is_public !== undefined ? req.body.is_public : true,
+        edition_number || null, edition_total || null]);
 
     const digitalWork = result.rows[0];
 
@@ -242,7 +245,8 @@ router.put('/:id', async (req, res) => {
     const {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
-      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id
+      nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id,
+      edition_number, edition_total
     } = req.body;
 
     const result = await client.query(`
@@ -251,13 +255,14 @@ router.put('/:id', async (req, res) => {
           file_size = $5, dimensions = $6, sale_status = $7, price = $8,
           license_type = $9, video_url = $10, embed_url = $11, platform = $12,
           nft_token_id = $13, nft_contract_address = $14, nft_blockchain = $15, notes = $16,
-          series_id = $17, is_public = $18
-      WHERE id = $19
+          series_id = $17, is_public = $18, edition_number = $19, edition_total = $20
+      WHERE id = $21
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
         nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
-        req.body.is_public !== undefined ? req.body.is_public : true, id]);
+        req.body.is_public !== undefined ? req.body.is_public : true,
+        edition_number || null, edition_total || null, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');

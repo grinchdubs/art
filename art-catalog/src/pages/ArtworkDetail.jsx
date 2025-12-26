@@ -143,6 +143,19 @@ function ArtworkDetail() {
     const buyerName = prompt('Buyer name (optional):');
     const buyerEmail = prompt('Buyer email (optional):');
     const platform = prompt('Platform (optional - e.g., Etsy, Direct, Gallery):');
+    
+    let editionNumber = null;
+    if (artwork.edition_total) {
+      const editionInput = prompt(`Edition number (1-${artwork.edition_total}):`);
+      if (editionInput) {
+        editionNumber = parseInt(editionInput);
+        if (isNaN(editionNumber) || editionNumber < 1 || editionNumber > artwork.edition_total) {
+          alert(`Edition number must be between 1 and ${artwork.edition_total}`);
+          return;
+        }
+      }
+    }
+    
     const notes = prompt('Notes (optional):');
 
     try {
@@ -153,6 +166,7 @@ function ArtworkDetail() {
         buyer_name: buyerName || null,
         buyer_email: buyerEmail || null,
         platform: platform || null,
+        edition_number: editionNumber,
         notes: notes || null,
       });
       alert('Sale recorded successfully!');
@@ -349,6 +363,14 @@ function ArtworkDetail() {
                 <div className="detail-label">Price</div>
                 <div className="detail-value">{artwork.price || 'Not specified'}</div>
               </div>
+              {artwork.edition_total && (
+                <div className="detail-field">
+                  <div className="detail-label">Edition</div>
+                  <div className="detail-value">
+                    {artwork.edition_number ? `${artwork.edition_number} of ${artwork.edition_total}` : `Limited edition of ${artwork.edition_total}`}
+                  </div>
+                </div>
+              )}
               <div className="detail-field">
                 <div className="detail-label">Current Location</div>
                 <div className="detail-value" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

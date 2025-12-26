@@ -169,6 +169,7 @@ function SalesList() {
                 <th>Date</th>
                 <th>Item</th>
                 <th>Type</th>
+                <th>Edition</th>
                 <th>Buyer</th>
                 <th>Price</th>
                 <th>Platform</th>
@@ -198,6 +199,7 @@ function SalesList() {
                       {sale.artwork_id ? 'Physical' : 'Digital'}
                     </span>
                   </td>
+                  <td>{sale.edition_number ? `#${sale.edition_number}` : '-'}</td>
                   <td>
                     {sale.buyer_name || '-'}
                     {sale.buyer_email && (
