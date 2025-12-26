@@ -43,7 +43,8 @@ export async function searchImmichAssets(query) {
     }
 
     const data = await response.json();
-    return data.assets?.items || [];
+    // Backend now returns array directly
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error searching Immich:', error);
     throw error;

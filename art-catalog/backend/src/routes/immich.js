@@ -58,7 +58,8 @@ router.post('/search', async (req, res) => {
     }
 
     const data = await response.json();
-    res.json(data);
+    // Return just the assets array for consistency with /assets endpoint
+    res.json(data.assets?.items || []);
   } catch (error) {
     console.error('Error searching Immich:', error);
     res.status(500).json({ error: 'Search failed' });
