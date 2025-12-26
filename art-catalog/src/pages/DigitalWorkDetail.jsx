@@ -26,7 +26,7 @@ function DigitalWorkDetail() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Don't trigger shortcuts if user is typing in an input
+      // Don't trigger shortcuts if user is typing in an input or if there are open dialogs/prompts
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return;
       }
@@ -37,9 +37,8 @@ function DigitalWorkDetail() {
             setLightboxOpen(false);
           } else if (showShortcuts) {
             setShowShortcuts(false);
-          } else {
-            navigate('/digital-works');
           }
+          // Removed navigation on Escape to prevent conflicts with prompt dialogs
           break;
         case 'ArrowLeft':
           navigateToPrevious();
