@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { artworkAPI, galleryAPI, getImageURL, seriesAPI } from '../utils/api';
 import TagSelector from '../components/TagSelector';
+import ImmichBrowser from '../components/ImmichBrowser';
 
 function ArtworkForm() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ function ArtworkForm() {
   const [selectedImageIds, setSelectedImageIds] = useState([]);
   const [primaryImageId, setPrimaryImageId] = useState(null);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [showImmichBrowser, setShowImmichBrowser] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState([]);
   const [allSeries, setAllSeries] = useState([]);
 
@@ -158,6 +160,40 @@ function ArtworkForm() {
   function setPrimaryImage(imageId) {
     if (selectedImageIds.includes(imageId)) {
       setPrimaryImageId(imageId);
+    }
+  }
+
+  async function handleImmichImport(files) {
+    try {
+      // Upload each file to the gallery
+      const uploadedImages = [];
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        const response = await galleryAPI.upload(formData);
+        uploadedImages.push(response);
+      }
+
+      // Add the new images to the gallery list
+      setAllGalleryImages(prev => [...prev, ...uploadedImages]);
+
+      // Auto-select the newly imported images
+      const newImageIds = uploadedImages.map(img => img.id);
+      setSelectedImageIds(prev => {
+        const combined = [...prev, ...newImageIds];
+        // If no primary image set, make the first new image primary
+        if (!primaryImageId && combined.length > 0) {
+          setPrimaryImageId(combined[0]);
+        }
+        return combined;
+      });
+
+      alert(`Successfully imported ${files.length} image(s) from Immich!`);
+    } catch (error) {
+      console.error('Error importing from Immich:', error);
+      alert('Failed to import images. Please try again.');
     }
   }
 
@@ -391,14 +427,23 @@ function ArtworkForm() {
           {/* Image Selection */}
           <div className="form-group">
             <label>Images</label>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setShowImagePicker(true)}
-              style={{ display: 'block', marginBottom: '16px' }}
-            >
-              Select from Gallery ({selectedImageIds.length} selected)
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowImagePicker(true)}
+              >
+                Select from Gallery ({selectedImageIds.length} selected)
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowImmichBrowser(true)}
+                style={{ background: '#9b59b6', borderColor: '#9b59b6' }}
+              >
+                📷 Import from Immich
+              </button>
+            </div>
 
             {selectedImages.length > 0 && (
               <div style={{ marginTop: '16px' }}>
@@ -549,6 +594,13 @@ function ArtworkForm() {
           </div>
         </div>
       )}
+
+      {/* Immich Browser Modal */}
+      <ImmichBrowser
+        isOpen={showImmichBrowser}
+        onClose={() => setShowImmichBrowser(false)}
+        onImport={handleImmichImport}
+      />
     </div>
   );
 }
