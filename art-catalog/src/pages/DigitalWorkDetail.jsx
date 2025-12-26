@@ -202,7 +202,7 @@ function DigitalWorkDetail() {
           <button type="button" className="btn btn-danger" onClick={handleDelete}>
             Delete
           </button>
-          {work.sale_status !== 'sold' && (
+          {(work.sale_status !== 'sold' || work.edition_total) && (
             <button type="button" className="btn btn-success" onClick={handleRecordSale}>
               Record Sale
             </button>

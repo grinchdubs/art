@@ -218,7 +218,7 @@ function ArtworkDetail() {
             <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete}>
               Delete
             </button>
-            {artwork.sale_status !== 'sold' && (
+            {(artwork.sale_status !== 'sold' || artwork.edition_total) && (
               <button type="button" className="btn btn-success btn-sm" onClick={handleRecordSale}>
                 Record Sale
               </button>
