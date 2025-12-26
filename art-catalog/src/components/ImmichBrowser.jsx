@@ -91,19 +91,39 @@ function ImmichBrowser({ isOpen, onClose, onImport }) {
     setImporting(true);
     try {
       const files = [];
-      for (const assetId of selectedAssets) {
+      const assetArray = Array.from(selectedAssets);
+      
+      for (let i = 0; i < assetArray.length; i++) {
+        const assetId = assetArray[i];
+        console.log(`Downloading ${i + 1}/${assetArray.length}: ${assetId}`);
+        
         const asset = assets.find(a => a.id === assetId);
-        const filename = asset?.originalFileName || `immich-${assetId}.jpg`;
-        const file = await downloadImmichImage(assetId, filename);
-        files.push(file);
+        if (!asset) {
+          console.error(`Asset ${assetId} not found in assets list`);
+          continue;
+        }
+        
+        const filename = asset.originalFileName || `immich-${assetId}.jpg`;
+        console.log(`Filename: ${filename}`);
+        
+        try {
+          const file = await downloadImmichImage(assetId, filename);
+          console.log(`Downloaded file:`, file);
+          files.push(file);
+        } catch (downloadError) {
+          console.error(`Failed to download ${assetId}:`, downloadError);
+          alert(`Failed to download ${filename}: ${downloadError.message}`);
+          throw downloadError;
+        }
       }
 
+      console.log(`Calling onImport with ${files.length} files`);
       onImport(files);
       setSelectedAssets(new Set());
       onClose();
     } catch (error) {
       console.error('Import failed:', error);
-      alert('Failed to import images. Please try again.');
+      alert(`Failed to import images: ${error.message}`);
     } finally {
       setImporting(false);
     }
