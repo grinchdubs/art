@@ -368,7 +368,7 @@ body.dark-mode .search-input::placeholder {
   height: 100vh;
   position: sticky;
   top: 0;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .sidebar h1 {
@@ -382,7 +382,14 @@ body.dark-mode .search-input::placeholder {
 .sidebar nav {
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 20px;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.sidebar > div:last-child {
+  flex-shrink: 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .nav-link {
