@@ -208,7 +208,14 @@ function ArtworkDetail() {
               Delete
             </button>
             {artwork.sale_status !== 'sold' && (
-              <button type="button" className="btn btn-success btn-sm" onClick={handleRecordSale}>
+              <button 
+                type="button" 
+                className="btn btn-success btn-sm" 
+                onClick={(e) => {
+                  console.log('Button clicked!', e);
+                  handleRecordSale(e);
+                }}
+              >
                 Record Sale
               </button>
             )}
