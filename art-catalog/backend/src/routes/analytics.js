@@ -60,10 +60,10 @@ router.get('/status-distribution', async (req, res) => {
   try {
     const artworksResult = await pool.query(`
       SELECT 
-        COALESCE(status, 'Unknown') as status,
+        COALESCE(sale_status, 'Unknown') as status,
         COUNT(*) as count
       FROM artworks
-      GROUP BY status
+      GROUP BY sale_status
     `);
     
     const digitalResult = await pool.query(`
@@ -93,16 +93,16 @@ router.get('/price-ranges', async (req, res) => {
     const result = await pool.query(`
       SELECT 
         CASE 
-          WHEN price < 100 THEN '< $100'
-          WHEN price >= 100 AND price < 500 THEN '$100-$500'
-          WHEN price >= 500 AND price < 1000 THEN '$500-$1K'
-          WHEN price >= 1000 AND price < 5000 THEN '$1K-$5K'
-          WHEN price >= 5000 AND price < 10000 THEN '$5K-$10K'
+          WHEN CAST(price AS DECIMAL) < 100 THEN '< $100'
+          WHEN CAST(price AS DECIMAL) >= 100 AND CAST(price AS DECIMAL) < 500 THEN '$100-$500'
+          WHEN CAST(price AS DECIMAL) >= 500 AND CAST(price AS DECIMAL) < 1000 THEN '$500-$1K'
+          WHEN CAST(price AS DECIMAL) >= 1000 AND CAST(price AS DECIMAL) < 5000 THEN '$1K-$5K'
+          WHEN CAST(price AS DECIMAL) >= 5000 AND CAST(price AS DECIMAL) < 10000 THEN '$5K-$10K'
           ELSE '$10K+'
         END as range,
         COUNT(*) as count
       FROM artworks
-      WHERE price IS NOT NULL AND price > 0
+      WHERE price IS NOT NULL AND price != '' AND price ~ '^[0-9.]+$'
       GROUP BY range
       ORDER BY 
         CASE range
@@ -131,8 +131,8 @@ router.get('/summary', async (req, res) => {
         (SELECT COUNT(*) FROM digital_works) as total_digital_works,
         (SELECT COUNT(*) FROM exhibitions) as total_exhibitions,
         (SELECT COUNT(*) FROM gallery_images) as total_images,
-        (SELECT SUM(price) FROM artworks WHERE price IS NOT NULL) as total_artwork_value,
-        (SELECT COUNT(*) FROM artworks WHERE status = 'sold') as artworks_sold,
+        (SELECT SUM(CAST(price AS DECIMAL)) FROM artworks WHERE price IS NOT NULL AND price != '' AND price ~ '^[0-9.]+$') as total_artwork_value,
+        (SELECT COUNT(*) FROM artworks WHERE sale_status = 'sold') as artworks_sold,
         (SELECT COUNT(*) FROM digital_works WHERE is_minted = true) as digital_works_minted
     `);
     
