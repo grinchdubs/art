@@ -207,6 +207,9 @@ function ArtworkDetail() {
             <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete}>
               Delete
             </button>
+            <div style={{ padding: '8px', background: '#f0f0f0', borderRadius: '4px', fontSize: '12px' }}>
+              Status: {artwork.sale_status || 'unknown'}
+            </div>
             {artwork.sale_status !== 'sold' && (
               <button 
                 type="button" 
@@ -215,9 +218,13 @@ function ArtworkDetail() {
                   console.log('Button clicked!', e);
                   handleRecordSale(e);
                 }}
+                style={{ position: 'relative', zIndex: 9999 }}
               >
                 Record Sale
               </button>
+            )}
+            {artwork.sale_status === 'sold' && (
+              <div style={{ padding: '8px', color: 'green' }}>SOLD - button hidden</div>
             )}
           </div>
         </div>
