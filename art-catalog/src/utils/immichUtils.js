@@ -70,18 +70,23 @@ export function getImmichImageUrl(assetId) {
  */
 export async function downloadImmichImage(assetId, filename) {
   try {
+    console.log(`Downloading image ${assetId}...`);
     // Use our backend proxy to download the image
     const response = await fetch(`/api/immich/download/${assetId}`, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'image/*'
       }
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Download failed:', response.status, errorText);
       throw new Error(`Failed to download image: ${response.status}`);
     }
 
+    console.log(`Converting to blob...`);
     const blob = await response.blob();
+    console.log(`Downloaded ${blob.size} bytes`);
     
     // Create a File object from the blob
     const file = new File([blob], filename || `immich-${assetId}.jpg`, {

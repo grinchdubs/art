@@ -165,14 +165,19 @@ function ArtworkForm() {
 
   async function handleImmichImport(files) {
     try {
+      console.log(`Importing ${files.length} images from Immich...`);
       // Upload each file to the gallery
       const uploadedImages = [];
       
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        console.log(`Uploading ${i + 1}/${files.length}: ${file.name} (${file.size} bytes)`);
+        
         const formData = new FormData();
         formData.append('image', file);
         
         const response = await galleryAPI.upload(formData);
+        console.log(`Uploaded successfully:`, response);
         uploadedImages.push(response);
       }
 
