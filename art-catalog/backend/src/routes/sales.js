@@ -109,6 +109,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Sale date is required' });
     }
 
+    // Clean and parse sale_price - remove currency symbols, commas, whitespace
+    let cleanedPrice = null;
+    if (sale_price) {
+      const priceStr = String(sale_price).replace(/[$,\s]/g, '').trim();
+      if (priceStr && !isNaN(priceStr)) {
+        cleanedPrice = parseFloat(priceStr);
+      }
+    }
+
     const result = await pool.query(`
       INSERT INTO sales (
         artwork_id, digital_work_id, sale_date, sale_price,
@@ -120,7 +129,7 @@ router.post('/', async (req, res) => {
       artwork_id || null,
       digital_work_id || null,
       sale_date,
-      sale_price || null,
+      cleanedPrice,
       buyer_name || null,
       buyer_email || null,
       platform || null,
