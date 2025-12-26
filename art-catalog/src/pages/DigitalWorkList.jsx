@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { digitalWorkAPI, galleryAPI, getImageURL } from '../utils/api';
+import { digitalWorkAPI, galleryAPI, getImageURL, tagAPI } from '../utils/api';
 import { exportDigitalWorksToCSV, exportDigitalWorksToJSON, exportDigitalWorksToText, exportDigitalWorksStats } from '../utils/digitalExportUtils';
 import { parseDigitalWorksCSV, downloadDigitalWorksTemplate } from '../utils/digitalImportUtils';
 import { parseVideoUrls, getVideoImportExample, fetchVideoTitles, getVideoThumbnailUrl, fetchVimeoThumbnail } from '../utils/videoImportUtils';
 import { fetchNFTsByCreator, matchVideoToNFT } from '../utils/nftUtils';
+import AdvancedSearch from '../components/AdvancedSearch';
 
 function DigitalWorkList() {
   const [works, setWorks] = useState([]);
@@ -34,13 +35,32 @@ function DigitalWorkList() {
   const [batchStatus, setBatchStatus] = useState('');
   const [priceAdjustmentType, setPriceAdjustmentType] = useState('percentage');
   const [priceAdjustmentValue, setPriceAdjustmentValue] = useState('');
+  
+  // Advanced search filters
+  const [advancedFilters, setAdvancedFilters] = useState({
+    creation_date_from: '',
+    creation_date_to: '',
+    price_min: '',
+    price_max: '',
+    location: '',
+    sale_status: '',
+    tags: [],
+    tag_match: 'any'
+  });
+  const [availableTags, setAvailableTags] = useState([]);
+  
   const navigate = useNavigate();
 
   const WALLET_ADDRESS = 'tz1hUfR2FdZSwQQnG4Rj512g2C1R5vF3bUDZ';
 
   useEffect(() => {
     loadWorks();
+    loadTags();
   }, []);
+
+  useEffect(() => {
+    loadWorks();
+  }, [advancedFilters]);
 
   useEffect(() => {
     const handleFocus = () => loadWorks();
@@ -50,7 +70,25 @@ function DigitalWorkList() {
 
   async function loadWorks() {
     try {
-      const data = await digitalWorkAPI.getAll();
+      // Build query params from advanced filters
+      const params = new URLSearchParams();
+      
+      if (advancedFilters.creation_date_from) params.append('creation_date_from', advancedFilters.creation_date_from);
+      if (advancedFilters.creation_date_to) params.append('creation_date_to', advancedFilters.creation_date_to);
+      if (advancedFilters.price_min) params.append('price_min', advancedFilters.price_min);
+      if (advancedFilters.price_max) params.append('price_max', advancedFilters.price_max);
+      if (advancedFilters.location) params.append('location', advancedFilters.location);
+      if (advancedFilters.sale_status) params.append('sale_status', advancedFilters.sale_status);
+      if (advancedFilters.tags && advancedFilters.tags.length > 0) {
+        params.append('tags', advancedFilters.tags.join(','));
+        params.append('tag_match', advancedFilters.tag_match);
+      }
+
+      const queryString = params.toString();
+      const url = `/api/digital-works${queryString ? '?' + queryString : ''}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
 
       // Sort by inventory number (oldest first)
       const sortedData = data.sort((a, b) => {
@@ -94,6 +132,15 @@ function DigitalWorkList() {
       console.error('Error loading digital works:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadTags() {
+    try {
+      const tags = await tagAPI.getAll();
+      setAvailableTags(tags);
+    } catch (error) {
+      console.error('Error loading tags:', error);
     }
   }
 
@@ -616,6 +663,14 @@ function DigitalWorkList() {
         </div>
       ) : (
         <>
+          {/* Advanced Search Component */}
+          <AdvancedSearch
+            filters={advancedFilters}
+            onFiltersChange={setAdvancedFilters}
+            availableTags={availableTags}
+            availableLocations={[...new Set(works.map(w => w.location).filter(Boolean))].sort()}
+          />
+
           <div style={{
             background: 'white',
             padding: '20px',

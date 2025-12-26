@@ -5,7 +5,103 @@ const pool = require('../db');
 // Get all digital works
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query(`
+    const { 
+      creation_date_from, 
+      creation_date_to, 
+      price_min, 
+      price_max, 
+      location, 
+      sale_status,
+      file_format,
+      tags,
+      tag_match // 'all' or 'any'
+    } = req.query;
+
+    let whereConditions = [];
+    let queryParams = [];
+    let paramCount = 0;
+
+    // Date range filter
+    if (creation_date_from) {
+      paramCount++;
+      whereConditions.push(`dw.creation_date >= $${paramCount}`);
+      queryParams.push(creation_date_from);
+    }
+    if (creation_date_to) {
+      paramCount++;
+      whereConditions.push(`dw.creation_date <= $${paramCount}`);
+      queryParams.push(creation_date_to);
+    }
+
+    // Price range filter
+    if (price_min) {
+      paramCount++;
+      whereConditions.push(`dw.price >= $${paramCount}`);
+      queryParams.push(parseFloat(price_min));
+    }
+    if (price_max) {
+      paramCount++;
+      whereConditions.push(`dw.price <= $${paramCount}`);
+      queryParams.push(parseFloat(price_max));
+    }
+
+    // Location filter
+    if (location) {
+      paramCount++;
+      whereConditions.push(`dw.location ILIKE $${paramCount}`);
+      queryParams.push(`%${location}%`);
+    }
+
+    // Sale status filter
+    if (sale_status) {
+      paramCount++;
+      whereConditions.push(`dw.sale_status = $${paramCount}`);
+      queryParams.push(sale_status);
+    }
+
+    // File format filter
+    if (file_format) {
+      paramCount++;
+      whereConditions.push(`dw.file_format = $${paramCount}`);
+      queryParams.push(file_format);
+    }
+
+    // Tag filter
+    let tagSubquery = '';
+    if (tags) {
+      const tagIds = tags.split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+      if (tagIds.length > 0) {
+        if (tag_match === 'all') {
+          // Work must have ALL specified tags
+          tagSubquery = `
+            AND dw.id IN (
+              SELECT digital_work_id 
+              FROM digital_work_tags 
+              WHERE tag_id = ANY($${paramCount + 1})
+              GROUP BY digital_work_id 
+              HAVING COUNT(DISTINCT tag_id) = ${tagIds.length}
+            )
+          `;
+        } else {
+          // Work must have ANY of the specified tags (default)
+          tagSubquery = `
+            AND dw.id IN (
+              SELECT digital_work_id 
+              FROM digital_work_tags 
+              WHERE tag_id = ANY($${paramCount + 1})
+            )
+          `;
+        }
+        paramCount++;
+        queryParams.push(tagIds);
+      }
+    }
+
+    const whereClause = whereConditions.length > 0 
+      ? `WHERE ${whereConditions.join(' AND ')}` 
+      : '';
+
+    const query = `
       SELECT dw.*,
              s.name as series_name,
              json_agg(jsonb_build_object(
@@ -25,9 +121,13 @@ router.get('/', async (req, res) => {
       LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
+      ${whereClause}
+      ${tagSubquery}
       GROUP BY dw.id, s.name
       ORDER BY dw.created_at DESC
-    `);
+    `;
+
+    const result = await pool.query(query, queryParams);
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching digital works:', error);

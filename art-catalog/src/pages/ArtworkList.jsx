@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { artworkAPI, galleryAPI, getImageURL } from '../utils/api';
+import { artworkAPI, galleryAPI, getImageURL, tagAPI } from '../utils/api';
 import { exportToCSV, exportToJSON, exportToText, exportStats } from '../utils/exportUtils';
 import { parseCSV, downloadTemplate } from '../utils/importUtils';
+import AdvancedSearch from '../components/AdvancedSearch';
 
 function ArtworkList() {
   const [artworks, setArtworks] = useState([]);
@@ -24,7 +25,20 @@ function ArtworkList() {
   const [priceAdjustmentType, setPriceAdjustmentType] = useState('percentage');
   const [priceAdjustmentValue, setPriceAdjustmentValue] = useState('');
 
-  // Filter states
+  // Advanced search filters
+  const [advancedFilters, setAdvancedFilters] = useState({
+    creation_date_from: '',
+    creation_date_to: '',
+    price_min: '',
+    price_max: '',
+    location: '',
+    sale_status: '',
+    tags: [],
+    tag_match: 'any'
+  });
+  const [availableTags, setAvailableTags] = useState([]);
+
+  // Basic filter states (kept for backward compatibility)
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMedium, setFilterMedium] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -35,7 +49,12 @@ function ArtworkList() {
 
   useEffect(() => {
     loadArtworks();
+    loadTags();
   }, []);
+
+  useEffect(() => {
+    loadArtworks();
+  }, [advancedFilters]);
 
   // Also reload when window gets focus (in case data changed)
   useEffect(() => {
@@ -46,7 +65,25 @@ function ArtworkList() {
 
   async function loadArtworks() {
     try {
-      const data = await artworkAPI.getAll();
+      // Build query params from advanced filters
+      const params = new URLSearchParams();
+      
+      if (advancedFilters.creation_date_from) params.append('creation_date_from', advancedFilters.creation_date_from);
+      if (advancedFilters.creation_date_to) params.append('creation_date_to', advancedFilters.creation_date_to);
+      if (advancedFilters.price_min) params.append('price_min', advancedFilters.price_min);
+      if (advancedFilters.price_max) params.append('price_max', advancedFilters.price_max);
+      if (advancedFilters.location) params.append('location', advancedFilters.location);
+      if (advancedFilters.sale_status) params.append('sale_status', advancedFilters.sale_status);
+      if (advancedFilters.tags && advancedFilters.tags.length > 0) {
+        params.append('tags', advancedFilters.tags.join(','));
+        params.append('tag_match', advancedFilters.tag_match);
+      }
+
+      const queryString = params.toString();
+      const url = `/api/artworks${queryString ? '?' + queryString : ''}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
       setArtworks(data);
 
       // Load primary image for each artwork
@@ -62,6 +99,15 @@ function ArtworkList() {
       console.error('Error loading artworks:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadTags() {
+    try {
+      const tags = await tagAPI.getAll();
+      setAvailableTags(tags);
+    } catch (error) {
+      console.error('Error loading tags:', error);
     }
   }
 
@@ -542,6 +588,14 @@ function ArtworkList() {
         </div>
       ) : (
         <>
+          {/* Advanced Search Component */}
+          <AdvancedSearch
+            filters={advancedFilters}
+            onFiltersChange={setAdvancedFilters}
+            availableTags={availableTags}
+            availableLocations={[...new Set(artworks.map(a => a.location).filter(Boolean))].sort()}
+          />
+
           {/* Search and Filter Controls */}
           <div style={{
             background: 'white',

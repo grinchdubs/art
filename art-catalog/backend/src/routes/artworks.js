@@ -5,7 +5,95 @@ const pool = require('../db');
 // Get all artworks
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query(`
+    const { 
+      creation_date_from, 
+      creation_date_to, 
+      price_min, 
+      price_max, 
+      location, 
+      sale_status,
+      tags,
+      tag_match // 'all' or 'any'
+    } = req.query;
+
+    let whereConditions = [];
+    let queryParams = [];
+    let paramCount = 0;
+
+    // Date range filter
+    if (creation_date_from) {
+      paramCount++;
+      whereConditions.push(`a.creation_date >= $${paramCount}`);
+      queryParams.push(creation_date_from);
+    }
+    if (creation_date_to) {
+      paramCount++;
+      whereConditions.push(`a.creation_date <= $${paramCount}`);
+      queryParams.push(creation_date_to);
+    }
+
+    // Price range filter
+    if (price_min) {
+      paramCount++;
+      whereConditions.push(`a.price >= $${paramCount}`);
+      queryParams.push(parseFloat(price_min));
+    }
+    if (price_max) {
+      paramCount++;
+      whereConditions.push(`a.price <= $${paramCount}`);
+      queryParams.push(parseFloat(price_max));
+    }
+
+    // Location filter
+    if (location) {
+      paramCount++;
+      whereConditions.push(`a.location ILIKE $${paramCount}`);
+      queryParams.push(`%${location}%`);
+    }
+
+    // Sale status filter
+    if (sale_status) {
+      paramCount++;
+      whereConditions.push(`a.sale_status = $${paramCount}`);
+      queryParams.push(sale_status);
+    }
+
+    // Tag filter
+    let tagSubquery = '';
+    if (tags) {
+      const tagIds = tags.split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+      if (tagIds.length > 0) {
+        if (tag_match === 'all') {
+          // Artwork must have ALL specified tags
+          tagSubquery = `
+            AND a.id IN (
+              SELECT artwork_id 
+              FROM artwork_tags 
+              WHERE tag_id = ANY($${paramCount + 1})
+              GROUP BY artwork_id 
+              HAVING COUNT(DISTINCT tag_id) = ${tagIds.length}
+            )
+          `;
+        } else {
+          // Artwork must have ANY of the specified tags (default)
+          tagSubquery = `
+            AND a.id IN (
+              SELECT artwork_id 
+              FROM artwork_tags 
+              WHERE tag_id = ANY($${paramCount + 1})
+            )
+          `;
+        }
+        paramCount++;
+        queryParams.push(tagIds);
+      }
+    }
+
+    const whereClause = whereConditions.length > 0 
+      ? `WHERE ${whereConditions.join(' AND ')}` 
+      : '';
+
+    const query = `
       SELECT a.*,
              s.name as series_name,
              json_agg(DISTINCT jsonb_build_object(
@@ -25,9 +113,13 @@ router.get('/', async (req, res) => {
       LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
+      ${whereClause}
+      ${tagSubquery}
       GROUP BY a.id, s.name
       ORDER BY a.created_at DESC
-    `);
+    `;
+
+    const result = await pool.query(query, queryParams);
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching artworks:', error);
