@@ -173,16 +173,26 @@ function ArtworkForm() {
         const file = files[i];
         console.log(`Uploading ${i + 1}/${files.length}: ${file.name} (${file.size} bytes)`);
         
-        const response = await galleryAPI.uploadSingle(file);
-        console.log(`Uploaded successfully:`, response);
-        uploadedImages.push(response);
+        try {
+          const response = await galleryAPI.uploadSingle(file);
+          console.log(`Uploaded successfully:`, response);
+          uploadedImages.push(response);
+        } catch (uploadError) {
+          console.error(`Failed to upload ${file.name}:`, uploadError);
+          alert(`Failed to upload ${file.name}: ${uploadError.message}`);
+          return; // Stop on first error
+        }
       }
+
+      console.log('All uploads complete. Uploaded images:', uploadedImages);
 
       // Add the new images to the gallery list
       setAllGalleryImages(prev => [...prev, ...uploadedImages]);
 
       // Auto-select the newly imported images
       const newImageIds = uploadedImages.map(img => img.id);
+      console.log('New image IDs:', newImageIds);
+      
       setSelectedImageIds(prev => {
         const combined = [...prev, ...newImageIds];
         // If no primary image set, make the first new image primary
