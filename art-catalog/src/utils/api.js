@@ -310,6 +310,29 @@ export const publicAPI = {
   },
 };
 
+// Analytics API
+export const analyticsAPI = {
+  getWorksOverTime: async () => {
+    return await apiCall('/api/analytics/works-over-time');
+  },
+
+  getWorksByMedium: async () => {
+    return await apiCall('/api/analytics/works-by-medium');
+  },
+
+  getStatusDistribution: async () => {
+    return await apiCall('/api/analytics/status-distribution');
+  },
+
+  getPriceRanges: async () => {
+    return await apiCall('/api/analytics/price-ranges');
+  },
+
+  getSummary: async () => {
+    return await apiCall('/api/analytics/summary');
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;
