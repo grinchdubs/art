@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const IMMICH_SERVER = 'http://grnchnas:30041';
+const IMMICH_SERVER = 'http://100.79.159.107:30041';
 const IMMICH_API_KEY = 'XvAiawr3Ht7yWBfO4ldjNgp1b2eIW1b3zI5X2Ecck';
 
 // Proxy: Get recent assets
