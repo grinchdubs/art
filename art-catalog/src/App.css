@@ -362,7 +362,7 @@ body.dark-mode .search-input::placeholder {
   width: 250px;
   background: #2c3e50;
   color: white;
-  padding: 20px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -373,8 +373,8 @@ body.dark-mode .search-input::placeholder {
 
 .sidebar h1 {
   font-size: 24px;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
+  margin: 0;
+  padding: 20px 20px 20px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
@@ -384,11 +384,12 @@ body.dark-mode .search-input::placeholder {
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
+  padding: 0 20px;
 }
 
 .sidebar > div:last-child {
   flex-shrink: 0;
-  padding-top: 20px;
+  padding: 20px;
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
