@@ -4,16 +4,22 @@ const router = express.Router();
 const IMMICH_SERVER = 'http://100.79.159.107:30041';
 const IMMICH_API_KEY = 'XvAiawr3Ht7yWBfO4ldjNgp1b2eIW1b3zI5X2Ecck';
 
-// Proxy: Get recent assets
+// Proxy: Get recent assets using search
 router.get('/assets', async (req, res) => {
   try {
     const { take = 100, skip = 0 } = req.query;
     
-    const response = await fetch(`${IMMICH_SERVER}/api/asset?take=${take}&skip=${skip}`, {
+    const response = await fetch(`${IMMICH_SERVER}/api/search/metadata`, {
+      method: 'POST',
       headers: {
         'x-api-key': IMMICH_API_KEY,
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        take: parseInt(take),
+        skip: parseInt(skip)
+      })
     });
 
     if (!response.ok) {
@@ -21,7 +27,8 @@ router.get('/assets', async (req, res) => {
     }
 
     const data = await response.json();
-    res.json(data);
+    // Return assets array from the response
+    res.json(data.assets?.items || []);
   } catch (error) {
     console.error('Error fetching Immich assets:', error);
     res.status(500).json({ error: 'Failed to fetch assets' });
@@ -61,7 +68,7 @@ router.post('/search', async (req, res) => {
 // Proxy: Get albums
 router.get('/albums', async (req, res) => {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/album`, {
+    const response = await fetch(`${IMMICH_SERVER}/api/albums`, {
       headers: {
         'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
@@ -85,7 +92,7 @@ router.get('/albums/:albumId', async (req, res) => {
   try {
     const { albumId } = req.params;
     
-    const response = await fetch(`${IMMICH_SERVER}/api/album/${albumId}`, {
+    const response = await fetch(`${IMMICH_SERVER}/api/albums/${albumId}`, {
       headers: {
         'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
@@ -109,7 +116,7 @@ router.get('/thumbnail/:assetId', async (req, res) => {
   try {
     const { assetId } = req.params;
     
-    const response = await fetch(`${IMMICH_SERVER}/api/asset/thumbnail/${assetId}?size=preview`, {
+    const response = await fetch(`${IMMICH_SERVER}/api/assets/${assetId}/thumbnail?size=preview`, {
       headers: {
         'x-api-key': IMMICH_API_KEY
       }
@@ -135,7 +142,7 @@ router.get('/download/:assetId', async (req, res) => {
     const { assetId } = req.params;
     
     // Use native fetch (available in Node 18+)
-    const response = await fetch(`${IMMICH_SERVER}/api/asset/file/${assetId}`, {
+    const response = await fetch(`${IMMICH_SERVER}/api/assets/${assetId}/original`, {
       headers: {
         'x-api-key': IMMICH_API_KEY
       }
