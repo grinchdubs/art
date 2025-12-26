@@ -69,12 +69,12 @@ router.get('/status-distribution', async (req, res) => {
     const digitalResult = await pool.query(`
       SELECT 
         CASE 
-          WHEN is_minted THEN 'Minted'
+          WHEN nft_token_id IS NOT NULL AND nft_token_id != '' THEN 'Minted'
           ELSE 'Not Minted'
         END as status,
         COUNT(*) as count
       FROM digital_works
-      GROUP BY is_minted
+      GROUP BY (nft_token_id IS NOT NULL AND nft_token_id != '')
     `);
     
     res.json({
@@ -133,7 +133,7 @@ router.get('/summary', async (req, res) => {
         (SELECT COUNT(*) FROM gallery_images) as total_images,
         (SELECT SUM(CAST(price AS DECIMAL)) FROM artworks WHERE price IS NOT NULL AND price != '' AND price ~ '^[0-9.]+$') as total_artwork_value,
         (SELECT COUNT(*) FROM artworks WHERE sale_status = 'sold') as artworks_sold,
-        (SELECT COUNT(*) FROM digital_works WHERE is_minted = true) as digital_works_minted
+        (SELECT COUNT(*) FROM digital_works WHERE nft_token_id IS NOT NULL AND nft_token_id != '') as digital_works_minted
     `);
     
     res.json(result.rows[0]);
