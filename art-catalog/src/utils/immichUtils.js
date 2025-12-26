@@ -1,17 +1,13 @@
 // Immich Integration Utility
-// Connects to Immich server to browse and import photos
-
-const IMMICH_SERVER = 'http://grnchnas:30041';
-const IMMICH_API_KEY = 'XvAiawr3Ht7yWBfO4ldjNgp1b2eIW1b3zI5X2Ecck';
+// Connects to Immich server via backend proxy
 
 /**
  * Fetch all assets from Immich with pagination
  */
 export async function fetchImmichAssets(page = 1, limit = 100) {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/asset?take=${limit}&skip=${(page - 1) * limit}`, {
+    const response = await fetch(`/api/immich/assets?take=${limit}&skip=${(page - 1) * limit}`, {
       headers: {
-        'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
       }
     });
@@ -33,17 +29,13 @@ export async function fetchImmichAssets(page = 1, limit = 100) {
  */
 export async function searchImmichAssets(query) {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/search/metadata`, {
+    const response = await fetch(`/api/immich/search`, {
       method: 'POST',
       headers: {
-        'x-api-key': IMMICH_API_KEY,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        q: query,
-        type: 'IMAGE'
-      })
+      body: JSON.stringify({ q: query })
     });
 
     if (!response.ok) {
@@ -62,14 +54,14 @@ export async function searchImmichAssets(query) {
  * Get thumbnail URL for an Immich asset
  */
 export function getImmichThumbnailUrl(assetId) {
-  return `${IMMICH_SERVER}/api/asset/thumbnail/${assetId}?size=preview`;
+  return `/api/immich/thumbnail/${assetId}`;
 }
 
 /**
  * Get full-size image URL for an Immich asset
  */
 export function getImmichImageUrl(assetId) {
-  return `${IMMICH_SERVER}/api/asset/file/${assetId}`;
+  return `/api/immich/download/${assetId}`;
 }
 
 /**
@@ -108,9 +100,8 @@ export async function downloadImmichImage(assetId, filename) {
  */
 export async function fetchImmichAlbums() {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/album`, {
+    const response = await fetch(`/api/immich/albums`, {
       headers: {
-        'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
       }
     });
@@ -132,9 +123,8 @@ export async function fetchImmichAlbums() {
  */
 export async function fetchAlbumAssets(albumId) {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/album/${albumId}`, {
+    const response = await fetch(`/api/immich/albums/${albumId}`, {
       headers: {
-        'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
       }
     });
@@ -156,9 +146,8 @@ export async function fetchAlbumAssets(albumId) {
  */
 export async function getAssetMetadata(assetId) {
   try {
-    const response = await fetch(`${IMMICH_SERVER}/api/asset/${assetId}`, {
+    const response = await fetch(`/api/immich/assets/${assetId}`, {
       headers: {
-        'x-api-key': IMMICH_API_KEY,
         'Accept': 'application/json'
       }
     });
