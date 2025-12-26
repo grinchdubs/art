@@ -376,6 +376,31 @@ export const salesAPI = {
   },
 };
 
+// Backup API
+export const backupAPI = {
+  export: async () => {
+    const url = `${API_BASE_URL}/api/backup/export`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to export backup: ${response.status}`);
+    }
+    return await response.json();
+  },
+
+  import: async (backupData) => {
+    return await apiCall('/api/backup/import', {
+      method: 'POST',
+      body: JSON.stringify(backupData),
+    });
+  },
+
+  clear: async () => {
+    return await apiCall('/api/backup/clear', {
+      method: 'POST',
+    });
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;
