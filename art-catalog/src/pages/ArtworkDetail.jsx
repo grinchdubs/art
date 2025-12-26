@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { artworkAPI, salesAPI, getImageURL } from '../utils/api';
 import ImageLightbox from '../components/ImageLightbox';
+import QRCodeGenerator from '../components/QRCodeGenerator';
 
 function ArtworkDetail() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ function ArtworkDetail() {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [allArtworkIds, setAllArtworkIds] = useState([]);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     loadArtwork();
@@ -134,13 +136,8 @@ function ArtworkDetail() {
       e.preventDefault();
       e.stopPropagation();
     }
-    console.log('handleRecordSale called');
     const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    console.log('saleDate:', saleDate);
-    if (!saleDate) {
-      console.log('Sale cancelled - no date provided');
-      return;
-    }
+    if (!saleDate) return;
 
     const salePrice = prompt('Sale price (optional):');
     const buyerName = prompt('Buyer name (optional):');
@@ -207,25 +204,14 @@ function ArtworkDetail() {
             <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete}>
               Delete
             </button>
-            <div style={{ padding: '8px', background: '#f0f0f0', borderRadius: '4px', fontSize: '12px' }}>
-              Status: {artwork.sale_status || 'unknown'}
-            </div>
             {artwork.sale_status !== 'sold' && (
-              <button 
-                type="button" 
-                className="btn btn-success btn-sm" 
-                onClick={(e) => {
-                  console.log('Button clicked!', e);
-                  handleRecordSale(e);
-                }}
-                style={{ position: 'relative', zIndex: 9999 }}
-              >
+              <button type="button" className="btn btn-success btn-sm" onClick={handleRecordSale}>
                 Record Sale
               </button>
             )}
-            {artwork.sale_status === 'sold' && (
-              <div style={{ padding: '8px', color: 'green' }}>SOLD - button hidden</div>
-            )}
+            <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowQR(true)}>
+              QR Code
+            </button>
           </div>
         </div>
 
@@ -561,6 +547,15 @@ function ArtworkDetail() {
           </button>
         </div>
       </div>
+
+      {showQR && (
+        <QRCodeGenerator
+          url={`${window.location.origin}/artworks/${id}`}
+          title={artwork.title}
+          inventory={artwork.inventory_number}
+          onClose={() => setShowQR(false)}
+        />
+      )}
     </div>
   );
 }

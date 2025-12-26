@@ -4,6 +4,7 @@ import { digitalWorkAPI, salesAPI, getImageURL } from '../utils/api';
 import { getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
 import ImageLightbox from '../components/ImageLightbox';
+import QRCodeGenerator from '../components/QRCodeGenerator';
 
 function DigitalWorkDetail() {
   const { id } = useParams();
@@ -17,6 +18,7 @@ function DigitalWorkDetail() {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [allWorkIds, setAllWorkIds] = useState([]);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     loadWork();
@@ -191,6 +193,9 @@ function DigitalWorkDetail() {
               Record Sale
             </button>
           )}
+          <button type="button" className="btn btn-secondary" onClick={() => setShowQR(true)}>
+            QR Code
+          </button>
         </div>
       </div>
 
@@ -609,6 +614,15 @@ function DigitalWorkDetail() {
             </button>
           </div>
         </div>
+      )}
+
+      {showQR && (
+        <QRCodeGenerator
+          url={`${window.location.origin}/digital-works/${id}`}
+          title={work.title}
+          inventory={work.inventory_number}
+          onClose={() => setShowQR(false)}
+        />
       )}
     </div>
   );
