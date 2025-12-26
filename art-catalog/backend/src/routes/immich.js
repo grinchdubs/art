@@ -129,7 +129,9 @@ router.get('/thumbnail/:assetId', async (req, res) => {
     const contentType = response.headers.get('content-type');
     res.setHeader('Content-Type', contentType);
     
-    response.body.pipe(res);
+    // Convert Web ReadableStream to Node.js stream
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
   } catch (error) {
     console.error('Error fetching thumbnail:', error);
     res.status(500).json({ error: 'Failed to fetch thumbnail' });
@@ -154,9 +156,15 @@ router.get('/download/:assetId', async (req, res) => {
 
     // Forward the image
     const contentType = response.headers.get('content-type');
+    const contentDisposition = response.headers.get('content-disposition');
     res.setHeader('Content-Type', contentType);
+    if (contentDisposition) {
+      res.setHeader('Content-Disposition', contentDisposition);
+    }
     
-    response.body.pipe(res);
+    // Convert Web ReadableStream to Node.js buffer
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
   } catch (error) {
     console.error('Error proxying Immich image:', error);
     res.status(500).json({ error: 'Failed to download image' });
