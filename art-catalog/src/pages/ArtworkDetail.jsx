@@ -130,9 +130,17 @@ function ArtworkDetail() {
   }
 
   async function handleRecordSale(e) {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log('handleRecordSale called');
     const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    if (!saleDate) return;
+    console.log('saleDate:', saleDate);
+    if (!saleDate) {
+      console.log('Sale cancelled - no date provided');
+      return;
+    }
 
     const salePrice = prompt('Sale price (optional):');
     const buyerName = prompt('Buyer name (optional):');
