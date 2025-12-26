@@ -365,6 +365,10 @@ body.dark-mode .search-input::placeholder {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
 }
 
 .sidebar h1 {
@@ -372,10 +376,13 @@ body.dark-mode .search-input::placeholder {
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .sidebar nav {
   flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
 }
 
 .nav-link {
