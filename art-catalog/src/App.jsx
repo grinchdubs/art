@@ -102,7 +102,7 @@ function Sidebar() {
           🌐 Public Portfolio
         </Link>
       </nav>
-      <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <div style={{ paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button
           onClick={toggleDarkMode}
           style={{
