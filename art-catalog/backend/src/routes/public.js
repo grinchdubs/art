@@ -14,9 +14,9 @@ router.get('/artworks', async (req, res) => {
             json_build_object(
               'id', gi.id,
               'file_path', gi.file_path,
-              'original_name', gi.original_name,
-              'is_primary', agi.is_primary
-            ) ORDER BY agi.display_order, agi.id
+              'filename', gi.filename,
+              'is_primary', ai.is_primary
+            ) ORDER BY ai.display_order, ai.id
           ) FILTER (WHERE gi.id IS NOT NULL),
           '[]'
         ) as images,
@@ -32,8 +32,8 @@ router.get('/artworks', async (req, res) => {
         ) as tags
       FROM artworks a
       LEFT JOIN series s ON a.series_id = s.id
-      LEFT JOIN artwork_gallery_images agi ON a.id = agi.artwork_id
-      LEFT JOIN gallery_images gi ON agi.gallery_image_id = gi.id
+      LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
+      LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
       WHERE a.is_public = true
@@ -60,9 +60,9 @@ router.get('/artworks/:id', async (req, res) => {
             json_build_object(
               'id', gi.id,
               'file_path', gi.file_path,
-              'original_name', gi.original_name,
-              'is_primary', agi.is_primary
-            ) ORDER BY agi.display_order, agi.id
+              'filename', gi.filename,
+              'is_primary', ai.is_primary
+            ) ORDER BY ai.display_order, ai.id
           ) FILTER (WHERE gi.id IS NOT NULL),
           '[]'
         ) as images,
@@ -78,8 +78,8 @@ router.get('/artworks/:id', async (req, res) => {
         ) as tags
       FROM artworks a
       LEFT JOIN series s ON a.series_id = s.id
-      LEFT JOIN artwork_gallery_images agi ON a.id = agi.artwork_id
-      LEFT JOIN gallery_images gi ON agi.gallery_image_id = gi.id
+      LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
+      LEFT JOIN gallery_images gi ON ai.image_id = gi.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
       WHERE a.id = $1 AND a.is_public = true
@@ -109,9 +109,9 @@ router.get('/digital-works', async (req, res) => {
             json_build_object(
               'id', gi.id,
               'file_path', gi.file_path,
-              'original_name', gi.original_name,
-              'is_primary', dwgi.is_primary
-            ) ORDER BY dwgi.display_order, dwgi.id
+              'filename', gi.filename,
+              'is_primary', dwi.is_primary
+            ) ORDER BY dwi.display_order, dwi.id
           ) FILTER (WHERE gi.id IS NOT NULL),
           '[]'
         ) as images,
@@ -127,8 +127,8 @@ router.get('/digital-works', async (req, res) => {
         ) as tags
       FROM digital_works dw
       LEFT JOIN series s ON dw.series_id = s.id
-      LEFT JOIN digital_work_gallery_images dwgi ON dw.id = dwgi.digital_work_id
-      LEFT JOIN gallery_images gi ON dwgi.gallery_image_id = gi.id
+      LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
+      LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
       WHERE dw.is_public = true
@@ -155,9 +155,9 @@ router.get('/digital-works/:id', async (req, res) => {
             json_build_object(
               'id', gi.id,
               'file_path', gi.file_path,
-              'original_name', gi.original_name,
-              'is_primary', dwgi.is_primary
-            ) ORDER BY dwgi.display_order, dwgi.id
+              'filename', gi.filename,
+              'is_primary', dwi.is_primary
+            ) ORDER BY dwi.display_order, dwi.id
           ) FILTER (WHERE gi.id IS NOT NULL),
           '[]'
         ) as images,
@@ -173,8 +173,8 @@ router.get('/digital-works/:id', async (req, res) => {
         ) as tags
       FROM digital_works dw
       LEFT JOIN series s ON dw.series_id = s.id
-      LEFT JOIN digital_work_gallery_images dwgi ON dw.id = dwgi.digital_work_id
-      LEFT JOIN gallery_images gi ON dwgi.gallery_image_id = gi.id
+      LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
+      LEFT JOIN gallery_images gi ON dwi.image_id = gi.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
       WHERE dw.id = $1 AND dw.is_public = true
