@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyticsAPI } from '../utils/api';
+import { useDarkMode } from '../App';
 import {
   LineChart,
   Line,
@@ -20,6 +21,7 @@ import {
 const COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#34495e', '#e67e22'];
 
 function Dashboard() {
+  const { darkMode } = useDarkMode();
   const [summary, setSummary] = useState(null);
   const [worksOverTime, setWorksOverTime] = useState([]);
   const [worksByMedium, setWorksByMedium] = useState([]);
@@ -150,19 +152,19 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div style={{ marginBottom: '40px' }}>
-        <h3 style={{ marginBottom: '24px', color: '#2c3e50', fontSize: '20px' }}>Analytics</h3>
+        <h3 style={{ marginBottom: '24px', color: darkMode ? '#e0e0e0' : '#2c3e50', fontSize: '20px' }}>Analytics</h3>
         
         {/* Works Over Time */}
         {worksOverTime.length > 0 && (
-          <div style={{ marginBottom: '40px', background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <h4 style={{ marginBottom: '16px', color: '#2c3e50' }}>Works Created Over Time</h4>
+          <div style={{ marginBottom: '40px', background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
+            <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Works Created Over Time</h4>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={worksOverTime}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#ccc'} />
+                <XAxis dataKey="month" stroke={darkMode ? '#e0e0e0' : '#666'} />
+                <YAxis stroke={darkMode ? '#e0e0e0' : '#666'} />
+                <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
+                <Legend wrapperStyle={{ color: darkMode ? '#e0e0e0' : '#666' }} />
                 <Line type="monotone" dataKey="physical" stroke="#3498db" strokeWidth={2} name="Physical Artworks" />
                 <Line type="monotone" dataKey="digital" stroke="#9b59b6" strokeWidth={2} name="Digital Works" />
               </LineChart>
@@ -174,8 +176,8 @@ function Dashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '40px' }}>
           {/* Works By Medium */}
           {worksByMedium.length > 0 && (
-            <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: '#2c3e50' }}>Works by Medium</h4>
+            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Works by Medium</h4>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -191,7 +193,7 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -199,14 +201,14 @@ function Dashboard() {
 
           {/* Price Ranges */}
           {priceRanges.length > 0 && (
-            <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: '#2c3e50' }}>Price Distribution</h4>
+            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Price Distribution</h4>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={priceRanges}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="range" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#ccc'} />
+                  <XAxis dataKey="range" stroke={darkMode ? '#e0e0e0' : '#666'} />
+                  <YAxis stroke={darkMode ? '#e0e0e0' : '#666'} />
+                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
                   <Bar dataKey="count" fill="#2ecc71" name="Artworks" />
                 </BarChart>
               </ResponsiveContainer>
@@ -217,8 +219,8 @@ function Dashboard() {
         {/* Status Distribution */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
           {statusDistribution.physical?.length > 0 && (
-            <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: '#2c3e50' }}>Physical Artwork Status</h4>
+            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Physical Artwork Status</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -235,15 +237,15 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           )}
 
           {statusDistribution.digital?.length > 0 && (
-            <div style={{ background: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: '#2c3e50' }}>Digital Work Status</h4>
+            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
+              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Digital Work Status</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -260,7 +262,7 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -269,8 +271,8 @@ function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div style={{ background: 'white', padding: '32px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-        <h3 style={{ marginBottom: '16px' }}>Quick Actions</h3>
+      <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '32px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+        <h3 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Quick Actions</h3>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button className="btn btn-primary" onClick={() => navigate('/artworks/new')}>
             Add New Artwork
