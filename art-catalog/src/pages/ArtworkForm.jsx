@@ -173,10 +173,7 @@ function ArtworkForm() {
         const file = files[i];
         console.log(`Uploading ${i + 1}/${files.length}: ${file.name} (${file.size} bytes)`);
         
-        const formData = new FormData();
-        formData.append('image', file);
-        
-        const response = await galleryAPI.upload(formData);
+        const response = await galleryAPI.uploadSingle(file);
         console.log(`Uploaded successfully:`, response);
         uploadedImages.push(response);
       }
