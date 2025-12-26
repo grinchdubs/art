@@ -129,7 +129,8 @@ function DigitalWorkDetail() {
     }
   }
 
-  async function handleRecordSale() {
+  async function handleRecordSale(e) {
+    if (e) e.preventDefault();
     const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
     if (!saleDate) return;
 
@@ -177,16 +178,17 @@ function DigitalWorkDetail() {
         <h2>{work.title}</h2>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
+            type="button"
             className="btn btn-secondary"
             onClick={() => navigate(`/digital-works/edit/${id}`)}
           >
             Edit
           </button>
-          <button className="btn btn-danger" onClick={handleDelete}>
+          <button type="button" className="btn btn-danger" onClick={handleDelete}>
             Delete
           </button>
           {work.sale_status !== 'sold' && (
-            <button className="btn btn-success" onClick={handleRecordSale}>
+            <button type="button" className="btn btn-success" onClick={handleRecordSale}>
               Record Sale
             </button>
           )}

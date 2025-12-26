@@ -130,7 +130,8 @@ function ArtworkDetail() {
     }
   }
 
-  async function handleRecordSale() {
+  async function handleRecordSale(e) {
+    if (e) e.preventDefault();
     const saleDate = prompt('Sale date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
     if (!saleDate) return;
 
@@ -190,16 +191,17 @@ function ArtworkDetail() {
           </div>
           <div className="detail-actions">
             <button
+              type="button"
               className="btn btn-primary btn-sm"
               onClick={() => navigate(`/artworks/edit/${id}`)}
             >
               Edit
             </button>
-            <button className="btn btn-danger btn-sm" onClick={handleDelete}>
+            <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete}>
               Delete
             </button>
             {artwork.sale_status !== 'sold' && (
-              <button className="btn btn-success btn-sm" onClick={handleRecordSale}>
+              <button type="button" className="btn btn-success btn-sm" onClick={handleRecordSale}>
                 Record Sale
               </button>
             )}
