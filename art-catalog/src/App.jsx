@@ -19,6 +19,7 @@ import SeriesForm from './pages/SeriesForm';
 import SeriesDetail from './pages/SeriesDetail';
 import PublicGallery from './pages/PublicGallery';
 import PublicWorkDetail from './pages/PublicWorkDetail';
+import SalesList from './pages/SalesList';
 
 // Import components
 import MigrationPanel from './components/MigrationPanel';
@@ -73,6 +74,13 @@ function Sidebar() {
         </div>
         <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}>
           Image Gallery
+        </Link>
+
+        <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
+          Sales
+        </div>
+        <Link to="/sales" className={`nav-link ${isActive('/sales') ? 'active' : ''}`}>
+          Sales Records
         </Link>
 
         <div style={{ marginTop: '20px', marginBottom: '8px', fontSize: '12px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', paddingLeft: '12px' }}>
@@ -138,6 +146,7 @@ function AppContent() {
           <Route path="/digital-works/edit/:id" element={<DigitalWorkForm />} />
           <Route path="/digital-works/:id" element={<DigitalWorkDetail />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/sales" element={<SalesList />} />
           <Route path="/public" element={<PublicGallery />} />
           <Route path="/public/:type/:id" element={<PublicWorkDetail />} />
         </Routes>

@@ -333,6 +333,49 @@ export const analyticsAPI = {
   },
 };
 
+// Sales API
+export const salesAPI = {
+  getAll: async () => {
+    return await apiCall('/api/sales');
+  },
+
+  getById: async (id) => {
+    return await apiCall(`/api/sales/${id}`);
+  },
+
+  getByArtwork: async (artworkId) => {
+    return await apiCall(`/api/sales/artwork/${artworkId}`);
+  },
+
+  getByDigitalWork: async (digitalWorkId) => {
+    return await apiCall(`/api/sales/digital-work/${digitalWorkId}`);
+  },
+
+  create: async (data) => {
+    return await apiCall('/api/sales', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: async (id, data) => {
+    return await apiCall(`/api/sales/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete: async (id) => {
+    return await apiCall(`/api/sales/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getStats: async () => {
+    return await apiCall('/api/sales/stats/summary');
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;

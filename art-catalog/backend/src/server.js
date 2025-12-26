@@ -26,6 +26,7 @@ const seriesRoutes = require('./routes/series');
 const publicRoutes = require('./routes/public');
 const immichRoutes = require('./routes/immich');
 const analyticsRoutes = require('./routes/analytics');
+const salesRoutes = require('./routes/sales');
 
 // Use routes
 app.use('/api/artworks', artworksRoutes);
@@ -37,6 +38,7 @@ app.use('/api/series', seriesRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/immich', immichRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/sales', salesRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
