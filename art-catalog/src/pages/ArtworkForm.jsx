@@ -23,6 +23,8 @@ function ArtworkForm() {
     edition_total: '',
     notes: '',
     is_public: true,
+    current_owner: '',
+    acquisition_date: '',
   });
 
   const [allGalleryImages, setAllGalleryImages] = useState([]);
@@ -430,6 +432,34 @@ function ArtworkForm() {
 
             <div className="form-group">
               {/* Empty div for grid alignment */}
+            </div>
+          </div>
+
+          {/* Current Owner & Acquisition */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="current_owner">Current Owner</label>
+              <input
+                type="text"
+                id="current_owner"
+                name="current_owner"
+                className="form-control"
+                value={formData.current_owner}
+                onChange={handleChange}
+                placeholder="Leave blank if retained by artist"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="acquisition_date">Acquisition Date</label>
+              <input
+                type="date"
+                id="acquisition_date"
+                name="acquisition_date"
+                className="form-control"
+                value={formData.acquisition_date}
+                onChange={handleChange}
+              />
             </div>
           </div>
 

@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { artworkAPI, salesAPI, getImageURL } from '../utils/api';
 import ImageLightbox from '../components/ImageLightbox';
 import QRCodeGenerator from '../components/QRCodeGenerator';
+import ProvenanceTimeline from '../components/ProvenanceTimeline';
+import TransferForm from '../components/TransferForm';
 
 function ArtworkDetail() {
   const { id } = useParams();
@@ -18,6 +20,7 @@ function ArtworkDetail() {
   const [allArtworkIds, setAllArtworkIds] = useState([]);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [showTransferForm, setShowTransferForm] = useState(false);
 
   useEffect(() => {
     loadArtwork();
@@ -175,6 +178,10 @@ function ArtworkDetail() {
       console.error('Error recording sale:', error);
       alert('Failed to record sale. Please try again.');
     }
+  }
+
+  function handleTransferRecorded() {
+    loadArtwork(); // Reload to show new transfer in timeline
   }
 
   if (loading) {
@@ -443,6 +450,39 @@ function ArtworkDetail() {
           )}
         </div>
 
+        {/* Provenance & Ownership History */}
+        <div style={{ marginTop: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0 }}>Provenance & Ownership History</h3>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowTransferForm(true)}
+              style={{ padding: '8px 16px' }}
+            >
+              + Record Transfer
+            </button>
+          </div>
+          
+          {artwork.current_owner && (
+            <div style={{ 
+              padding: '16px', 
+              background: '#f0f8ff', 
+              borderRadius: '8px', 
+              marginBottom: '16px',
+              border: '1px solid #b3d9ff'
+            }}>
+              <strong>Current Owner:</strong> {artwork.current_owner}
+              {artwork.acquisition_date && (
+                <span style={{ marginLeft: '12px', color: '#666' }}>
+                  Since: {new Date(artwork.acquisition_date).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+          )}
+          
+          <ProvenanceTimeline ownershipHistory={artwork.ownership_history || []} />
+        </div>
+
         {/* Location Change Dialog */}
         {showLocationDialog && (
           <div style={{
@@ -576,6 +616,15 @@ function ArtworkDetail() {
           title={artwork.title}
           inventory={artwork.inventory_number}
           onClose={() => setShowQR(false)}
+        />
+      )}
+
+      {showTransferForm && (
+        <TransferForm
+          workId={parseInt(id)}
+          workType="artwork"
+          onTransferRecorded={handleTransferRecorded}
+          onClose={() => setShowTransferForm(false)}
         />
       )}
     </div>

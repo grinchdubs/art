@@ -401,6 +401,42 @@ export const backupAPI = {
   },
 };
 
+// Provenance API
+export const provenanceAPI = {
+  getArtworkHistory: async (artworkId) => {
+    return await apiCall(`/api/provenance/artwork/${artworkId}/history`);
+  },
+
+  getDigitalWorkHistory: async (digitalWorkId) => {
+    return await apiCall(`/api/provenance/digital-work/${digitalWorkId}/history`);
+  },
+
+  recordTransfer: async (transferData) => {
+    return await apiCall('/api/provenance/transfer', {
+      method: 'POST',
+      body: JSON.stringify(transferData),
+    });
+  },
+
+  updateTransfer: async (id, transferData) => {
+    return await apiCall(`/api/provenance/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(transferData),
+    });
+  },
+
+  deleteTransfer: async (id) => {
+    return await apiCall(`/api/provenance/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getAll: async (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return await apiCall(`/api/provenance/all?${params}`);
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;
