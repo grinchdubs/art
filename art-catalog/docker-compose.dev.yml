@@ -1,0 +1,55 @@
+services:
+  db-dev:
+    image: postgres:15-alpine
+    container_name: art-catalog-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: artcatalog
+      POSTGRES_PASSWORD: artcatalog123
+      POSTGRES_DB: artcatalog_dev
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./backend/src/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U artcatalog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: art-catalog-backend-dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://artcatalog:artcatalog123@db-dev:5432/artcatalog_dev
+      - PORT=3002
+    ports:
+      - "3003:3002"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/src:/app/src
+    depends_on:
+      db-dev:
+        condition: service_healthy
+
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: art-catalog-frontend-dev
+    ports:
+      - "3334:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=
+    depends_on:
+      - backend-dev
+
+volumes:
+  postgres_data_dev:

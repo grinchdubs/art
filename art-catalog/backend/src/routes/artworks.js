@@ -152,7 +152,20 @@ router.get('/:id', async (req, res) => {
                'id', t.id,
                'name', t.name,
                'color', t.color
-             )) FILTER (WHERE t.id IS NOT NULL) as tags
+             )) FILTER (WHERE t.id IS NOT NULL) as tags,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', oh.id,
+               'transfer_type', oh.transfer_type,
+               'transfer_date', oh.transfer_date,
+               'owner_name', oh.owner_name,
+               'owner_email', oh.owner_email,
+               'owner_phone', oh.owner_phone,
+               'price_paid', oh.price_paid,
+               'payment_method', oh.payment_method,
+               'return_date', oh.return_date,
+               'notes', oh.notes,
+               'created_at', oh.created_at
+             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history
       FROM artworks a
       LEFT JOIN series s ON a.series_id = s.id
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
@@ -161,6 +174,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN exhibitions e ON ae.exhibition_id = e.id
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
+      LEFT JOIN ownership_history oh ON a.id = oh.artwork_id
       WHERE a.id = $1
       GROUP BY a.id, s.name
     `, [id]);
@@ -185,7 +199,7 @@ router.post('/', async (req, res) => {
     const {
       inventory_number, title, creation_date, medium, dimensions,
       series_name, series_id, sale_status, price, location, notes, images,
-      edition_number, edition_total
+      edition_number, edition_total, current_owner, acquisition_date
     } = req.body;
 
     // Insert artwork
@@ -193,13 +207,13 @@ router.post('/', async (req, res) => {
       INSERT INTO artworks (
         inventory_number, title, creation_date, medium, dimensions,
         series_id, sale_status, price, location, notes, is_public,
-        edition_number, edition_total
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        edition_number, edition_total, current_owner, acquisition_date
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
         series_id || null, sale_status || 'available', price, location, notes,
         req.body.is_public !== undefined ? req.body.is_public : true,
-        edition_number || null, edition_total || null]);
+        edition_number || null, edition_total || null, current_owner || null, acquisition_date || null]);
 
     const artwork = artworkResult.rows[0];
 
@@ -243,7 +257,7 @@ router.put('/:id', async (req, res) => {
     const {
       inventory_number, title, creation_date, medium, dimensions,
       series_name, series_id, sale_status, price, location, notes, images,
-      edition_number, edition_total
+      edition_number, edition_total, current_owner, acquisition_date
     } = req.body;
 
     const result = await client.query(`
@@ -251,13 +265,13 @@ router.put('/:id', async (req, res) => {
       SET inventory_number = $1, title = $2, creation_date = $3,
           medium = $4, dimensions = $5, series_id = $6,
           sale_status = $7, price = $8, location = $9, notes = $10, is_public = $11,
-          edition_number = $12, edition_total = $13
-      WHERE id = $14
+          edition_number = $12, edition_total = $13, current_owner = $14, acquisition_date = $15
+      WHERE id = $16
       RETURNING *
     `, [inventory_number, title, creation_date, medium, dimensions,
         series_id || null, sale_status, price, location, notes,
         req.body.is_public !== undefined ? req.body.is_public : true,
-        edition_number || null, edition_total || null, id]);
+        edition_number || null, edition_total || null, current_owner || null, acquisition_date || null, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');

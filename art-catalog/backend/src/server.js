@@ -28,6 +28,7 @@ const immichRoutes = require('./routes/immich');
 const analyticsRoutes = require('./routes/analytics');
 const salesRoutes = require('./routes/sales');
 const backupRoutes = require('./routes/backup');
+const provenanceRoutes = require('./routes/provenance');
 
 // Use routes
 app.use('/api/artworks', artworksRoutes);
@@ -41,6 +42,7 @@ app.use('/api/immich', immichRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/backup', backupRoutes);
+app.use('/api/provenance', provenanceRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

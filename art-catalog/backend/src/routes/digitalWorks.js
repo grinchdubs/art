@@ -160,7 +160,20 @@ router.get('/:id', async (req, res) => {
                'id', t.id,
                'name', t.name,
                'color', t.color
-             )) FILTER (WHERE t.id IS NOT NULL) as tags
+             )) FILTER (WHERE t.id IS NOT NULL) as tags,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', oh.id,
+               'transfer_type', oh.transfer_type,
+               'transfer_date', oh.transfer_date,
+               'owner_name', oh.owner_name,
+               'owner_email', oh.owner_email,
+               'owner_phone', oh.owner_phone,
+               'price_paid', oh.price_paid,
+               'payment_method', oh.payment_method,
+               'return_date', oh.return_date,
+               'notes', oh.notes,
+               'created_at', oh.created_at
+             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history
       FROM digital_works dw
       LEFT JOIN series s ON dw.series_id = s.id
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
@@ -169,6 +182,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN exhibitions e ON dwe.exhibition_id = e.id
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
+      LEFT JOIN ownership_history oh ON dw.id = oh.digital_work_id
       WHERE dw.id = $1
       GROUP BY dw.id, s.name
     `, [id]);
@@ -194,7 +208,7 @@ router.post('/', async (req, res) => {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
       nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id,
-      edition_number, edition_total
+      edition_number, edition_total, current_owner, acquisition_date
     } = req.body;
 
     const result = await client.query(`
@@ -202,14 +216,14 @@ router.post('/', async (req, res) => {
         inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
         nft_token_id, nft_contract_address, nft_blockchain, notes, series_id, is_public,
-        edition_number, edition_total
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+        edition_number, edition_total, current_owner, acquisition_date
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status || 'available', price, license_type, video_url, embed_url, platform,
         nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
         req.body.is_public !== undefined ? req.body.is_public : true,
-        edition_number || null, edition_total || null]);
+        edition_number || null, edition_total || null, current_owner || null, acquisition_date || null]);
 
     const digitalWork = result.rows[0];
 
@@ -246,7 +260,7 @@ router.put('/:id', async (req, res) => {
       inventory_number, title, creation_date, file_format, file_size, dimensions,
       sale_status, price, license_type, video_url, embed_url, platform,
       nft_token_id, nft_contract_address, nft_blockchain, notes, images, series_id,
-      edition_number, edition_total
+      edition_number, edition_total, current_owner, acquisition_date
     } = req.body;
 
     const result = await client.query(`
@@ -255,14 +269,15 @@ router.put('/:id', async (req, res) => {
           file_size = $5, dimensions = $6, sale_status = $7, price = $8,
           license_type = $9, video_url = $10, embed_url = $11, platform = $12,
           nft_token_id = $13, nft_contract_address = $14, nft_blockchain = $15, notes = $16,
-          series_id = $17, is_public = $18, edition_number = $19, edition_total = $20
-      WHERE id = $21
+          series_id = $17, is_public = $18, edition_number = $19, edition_total = $20,
+          current_owner = $21, acquisition_date = $22
+      WHERE id = $23
       RETURNING *
     `, [inventory_number, title, creation_date, file_format, file_size, dimensions,
         sale_status, price, license_type, video_url, embed_url, platform,
         nft_token_id, nft_contract_address, nft_blockchain, notes, series_id || null,
         req.body.is_public !== undefined ? req.body.is_public : true,
-        edition_number || null, edition_total || null, id]);
+        edition_number || null, edition_total || null, current_owner || null, acquisition_date || null, id]);
 
     if (result.rows.length === 0) {
       await client.query('ROLLBACK');
