@@ -1,0 +1,225 @@
+.publications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-publications {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #7f8c8d;
+}
+
+.publication-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.publication-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.publication-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+  gap: 16px;
+}
+
+.publication-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.publication-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.publication-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.publication-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.article-title {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.publication-date {
+  font-size: 14px;
+  color: #7f8c8d;
+  white-space: nowrap;
+}
+
+.expand-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #7f8c8d;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.expand-button:hover {
+  color: #2c3e50;
+}
+
+.publication-details {
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid #f0f0f0;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.publication-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+  align-items: center;
+}
+
+.publication-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #3498db;
+  color: white;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.publication-author,
+.publication-page {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.publication-link {
+  margin: 12px 0;
+}
+
+.publication-link a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.publication-link a:hover {
+  text-decoration: underline;
+}
+
+.publication-notes {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.publication-notes strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.publication-notes p {
+  margin: 0;
+  color: #34495e;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.publication-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #3498db;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #2980b9;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+@media (max-width: 768px) {
+  .publication-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .publication-date {
+    align-self: flex-end;
+  }
+
+  .publication-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -173,7 +173,18 @@ router.get('/:id', async (req, res) => {
                'return_date', oh.return_date,
                'notes', oh.notes,
                'created_at', oh.created_at
-             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history
+             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', p.id,
+               'publication_type', p.publication_type,
+               'publication_name', p.publication_name,
+               'publication_date', p.publication_date,
+               'url', p.url,
+               'page_number', p.page_number,
+               'author', p.author,
+               'article_title', p.article_title,
+               'notes', p.notes
+             )) FILTER (WHERE p.id IS NOT NULL) as publications
       FROM digital_works dw
       LEFT JOIN series s ON dw.series_id = s.id
       LEFT JOIN digital_work_images dwi ON dw.id = dwi.digital_work_id
@@ -183,6 +194,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN digital_work_tags dwt ON dw.id = dwt.digital_work_id
       LEFT JOIN tags t ON dwt.tag_id = t.id
       LEFT JOIN ownership_history oh ON dw.id = oh.digital_work_id
+      LEFT JOIN publications p ON dw.id = p.digital_work_id
       WHERE dw.id = $1
       GROUP BY dw.id, s.name
     `, [id]);

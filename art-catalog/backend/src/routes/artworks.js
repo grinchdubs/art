@@ -165,7 +165,18 @@ router.get('/:id', async (req, res) => {
                'return_date', oh.return_date,
                'notes', oh.notes,
                'created_at', oh.created_at
-             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history
+             ) ORDER BY oh.transfer_date DESC, oh.created_at DESC) FILTER (WHERE oh.id IS NOT NULL) as ownership_history,
+             json_agg(DISTINCT jsonb_build_object(
+               'id', p.id,
+               'publication_type', p.publication_type,
+               'publication_name', p.publication_name,
+               'publication_date', p.publication_date,
+               'url', p.url,
+               'page_number', p.page_number,
+               'author', p.author,
+               'article_title', p.article_title,
+               'notes', p.notes
+             )) FILTER (WHERE p.id IS NOT NULL) as publications
       FROM artworks a
       LEFT JOIN series s ON a.series_id = s.id
       LEFT JOIN artwork_images ai ON a.id = ai.artwork_id
@@ -175,6 +186,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN artwork_tags at ON a.id = at.artwork_id
       LEFT JOIN tags t ON at.tag_id = t.id
       LEFT JOIN ownership_history oh ON a.id = oh.artwork_id
+      LEFT JOIN publications p ON a.id = p.artwork_id
       WHERE a.id = $1
       GROUP BY a.id, s.name
     `, [id]);

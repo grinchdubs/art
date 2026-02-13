@@ -437,6 +437,42 @@ export const provenanceAPI = {
   },
 };
 
+// Publications API
+export const publicationsAPI = {
+  getArtworkPublications: async (artworkId) => {
+    return await apiCall(`/api/publications/artwork/${artworkId}`);
+  },
+
+  getDigitalWorkPublications: async (digitalWorkId) => {
+    return await apiCall(`/api/publications/digital-work/${digitalWorkId}`);
+  },
+
+  create: async (publicationData) => {
+    return await apiCall('/api/publications', {
+      method: 'POST',
+      body: JSON.stringify(publicationData),
+    });
+  },
+
+  update: async (id, publicationData) => {
+    return await apiCall(`/api/publications/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(publicationData),
+    });
+  },
+
+  delete: async (id) => {
+    return await apiCall(`/api/publications/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getAll: async (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    return await apiCall(`/api/publications/all?${params}`);
+  },
+};
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;

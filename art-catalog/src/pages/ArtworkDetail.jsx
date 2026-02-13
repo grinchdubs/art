@@ -5,6 +5,9 @@ import ImageLightbox from '../components/ImageLightbox';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 import ProvenanceTimeline from '../components/ProvenanceTimeline';
 import TransferForm from '../components/TransferForm';
+import PublicationsList from '../components/PublicationsList';
+import PublicationForm from '../components/PublicationForm';
+import { publicationsAPI } from '../utils/api';
 
 function ArtworkDetail() {
   const { id } = useParams();
@@ -21,6 +24,8 @@ function ArtworkDetail() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [showTransferForm, setShowTransferForm] = useState(false);
+  const [showPublicationForm, setShowPublicationForm] = useState(false);
+  const [editingPublication, setEditingPublication] = useState(null);
 
   useEffect(() => {
     loadArtwork();
@@ -181,7 +186,33 @@ function ArtworkDetail() {
   }
 
   function handleTransferRecorded() {
+    setShowTransferForm(false);
     loadArtwork(); // Reload to show new transfer in timeline
+  }
+
+  async function handlePublicationEdit(publication) {
+    setEditingPublication(publication);
+    setShowPublicationForm(true);
+  }
+
+  async function handlePublicationDelete(publicationId) {
+    if (!window.confirm('Are you sure you want to delete this publication record?')) {
+      return;
+    }
+
+    try {
+      await publicationsAPI.delete(publicationId);
+      loadArtwork(); // Reload to update publications list
+    } catch (error) {
+      console.error('Error deleting publication:', error);
+      alert('Failed to delete publication. Please try again.');
+    }
+  }
+
+  function handlePublicationAdded() {
+    setShowPublicationForm(false);
+    setEditingPublication(null);
+    loadArtwork(); // Reload to show new publication
   }
 
   if (loading) {
@@ -450,6 +481,29 @@ function ArtworkDetail() {
           )}
         </div>
 
+        {/* Publications & Media */}
+        <div style={{ marginTop: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0 }}>Publications & Media</h3>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => {
+                setEditingPublication(null);
+                setShowPublicationForm(true);
+              }}
+              style={{ padding: '8px 16px' }}
+            >
+              + Add Publication
+            </button>
+          </div>
+
+          <PublicationsList 
+            publications={artwork.publications || []}
+            onEdit={handlePublicationEdit}
+            onDelete={handlePublicationDelete}
+          />
+        </div>
+
         {/* Provenance & Ownership History */}
         <div style={{ marginTop: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -625,6 +679,19 @@ function ArtworkDetail() {
           workType="artwork"
           onTransferRecorded={handleTransferRecorded}
           onClose={() => setShowTransferForm(false)}
+        />
+      )}
+
+      {showPublicationForm && (
+        <PublicationForm
+          workId={parseInt(id)}
+          workType="artwork"
+          existingPublication={editingPublication}
+          onPublicationAdded={handlePublicationAdded}
+          onClose={() => {
+            setShowPublicationForm(false);
+            setEditingPublication(null);
+          }}
         />
       )}
     </div>
