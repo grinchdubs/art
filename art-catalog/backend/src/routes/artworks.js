@@ -300,7 +300,8 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error updating artwork:', error);
-    res.status(500).json({ error: 'Failed to update artwork' });
+    console.error('Error details:', error.message, error.stack);
+    res.status(500).json({ error: 'Failed to update artwork', details: error.message });
   } finally {
     client.release();
   }
