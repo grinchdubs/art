@@ -23,6 +23,8 @@ function DigitalWorkForm() {
     notes: '',
     series_id: '',
     is_public: true,
+    current_owner: '',
+    acquisition_date: '',
   });
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -284,6 +286,33 @@ function DigitalWorkForm() {
                 value={formData.dimensions}
                 onChange={handleChange}
                 placeholder="e.g., 1920x1080, 4K"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="current_owner">Current Owner</label>
+              <input
+                type="text"
+                id="current_owner"
+                name="current_owner"
+                className="form-control"
+                value={formData.current_owner}
+                onChange={handleChange}
+                placeholder="Owner name or organization"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="acquisition_date">Acquisition Date</label>
+              <input
+                type="date"
+                id="acquisition_date"
+                name="acquisition_date"
+                className="form-control"
+                value={formData.acquisition_date}
+                onChange={handleChange}
               />
             </div>
           </div>

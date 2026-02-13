@@ -5,6 +5,8 @@ import { getVideoEmbedUrl } from '../utils/videoImportUtils';
 import { fetchTezosPrice, formatPriceWithUSD } from '../utils/nftUtils';
 import ImageLightbox from '../components/ImageLightbox';
 import QRCodeGenerator from '../components/QRCodeGenerator';
+import ProvenanceTimeline from '../components/ProvenanceTimeline';
+import TransferForm from '../components/TransferForm';
 
 function DigitalWorkDetail() {
   const { id } = useParams();
@@ -19,6 +21,7 @@ function DigitalWorkDetail() {
   const [allWorkIds, setAllWorkIds] = useState([]);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [showTransferForm, setShowTransferForm] = useState(false);
 
   useEffect(() => {
     loadWork();
@@ -171,6 +174,11 @@ function DigitalWorkDetail() {
       console.error('Error recording sale:', error);
       alert('Failed to record sale. Please try again.');
     }
+  }
+
+  function handleTransferRecorded() {
+    setShowTransferForm(false);
+    loadWork(); // Reload to get updated ownership history
   }
 
   if (loading) {
@@ -534,6 +542,45 @@ function DigitalWorkDetail() {
           </div>
         </div>
 
+        {/* Provenance & Ownership */}
+        <div style={{ marginTop: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0 }}>Provenance & Ownership</h3>
+            <button
+              onClick={() => setShowTransferForm(true)}
+              className="btn btn-secondary"
+              style={{ fontSize: '14px', padding: '8px 16px' }}
+            >
+              Record Transfer
+            </button>
+          </div>
+
+          {work.current_owner && (
+            <div style={{
+              background: '#f8f9fa',
+              padding: '16px',
+              borderRadius: '8px',
+              marginBottom: '16px'
+            }}>
+              <div style={{ fontWeight: '600', color: '#2c3e50', marginBottom: '4px' }}>Current Owner</div>
+              <div style={{ fontSize: '18px', color: '#34495e' }}>{work.current_owner}</div>
+              {work.acquisition_date && (
+                <div style={{ fontSize: '14px', color: '#7f8c8d', marginTop: '4px' }}>
+                  Since {new Date(work.acquisition_date).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+          )}
+
+          {work.ownership_history && work.ownership_history.length > 0 ? (
+            <ProvenanceTimeline history={work.ownership_history} />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
+              <p style={{ color: '#7f8c8d' }}>No ownership history recorded</p>
+            </div>
+          )}
+        </div>
+
         {/* Exhibition History */}
         <div style={{ marginTop: '30px' }}>
           <h3 style={{ marginBottom: '16px' }}>Exhibition History</h3>
@@ -645,6 +692,16 @@ function DigitalWorkDetail() {
           title={work.title}
           inventory={work.inventory_number}
           onClose={() => setShowQR(false)}
+        />
+      )}
+
+      {showTransferForm && (
+        <TransferForm
+          workId={id}
+          workType="digital_work"
+          workTitle={work.title}
+          onClose={() => setShowTransferForm(false)}
+          onTransferRecorded={handleTransferRecorded}
         />
       )}
     </div>
