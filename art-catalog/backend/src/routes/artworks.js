@@ -153,7 +153,7 @@ router.get('/:id', async (req, res) => {
                'name', t.name,
                'color', t.color
              )) FILTER (WHERE t.id IS NOT NULL) as tags,
-             json_agg(DISTINCT jsonb_build_object(
+             json_agg(jsonb_build_object(
                'id', oh.id,
                'transfer_type', oh.transfer_type,
                'transfer_date', oh.transfer_date,
