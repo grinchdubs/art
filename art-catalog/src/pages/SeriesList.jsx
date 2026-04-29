@@ -37,7 +37,11 @@ function SeriesList() {
   }
 
   if (loading) {
-    return <div>Loading series...</div>;
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+      </div>
+    );
   }
 
   return (
@@ -50,68 +54,66 @@ function SeriesList() {
       </div>
 
       {series.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d', marginBottom: '16px' }}>No series created yet</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">📚</div>
+          <h3>No series yet</h3>
+          <p>Group your works into series and collections</p>
           <button className="btn btn-primary" onClick={() => navigate('/series/new')}>
             Create Your First Series
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '20px' }}>
+        <div style={{ display: 'grid', gap: '12px' }}>
           {series.map((s) => (
             <div
               key={s.id}
               style={{
-                background: 'white',
-                padding: '24px',
-                borderRadius: '8px',
-                border: '1px solid #ecf0f1',
+                background: 'var(--bg-surface)',
+                padding: '20px 24px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'border-color var(--transition)',
               }}
               onClick={() => navigate(`/series/${s.id}`)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#3498db';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(52, 152, 219, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#ecf0f1';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-mid)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: '0 0 8px 0', color: '#2c3e50' }}>{s.name}</h3>
+                  <h3 style={{ margin: '0 0 6px 0', color: 'var(--text-primary)', fontSize: '16px', fontWeight: '500' }}>
+                    {s.name}
+                  </h3>
                   {s.description && (
-                    <p style={{ color: '#7f8c8d', margin: '0 0 12px 0', lineHeight: '1.6' }}>
+                    <p style={{ color: 'var(--text-secondary)', margin: '0 0 14px 0', lineHeight: '1.6', fontSize: '13px' }}>
                       {s.description}
                     </p>
                   )}
-                  
-                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+
+                  <div style={{ display: 'flex', gap: '24px', marginTop: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#3498db' }}>
+                      <span style={{ fontSize: '22px', fontWeight: '600', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
                         {s.artwork_count || 0}
                       </span>
-                      <span style={{ color: '#7f8c8d', fontSize: '14px' }}>
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
                         Physical Work{s.artwork_count !== 1 ? 's' : ''}
                       </span>
                     </div>
-                    
+
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#9b59b6' }}>
+                      <span style={{ fontSize: '22px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
                         {s.digital_work_count || 0}
                       </span>
-                      <span style={{ color: '#7f8c8d', fontSize: '14px' }}>
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
                         Digital Work{s.digital_work_count !== 1 ? 's' : ''}
                       </span>
                     </div>
                   </div>
 
                   {(s.start_date || s.end_date) && (
-                    <div style={{ marginTop: '12px', color: '#95a5a6', fontSize: '14px' }}>
+                    <div style={{ marginTop: '10px', color: 'var(--text-muted)', fontSize: '12px' }}>
                       {s.start_date && new Date(s.start_date).toLocaleDateString()}
-                      {s.start_date && s.end_date && ' - '}
+                      {s.start_date && s.end_date && ' – '}
                       {s.end_date && new Date(s.end_date).toLocaleDateString()}
                     </div>
                   )}
@@ -120,19 +122,13 @@ function SeriesList() {
                 <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
                   <button
                     className="btn btn-secondary btn-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/series/${s.id}/edit`);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/series/${s.id}/edit`); }}
                   >
                     Edit
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(s.id, s.name);
-                    }}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(s.id, s.name); }}
                   >
                     Delete
                   </button>

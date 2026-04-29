@@ -40,12 +40,12 @@ function SeriesDetail() {
         <div>
           <h2>{series.name}</h2>
           {series.description && (
-            <p style={{ color: '#7f8c8d', marginTop: '8px', lineHeight: '1.6' }}>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '8px', lineHeight: '1.6' }}>
               {series.description}
             </p>
           )}
           {(series.start_date || series.end_date) && (
-            <p style={{ color: '#95a5a6', fontSize: '14px', marginTop: '8px' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '8px' }}>
               {series.start_date && new Date(series.start_date).toLocaleDateString()}
               {series.start_date && series.end_date && ' - '}
               {series.end_date && new Date(series.end_date).toLocaleDateString()}
@@ -63,29 +63,29 @@ function SeriesDetail() {
       </div>
 
       <div style={{ marginBottom: '32px', display: 'flex', gap: '24px' }}>
-        <div style={{ padding: '16px', background: '#f8f9fa', borderRadius: '8px', flex: 1 }}>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3498db' }}>
+        <div style={{ padding: '16px', background: 'var(--bg-elevated)', borderRadius: '8px', flex: 1 }}>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--accent)' }}>
             {series.artworks?.length || 0}
           </div>
-          <div style={{ color: '#7f8c8d' }}>Physical Artworks</div>
+          <div style={{ color: 'var(--text-secondary)' }}>Physical Artworks</div>
         </div>
-        <div style={{ padding: '16px', background: '#f8f9fa', borderRadius: '8px', flex: 1 }}>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#9b59b6' }}>
+        <div style={{ padding: '16px', background: 'var(--bg-elevated)', borderRadius: '8px', flex: 1 }}>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
             {series.digital_works?.length || 0}
           </div>
-          <div style={{ color: '#7f8c8d' }}>Digital Works</div>
+          <div style={{ color: 'var(--text-secondary)' }}>Digital Works</div>
         </div>
-        <div style={{ padding: '16px', background: '#f8f9fa', borderRadius: '8px', flex: 1 }}>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#2c3e50' }}>
+        <div style={{ padding: '16px', background: 'var(--bg-elevated)', borderRadius: '8px', flex: 1 }}>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
             {totalWorks}
           </div>
-          <div style={{ color: '#7f8c8d' }}>Total Works</div>
+          <div style={{ color: 'var(--text-secondary)' }}>Total Works</div>
         </div>
       </div>
 
       {series.artworks && series.artworks.length > 0 && (
         <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Physical Artworks</h3>
+          <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Physical Artworks</h3>
           <div className="artwork-grid">
             {series.artworks.map((artwork) => {
               const primaryImage = artwork.images?.find(img => img.is_primary) || artwork.images?.[0];
@@ -129,7 +129,7 @@ function SeriesDetail() {
 
       {series.digital_works && series.digital_works.length > 0 && (
         <div>
-          <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Digital Works</h3>
+          <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Digital Works</h3>
           <div className="artwork-grid">
             {series.digital_works.map((work) => {
               const primaryImage = work.images?.find(img => img.is_primary) || work.images?.[0];
@@ -172,11 +172,11 @@ function SeriesDetail() {
       )}
 
       {totalWorks === 0 && (
-        <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-          <p style={{ color: '#7f8c8d', marginBottom: '16px' }}>
+        <div style={{ textAlign: 'center', padding: '40px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
             No works in this series yet
           </p>
-          <p style={{ color: '#95a5a6', fontSize: '14px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
             Add works to this series by editing them and selecting this series from the dropdown
           </p>
         </div>

@@ -557,15 +557,15 @@ function DigitalWorkDetail() {
 
           {work.current_owner && (
             <div style={{
-              background: '#f8f9fa',
+              background: 'var(--bg-elevated)',
               padding: '16px',
               borderRadius: '8px',
               marginBottom: '16px'
             }}>
-              <div style={{ fontWeight: '600', color: '#2c3e50', marginBottom: '4px' }}>Current Owner</div>
-              <div style={{ fontSize: '18px', color: '#34495e' }}>{work.current_owner}</div>
+              <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>Current Owner</div>
+              <div style={{ fontSize: '18px', color: 'var(--text-primary)' }}>{work.current_owner}</div>
               {work.acquisition_date && (
-                <div style={{ fontSize: '14px', color: '#7f8c8d', marginTop: '4px' }}>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Since {new Date(work.acquisition_date).toLocaleDateString()}
                 </div>
               )}
@@ -575,8 +575,8 @@ function DigitalWorkDetail() {
           {work.ownership_history && work.ownership_history.length > 0 ? (
             <ProvenanceTimeline history={work.ownership_history} />
           ) : (
-            <div style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>No ownership history recorded</p>
+            <div style={{ textAlign: 'center', padding: '30px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No ownership history recorded</p>
             </div>
           )}
         </div>
@@ -585,8 +585,8 @@ function DigitalWorkDetail() {
         <div style={{ marginTop: '30px' }}>
           <h3 style={{ marginBottom: '16px' }}>Exhibition History</h3>
           {exhibitions.length === 0 ? (
-            <div className="empty-exhibition-state" style={{ textAlign: 'center', padding: '30px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>This digital work has not been exhibited yet</p>
+            <div className="empty-exhibition-state" style={{ textAlign: 'center', padding: '30px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>This digital work has not been exhibited yet</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -595,10 +595,7 @@ function DigitalWorkDetail() {
                   key={exhibition.id}
                   className="exhibition-card"
                   style={{
-                    background: 'white',
                     padding: '16px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     cursor: 'pointer',
                     transition: 'transform 0.2s',
                   }}
@@ -611,7 +608,7 @@ function DigitalWorkDetail() {
                   }}
                 >
                   <div className="exhibition-name" style={{ fontWeight: '500', marginBottom: '4px' }}>{exhibition.name}</div>
-                  <div className="exhibition-meta" style={{ fontSize: '14px', color: '#7f8c8d' }}>
+                  <div className="exhibition-meta" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                     {exhibition.venue} • {new Date(exhibition.start_date).toLocaleDateString()}
                     {exhibition.end_date && ` - ${new Date(exhibition.end_date).toLocaleDateString()}`}
                   </div>
@@ -641,11 +638,13 @@ function DigitalWorkDetail() {
         >
           <div
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
               padding: '32px',
               borderRadius: '12px',
               maxWidth: '500px',
               width: '90%',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
             }}
             onClick={(e) => e.stopPropagation()}
           >

@@ -107,13 +107,13 @@ function SalesList() {
           >
             <div className="stat-card">
               <div className="stat-label">Total Sales</div>
-              <div className="stat-value" style={{ color: '#3498db' }}>
+              <div className="stat-value" style={{ color: 'var(--accent)' }}>
                 {stats.total_sales || 0}
               </div>
             </div>
             <div className="stat-card">
               <div className="stat-label">Total Revenue</div>
-              <div className="stat-value" style={{ color: '#27ae60' }}>
+              <div className="stat-value" style={{ color: 'var(--success)' }}>
                 ${parseFloat(stats.total_revenue || 0).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -122,7 +122,7 @@ function SalesList() {
             </div>
             <div className="stat-card">
               <div className="stat-label">Average Sale</div>
-              <div className="stat-value" style={{ color: '#f39c12' }}>
+              <div className="stat-value" style={{ color: 'var(--warning)' }}>
                 ${parseFloat(stats.average_sale_price || 0).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -131,7 +131,7 @@ function SalesList() {
             </div>
             <div className="stat-card">
               <div className="stat-label">Items Sold</div>
-              <div className="stat-value" style={{ color: '#9b59b6' }}>
+              <div className="stat-value">
                 {(parseInt(stats.artworks_sold) || 0) + (parseInt(stats.digital_works_sold) || 0)}
               </div>
             </div>
@@ -146,19 +146,16 @@ function SalesList() {
           placeholder="Search sales by buyer, item, or platform..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          className="form-control"
           style={{
             width: '100%',
-            padding: '10px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
           }}
         />
       </div>
 
       {/* Sales Table */}
       {filteredSales.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#7f8c8d' }}>
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
           {sales.length === 0 ? 'No sales recorded yet.' : 'No sales match your search.'}
         </div>
       ) : (
@@ -182,7 +179,7 @@ function SalesList() {
                   <td>{new Date(sale.sale_date).toLocaleDateString()}</td>
                   <td>
                     {sale.artwork_title || sale.digital_work_title}
-                    <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                       {sale.artwork_inventory || sale.digital_work_inventory}
                     </div>
                   </td>
@@ -192,8 +189,9 @@ function SalesList() {
                         padding: '4px 8px',
                         borderRadius: '4px',
                         fontSize: '12px',
-                        backgroundColor: sale.artwork_id ? '#e3f2fd' : '#f3e5f5',
-                        color: sale.artwork_id ? '#1976d2' : '#7b1fa2',
+                        backgroundColor: 'var(--bg-elevated)',
+                        color: 'var(--text-secondary)',
+                        border: '1px solid var(--border)',
                       }}
                     >
                       {sale.artwork_id ? 'Physical' : 'Digital'}
@@ -203,7 +201,7 @@ function SalesList() {
                   <td>
                     {sale.buyer_name || '-'}
                     {sale.buyer_email && (
-                      <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                         {sale.buyer_email}
                       </div>
                     )}

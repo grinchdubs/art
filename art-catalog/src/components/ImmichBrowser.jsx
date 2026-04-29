@@ -146,7 +146,7 @@ function ImmichBrowser({ isOpen, onClose, onImport }) {
       padding: '20px'
     }}>
       <div style={{
-        background: 'white',
+        background: 'var(--bg-surface)',
         borderRadius: '12px',
         width: '100%',
         maxWidth: '1200px',
@@ -352,7 +352,7 @@ function ImmichBrowser({ isOpen, onClose, onImport }) {
                       </div>
                       <div style={{
                         fontSize: '12px',
-                        color: '#7f8c8d'
+                        color: 'var(--text-secondary)'
                       }}>
                         {album.assetCount} photos
                       </div>
@@ -374,7 +374,7 @@ function ImmichBrowser({ isOpen, onClose, onImport }) {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+          <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
             {selectedAssets.size} photo{selectedAssets.size !== 1 ? 's' : ''} selected
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -420,7 +420,7 @@ function ImmichBrowser({ isOpen, onClose, onImport }) {
   function renderAssetGrid() {
     if (assets.length === 0) {
       return (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#7f8c8d' }}>
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
           No photos found
         </div>
       );

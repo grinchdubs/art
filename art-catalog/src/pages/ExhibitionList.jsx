@@ -49,42 +49,33 @@ function ExhibitionList() {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {exhibitions.map((exhibition) => (
             <div
               key={exhibition.id}
+              className="exhibition-card"
               style={{
-                background: 'white',
-                padding: '24px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                padding: '20px 24px',
                 cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
               }}
               onClick={() => navigate(`/exhibitions/${exhibition.id}`)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-              }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 style={{ margin: '0 0 8px 0', color: '#2c3e50' }}>{exhibition.name}</h3>
-                  <div style={{ color: '#7f8c8d', fontSize: '14px', marginBottom: '4px' }}>
+                  <h3 className="exhibition-name" style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: '500' }}>
+                    {exhibition.name}
+                  </h3>
+                  <div className="exhibition-meta" style={{ fontSize: '13px', marginBottom: '2px' }}>
                     📍 {exhibition.venue}
                   </div>
-                  <div style={{ color: '#7f8c8d', fontSize: '14px' }}>
+                  <div className="exhibition-meta" style={{ fontSize: '13px' }}>
                     📅 {new Date(exhibition.start_date).toLocaleDateString()}
-                    {exhibition.end_date && ` - ${new Date(exhibition.end_date).toLocaleDateString()}`}
+                    {exhibition.end_date && ` – ${new Date(exhibition.end_date).toLocaleDateString()}`}
                   </div>
                 </div>
               </div>
               {exhibition.description && (
-                <p style={{ marginTop: '12px', color: '#555', fontSize: '14px' }}>
+                <p style={{ marginTop: '10px', color: 'var(--text-secondary)', fontSize: '13px', lineHeight: '1.6' }}>
                   {exhibition.description.length > 150
                     ? `${exhibition.description.substring(0, 150)}...`
                     : exhibition.description}

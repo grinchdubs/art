@@ -672,11 +672,11 @@ function DigitalWorkList() {
           />
 
           <div style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '20px',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             marginBottom: '24px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
@@ -758,7 +758,7 @@ function DigitalWorkList() {
             </div>
 
             <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+              <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 Showing {filteredWorks.length} of {works.length} digital works
               </div>
               {hasActiveFilters && (
@@ -770,8 +770,8 @@ function DigitalWorkList() {
           </div>
 
           {filteredWorks.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d', marginBottom: '16px' }}>No digital works match your filters</p>
+            <div style={{ textAlign: 'center', padding: '40px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>No digital works match your filters</p>
               <button className="btn btn-secondary btn-sm" onClick={clearFilters}>
                 Clear Filters
               </button>
@@ -892,13 +892,13 @@ function DigitalWorkList() {
           zIndex: 1000,
         }}>
           <div className="batch-dialog" style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '30px',
             borderRadius: '8px',
             maxWidth: '500px',
             width: '90%',
           }}>
-            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>
               Batch Actions ({selectedWorks.size} works)
             </h3>
 
@@ -953,14 +953,14 @@ function DigitalWorkList() {
                   Apply
                 </button>
               </div>
-              <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+              <small style={{ color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
                 {priceAdjustmentType === 'percentage'
                   ? 'Enter percentage (positive to increase, negative to decrease)'
                   : 'Enter dollar amount (positive to increase, negative to decrease)'}
               </small>
             </div>
 
-            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
+            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
               <button
                 className="btn btn-primary"
                 onClick={() => {
@@ -1001,7 +1001,7 @@ function DigitalWorkList() {
         <div className="modal-overlay" onClick={() => setShowImportDialog(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Import Digital Works from CSV</h3>
-            <p style={{ color: '#7f8c8d', marginBottom: '20px' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
               Upload a CSV file to import multiple digital works at once.
             </p>
 
@@ -1023,7 +1023,7 @@ function DigitalWorkList() {
                 <h4>Preview ({parsedImport.works.length} digital works)</h4>
 
                 {importErrors.length > 0 && (
-                  <div style={{ background: '#fff3cd', padding: '12px', borderRadius: '6px', marginBottom: '16px' }}>
+                  <div style={{ background: 'rgba(201, 154, 58, 0.1)', padding: '12px', borderRadius: '6px', marginBottom: '16px' }}>
                     <strong>Warnings ({importErrors.length}):</strong>
                     <ul style={{ marginTop: '8px', marginBottom: 0 }}>
                       {importErrors.slice(0, 5).map((error, idx) => (
@@ -1087,7 +1087,7 @@ function DigitalWorkList() {
         <div className="modal-overlay" onClick={() => setShowVideoImportDialog(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Import Videos from URLs</h3>
-            <p style={{ color: '#7f8c8d', marginBottom: '20px' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
               Paste YouTube or Vimeo URLs (one per line) to import them as digital works.
             </p>
 
@@ -1103,7 +1103,7 @@ function DigitalWorkList() {
                 onChange={handleVideoUrlChange}
                 style={{ fontFamily: 'monospace', fontSize: '13px' }}
               />
-              <small style={{ color: '#7f8c8d', fontSize: '12px', display: 'block', marginTop: '8px' }}>
+              <small style={{ color: 'var(--text-secondary)', fontSize: '12px', display: 'block', marginTop: '8px' }}>
                 Supported: YouTube, Vimeo (paste one URL per line)
               </small>
             </div>
@@ -1113,7 +1113,7 @@ function DigitalWorkList() {
                 <h4>Preview ({parsedVideos.videos.length} videos)</h4>
 
                 {videoErrors.length > 0 && (
-                  <div style={{ background: '#fff3cd', padding: '12px', borderRadius: '6px', marginBottom: '16px' }}>
+                  <div style={{ background: 'rgba(201, 154, 58, 0.1)', padding: '12px', borderRadius: '6px', marginBottom: '16px' }}>
                     <strong>Invalid URLs ({videoErrors.length}):</strong>
                     <ul style={{ marginTop: '8px', marginBottom: 0 }}>
                       {videoErrors.slice(0, 5).map((error, idx) => (
@@ -1178,16 +1178,16 @@ function DigitalWorkList() {
         <div className="modal-overlay" onClick={() => setShowNftDialog(false)}>
           <div className="modal-content import-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
             <h3>Match NFTs to Digital Works</h3>
-            <p style={{ color: '#7f8c8d', marginBottom: '20px' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
               {nftMatches.length} NFT{nftMatches.length !== 1 ? 's' : ''} matched to your videos. Review and confirm the matches below.
             </p>
 
             {nftMatches.length > 0 ? (
               <div style={{ maxHeight: '400px', overflow: 'auto', marginBottom: '20px' }}>
                 <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                  <thead style={{ position: 'sticky', top: 0, background: '#f8f9fa' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-elevated)' }}>
                     <tr>
-                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>
                         <input
                           type="checkbox"
                           checked={nftMatches.every(m => m.confirmed)}
@@ -1197,15 +1197,15 @@ function DigitalWorkList() {
                           }}
                         />
                       </th>
-                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Video Title</th>
-                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>NFT Name</th>
-                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Token ID</th>
-                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ddd' }}>Editions</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Video Title</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>NFT Name</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Token ID</th>
+                      <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Editions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {nftMatches.map((match, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                      <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                         <td style={{ padding: '8px' }}>
                           <input
                             type="checkbox"
@@ -1225,7 +1225,7 @@ function DigitalWorkList() {
                 </table>
               </div>
             ) : (
-              <p style={{ textAlign: 'center', color: '#7f8c8d', padding: '40px 0' }}>
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 0' }}>
                 No NFTs could be automatically matched. Try manually editing works to add NFT data.
               </p>
             )}

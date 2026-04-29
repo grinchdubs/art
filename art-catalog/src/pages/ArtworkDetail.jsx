@@ -471,7 +471,7 @@ function ArtworkDetail() {
                   }}
                 >
                   <div style={{ fontWeight: '500', marginBottom: '4px' }}>{exhibition.name}</div>
-                  <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+                  <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                     {exhibition.venue} • {new Date(exhibition.start_date).toLocaleDateString()}
                     {exhibition.end_date && ` - ${new Date(exhibition.end_date).toLocaleDateString()}`}
                   </div>
@@ -518,16 +518,16 @@ function ArtworkDetail() {
           </div>
           
           {artwork.current_owner && (
-            <div style={{ 
-              padding: '16px', 
-              background: '#f0f8ff', 
-              borderRadius: '8px', 
+            <div style={{
+              padding: '16px',
+              background: 'var(--bg-elevated)',
+              borderRadius: '8px',
               marginBottom: '16px',
-              border: '1px solid #b3d9ff'
+              border: '1px solid var(--border)'
             }}>
               <strong>Current Owner:</strong> {artwork.current_owner}
               {artwork.acquisition_date && (
-                <span style={{ marginLeft: '12px', color: '#666' }}>
+                <span style={{ marginLeft: '12px', color: 'var(--text-secondary)' }}>
                   Since: {new Date(artwork.acquisition_date).toLocaleDateString()}
                 </span>
               )}
@@ -552,13 +552,14 @@ function ArtworkDetail() {
             zIndex: 1000,
           }}>
             <div style={{
-              background: 'white',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
               padding: '30px',
               borderRadius: '8px',
               maxWidth: '500px',
               width: '90%',
             }}>
-              <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Change Location</h3>
+              <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Change Location</h3>
 
               <div className="form-group">
                 <label>New Location *</label>
@@ -623,27 +624,28 @@ function ArtworkDetail() {
           >
             <div
               style={{
-                background: 'white',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
                 padding: '30px',
                 borderRadius: '8px',
                 maxWidth: '400px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Keyboard Shortcuts</h3>
+              <h3 style={{ marginTop: 0, marginBottom: '20px', color: 'var(--text-primary)' }}>Keyboard Shortcuts</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: '500' }}>ESC</span>
-                  <span style={{ color: '#7f8c8d' }}>Go back or close dialogs</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Go back or close dialogs</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: '500' }}>← →</span>
-                  <span style={{ color: '#7f8c8d' }}>Navigate artworks</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Navigate artworks</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: '500' }}>?</span>
-                  <span style={{ color: '#7f8c8d' }}>Show this help</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>Show this help</span>
                 </div>
               </div>
               <button
@@ -657,7 +659,7 @@ function ArtworkDetail() {
           </div>
         )}
 
-        <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
+        <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
           <button className="btn btn-secondary" onClick={() => navigate('/artworks')}>
             Back to All Works
           </button>

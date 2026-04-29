@@ -26,7 +26,7 @@ function AdvancedSearch({ filters, onFiltersChange, availableTags = [], availabl
 
   return (
     <div style={{
-      background: '#f8f9fa',
+      background: 'var(--bg-elevated)',
       borderRadius: '8px',
       padding: '16px',
       marginBottom: '24px',

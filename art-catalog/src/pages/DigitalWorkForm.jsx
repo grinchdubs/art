@@ -216,7 +216,7 @@ function DigitalWorkForm() {
               required
               placeholder="Auto-generated"
             />
-            <small style={{ color: '#7f8c8d', fontSize: '12px' }}>
+            <small style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
               Format: GRNCH-DIG-YEAR-SERIES
             </small>
           </div>
@@ -406,7 +406,7 @@ function DigitalWorkForm() {
                 </option>
               ))}
             </select>
-            <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+            <small style={{ color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
               Group this work into a series or collection. <a href="/series/new" target="_blank" style={{ color: '#3498db' }}>Create new series</a>
             </small>
           </div>
@@ -435,7 +435,7 @@ function DigitalWorkForm() {
               />
               <span style={{ fontWeight: '500' }}>🌐 Show in Public Gallery</span>
             </label>
-            <small style={{ display: 'block', color: '#7f8c8d', marginTop: '4px', marginLeft: '24px' }}>
+            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '4px', marginLeft: '24px' }}>
               When checked, this digital work will be visible in the public portfolio view
             </small>
           </div>
@@ -455,7 +455,7 @@ function DigitalWorkForm() {
               accept="image/*,video/*"
               multiple
             />
-            <small style={{ color: '#7f8c8d', fontSize: '12px', display: 'block', marginTop: '8px' }}>
+            <small style={{ color: 'var(--text-secondary)', fontSize: '12px', display: 'block', marginTop: '8px' }}>
               Upload preview images or videos. Multiple files supported.
             </small>
 
@@ -596,7 +596,7 @@ function DigitalWorkForm() {
           padding: '20px'
         }}>
           <div style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '30px',
             borderRadius: '8px',
             maxWidth: '900px',
@@ -604,10 +604,10 @@ function DigitalWorkForm() {
             maxHeight: '80vh',
             overflow: 'auto'
           }}>
-            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Select Images from Gallery</h3>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Select Images from Gallery</h3>
 
             {allGalleryImages.length === 0 ? (
-              <p style={{ color: '#7f8c8d', textAlign: 'center', padding: '40px 0' }}>
+              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 0' }}>
                 No images in gallery. Upload images in the <a href="/gallery" style={{ color: '#3498db' }}>Image Gallery</a> first.
               </p>
             ) : (
@@ -630,7 +630,7 @@ function DigitalWorkForm() {
                       alt={image.original_name}
                       style={{ width: '100%', height: '150px', objectFit: 'cover' }}
                     />
-                    <div style={{ padding: '8px', background: 'white' }}>
+                    <div style={{ padding: '8px', background: 'var(--bg-surface)' }}>
                       <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {image.original_name}
                       </p>

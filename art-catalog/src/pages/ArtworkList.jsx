@@ -477,9 +477,10 @@ function ArtworkList() {
               top: '100%',
               right: 0,
               marginTop: '8px',
-              background: 'white',
+              background: 'var(--bg-surface)',
               borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              border: '1px solid var(--border)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
               zIndex: 100,
               minWidth: '200px',
               overflow: 'hidden'
@@ -497,10 +498,10 @@ function ArtworkList() {
                   textAlign: 'left',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-elevated)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Export as CSV
@@ -518,10 +519,10 @@ function ArtworkList() {
                   textAlign: 'left',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-elevated)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Export as JSON
@@ -539,15 +540,15 @@ function ArtworkList() {
                   textAlign: 'left',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-elevated)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Export as Text Report
               </button>
-              <div style={{ borderTop: '1px solid #ecf0f1', margin: '4px 0' }}></div>
+              <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }}></div>
               <button
                 onClick={() => {
                   exportStats(artworks);
@@ -561,10 +562,10 @@ function ArtworkList() {
                   textAlign: 'left',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-elevated)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Export Statistics
@@ -598,16 +599,16 @@ function ArtworkList() {
 
           {/* Search and Filter Controls */}
           <div style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '20px',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             marginBottom: '24px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
               {/* Search */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Search
                 </label>
                 <input
@@ -621,7 +622,7 @@ function ArtworkList() {
 
               {/* Medium Filter */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Medium
                 </label>
                 <select
@@ -638,7 +639,7 @@ function ArtworkList() {
 
               {/* Status Filter */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Status
                 </label>
                 <select
@@ -656,7 +657,7 @@ function ArtworkList() {
 
               {/* Series Filter */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Series
                 </label>
                 <select
@@ -673,7 +674,7 @@ function ArtworkList() {
 
               {/* Date From */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Created From
                 </label>
                 <input
@@ -686,7 +687,7 @@ function ArtworkList() {
 
               {/* Date To */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Created To
                 </label>
                 <input
@@ -699,7 +700,7 @@ function ArtworkList() {
 
               {/* Sort */}
               <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: '#2c3e50' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px', color: 'var(--text-primary)' }}>
                   Sort By
                 </label>
                 <select
@@ -721,7 +722,7 @@ function ArtworkList() {
             {/* Results count and clear button */}
             <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                   Showing {filteredArtworks.length} of {artworks.length} works
                   {selectedArtworks.size > 0 && ` • ${selectedArtworks.size} selected`}
                 </div>
@@ -764,13 +765,13 @@ function ArtworkList() {
               zIndex: 1000,
             }}>
               <div className="batch-dialog" style={{
-                background: 'white',
+                background: 'var(--bg-surface)',
                 padding: '30px',
                 borderRadius: '8px',
                 maxWidth: '500px',
                 width: '90%',
               }}>
-                <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>
+                <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>
                   Batch Actions ({selectedArtworks.size} works)
                 </h3>
 
@@ -846,14 +847,14 @@ function ArtworkList() {
                       Apply
                     </button>
                   </div>
-                  <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+                  <small style={{ color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
                     {priceAdjustmentType === 'percentage'
                       ? 'Enter percentage (positive to increase, negative to decrease)'
                       : 'Enter dollar amount (positive to increase, negative to decrease)'}
                   </small>
                 </div>
 
-                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ecf0f1' }}>
+                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
                   <button
                     className="btn btn-primary"
                     onClick={() => {
@@ -893,8 +894,8 @@ function ArtworkList() {
 
           {/* Artwork Grid */}
           {filteredArtworks.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d', marginBottom: '16px' }}>No works match your filters</p>
+            <div style={{ textAlign: 'center', padding: '40px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>No works match your filters</p>
               <button className="btn btn-secondary btn-sm" onClick={clearFilters}>
                 Clear Filters
               </button>
@@ -1010,7 +1011,7 @@ function ArtworkList() {
           zIndex: 1000,
         }}>
           <div className="import-dialog" style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '30px',
             borderRadius: '8px',
             maxWidth: '800px',
@@ -1018,13 +1019,13 @@ function ArtworkList() {
             maxHeight: '80vh',
             overflow: 'auto'
           }}>
-            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>
               Import Works from CSV
             </h3>
 
             {!importFile ? (
               <>
-                <p style={{ marginBottom: '20px', color: '#7f8c8d' }}>
+                <p style={{ marginBottom: '20px', color: 'var(--text-secondary)' }}>
                   Upload a CSV file to import multiple works at once. The file should follow the export format.
                 </p>
 
@@ -1052,12 +1053,12 @@ function ArtworkList() {
               </>
             ) : (
               <>
-                <div style={{ marginBottom: '20px', padding: '12px', background: '#f8f9fa', borderRadius: '6px' }}>
+                <div style={{ marginBottom: '20px', padding: '12px', background: 'var(--bg-elevated)', borderRadius: '6px' }}>
                   <div style={{ fontWeight: '500', marginBottom: '4px' }}>
                     File: {importFile.name}
                   </div>
                   {parsedImport && (
-                    <div style={{ fontSize: '14px', color: '#7f8c8d' }}>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                       {parsedImport.length} works ready to import
                       {importErrors.length > 0 && ` • ${importErrors.length} errors found`}
                     </div>
@@ -1065,13 +1066,13 @@ function ArtworkList() {
                 </div>
 
                 {importErrors.length > 0 && (
-                  <div style={{ marginBottom: '20px', padding: '12px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
-                    <div style={{ fontWeight: '500', color: '#856404', marginBottom: '8px' }}>
+                  <div style={{ marginBottom: '20px', padding: '12px', background: 'rgba(201, 154, 58, 0.1)', borderRadius: '6px', border: '1px solid var(--warning)' }}>
+                    <div style={{ fontWeight: '500', color: 'var(--warning)', marginBottom: '8px' }}>
                       Errors Found:
                     </div>
                     <div style={{ maxHeight: '150px', overflow: 'auto' }}>
                       {importErrors.map((error, index) => (
-                        <div key={index} style={{ fontSize: '13px', color: '#856404', marginBottom: '4px' }}>
+                        <div key={index} style={{ fontSize: '13px', color: 'var(--warning)', marginBottom: '4px' }}>
                           Row {error.row}: {error.message}
                         </div>
                       ))}
@@ -1082,29 +1083,29 @@ function ArtworkList() {
                 {parsedImport && parsedImport.length > 0 && (
                   <div style={{ marginBottom: '20px' }}>
                     <div style={{ fontWeight: '500', marginBottom: '8px' }}>Preview:</div>
-                    <div style={{ maxHeight: '300px', overflow: 'auto', border: '1px solid #ecf0f1', borderRadius: '6px' }}>
+                    <div style={{ maxHeight: '300px', overflow: 'auto', border: '1px solid var(--border)', borderRadius: '6px' }}>
                       <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                        <thead style={{ background: '#f8f9fa', position: 'sticky', top: 0 }}>
+                        <thead style={{ background: 'var(--bg-elevated)', position: 'sticky', top: 0 }}>
                           <tr>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ecf0f1' }}>Title</th>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ecf0f1' }}>Inventory</th>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ecf0f1' }}>Medium</th>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid #ecf0f1' }}>Status</th>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Title</th>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Inventory</th>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Medium</th>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Status</th>
                           </tr>
                         </thead>
                         <tbody>
                           {parsedImport.slice(0, 10).map((artwork, index) => (
                             <tr key={index}>
-                              <td style={{ padding: '8px', borderBottom: '1px solid #ecf0f1' }}>{artwork.title}</td>
-                              <td style={{ padding: '8px', borderBottom: '1px solid #ecf0f1' }}>{artwork.inventory_number}</td>
-                              <td style={{ padding: '8px', borderBottom: '1px solid #ecf0f1' }}>{artwork.medium}</td>
-                              <td style={{ padding: '8px', borderBottom: '1px solid #ecf0f1' }}>{artwork.sale_status}</td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid var(--border)' }}>{artwork.title}</td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid var(--border)' }}>{artwork.inventory_number}</td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid var(--border)' }}>{artwork.medium}</td>
+                              <td style={{ padding: '8px', borderBottom: '1px solid var(--border)' }}>{artwork.sale_status}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                       {parsedImport.length > 10 && (
-                        <div style={{ padding: '8px', textAlign: 'center', fontSize: '12px', color: '#7f8c8d', background: '#f8f9fa' }}>
+                        <div style={{ padding: '8px', textAlign: 'center', fontSize: '12px', color: 'var(--text-secondary)', background: 'var(--bg-elevated)' }}>
                           ... and {parsedImport.length - 10} more
                         </div>
                       )}

@@ -270,7 +270,7 @@ function ArtworkForm() {
               required
               placeholder="Auto-generated from date and medium"
             />
-            <small style={{ color: '#7f8c8d', fontSize: '12px' }}>
+            <small style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
               {isEdit
                 ? 'Format: GRNCH-YEAR-NAME-SERIES'
                 : 'Auto-generated as: GRNCH-[Year from Creation Date]-[Medium]-[Series Number]'
@@ -349,7 +349,7 @@ function ArtworkForm() {
                   </option>
                 ))}
               </select>
-              <small style={{ color: '#7f8c8d', marginTop: '4px', display: 'block' }}>
+              <small style={{ color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
                 Group this artwork into a series or collection. <a href="/series/new" target="_blank" style={{ color: '#3498db' }}>Create new series</a>
               </small>
             </div>
@@ -487,7 +487,7 @@ function ArtworkForm() {
               />
               <span style={{ fontWeight: '500' }}>🌐 Show in Public Gallery</span>
             </label>
-            <small style={{ display: 'block', color: '#7f8c8d', marginTop: '4px', marginLeft: '24px' }}>
+            <small style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '4px', marginLeft: '24px' }}>
               When checked, this artwork will be visible in the public portfolio view
             </small>
           </div>
@@ -532,7 +532,7 @@ function ArtworkForm() {
                         alt={image.original_name}
                         style={{ width: '100%', height: '150px', objectFit: 'cover' }}
                       />
-                      <div style={{ padding: '8px', background: 'white' }}>
+                      <div style={{ padding: '8px', background: 'var(--bg-surface)' }}>
                         <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {image.original_name}
                         </p>
@@ -594,7 +594,7 @@ function ArtworkForm() {
           padding: '20px'
         }}>
           <div style={{
-            background: 'white',
+            background: 'var(--bg-surface)',
             padding: '30px',
             borderRadius: '8px',
             maxWidth: '900px',
@@ -602,10 +602,10 @@ function ArtworkForm() {
             maxHeight: '80vh',
             overflow: 'auto'
           }}>
-            <h3 style={{ marginBottom: '20px', color: '#2c3e50' }}>Select Images from Gallery</h3>
+            <h3 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>Select Images from Gallery</h3>
 
             {allGalleryImages.length === 0 ? (
-              <p style={{ color: '#7f8c8d', textAlign: 'center', padding: '40px 0' }}>
+              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 0' }}>
                 No images in gallery. Upload images in the <a href="/gallery" style={{ color: '#3498db' }}>Image Gallery</a> first.
               </p>
             ) : (
@@ -628,7 +628,7 @@ function ArtworkForm() {
                       alt={image.original_name}
                       style={{ width: '100%', height: '150px', objectFit: 'cover' }}
                     />
-                    <div style={{ padding: '8px', background: 'white' }}>
+                    <div style={{ padding: '8px', background: 'var(--bg-surface)' }}>
                       <p style={{ margin: 0, fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {image.original_name}
                       </p>

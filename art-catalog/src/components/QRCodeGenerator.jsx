@@ -92,7 +92,7 @@ function QRCodeGenerator({ url, title, inventory, onClose }) {
     >
       <div
         style={{
-          background: 'white',
+          background: 'var(--bg-surface)',
           padding: '32px',
           borderRadius: '12px',
           maxWidth: '500px',
@@ -100,12 +100,12 @@ function QRCodeGenerator({ url, title, inventory, onClose }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ marginBottom: '16px', color: '#2c3e50' }}>QR Code</h2>
+        <h2 style={{ marginBottom: '16px', color: 'var(--text-primary)' }}>QR Code</h2>
         
         <div style={{ marginBottom: '16px' }}>
-          <h3 style={{ fontSize: '18px', marginBottom: '4px', color: '#2c3e50' }}>{title}</h3>
+          <h3 style={{ fontSize: '18px', marginBottom: '4px', color: 'var(--text-primary)' }}>{title}</h3>
           {inventory && (
-            <p style={{ fontSize: '14px', color: '#7f8c8d', marginBottom: '8px' }}>{inventory}</p>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>{inventory}</p>
           )}
         </div>
 
@@ -119,7 +119,7 @@ function QRCodeGenerator({ url, title, inventory, onClose }) {
           </div>
         )}
 
-        <div style={{ marginBottom: '16px', fontSize: '12px', color: '#7f8c8d', wordBreak: 'break-all' }}>
+        <div style={{ marginBottom: '16px', fontSize: '12px', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
           {url}
         </div>
 

@@ -131,14 +131,14 @@ function PublicGallery() {
           fontSize: '42px', 
           fontWeight: '300', 
           marginBottom: '8px',
-          color: '#2c3e50',
+          color: 'var(--text-primary)',
           letterSpacing: '2px'
         }}>
           Portfolio
         </h1>
         <p style={{ 
           fontSize: '18px', 
-          color: '#7f8c8d',
+          color: 'var(--text-secondary)',
           fontWeight: '300'
         }}>
           Digital Art & Physical Works
@@ -152,7 +152,7 @@ function PublicGallery() {
         gap: '16px',
         marginBottom: '32px',
         padding: '24px',
-        background: '#f8f9fa',
+        background: 'var(--bg-elevated)',
         borderRadius: '8px'
       }}>
         <div>
@@ -161,7 +161,7 @@ function PublicGallery() {
             fontSize: '14px', 
             fontWeight: '500', 
             marginBottom: '6px',
-            color: '#2c3e50'
+            color: 'var(--text-primary)'
           }}>
             Search
           </label>
@@ -186,7 +186,7 @@ function PublicGallery() {
             fontSize: '14px', 
             fontWeight: '500', 
             marginBottom: '6px',
-            color: '#2c3e50'
+            color: 'var(--text-primary)'
           }}>
             Type
           </label>
@@ -213,7 +213,7 @@ function PublicGallery() {
             fontSize: '14px', 
             fontWeight: '500', 
             marginBottom: '6px',
-            color: '#2c3e50'
+            color: 'var(--text-primary)'
           }}>
             Medium/Format
           </label>
@@ -241,7 +241,7 @@ function PublicGallery() {
             fontSize: '14px', 
             fontWeight: '500', 
             marginBottom: '6px',
-            color: '#2c3e50'
+            color: 'var(--text-primary)'
           }}>
             Series
           </label>
@@ -268,7 +268,7 @@ function PublicGallery() {
       <div style={{ 
         textAlign: 'center', 
         marginBottom: '24px',
-        color: '#7f8c8d',
+        color: 'var(--text-secondary)',
         fontSize: '14px'
       }}>
         Showing {filteredWorks.length} of {allWorks.length} works
@@ -279,7 +279,7 @@ function PublicGallery() {
         <div style={{ 
           textAlign: 'center', 
           padding: '60px 20px',
-          color: '#7f8c8d'
+          color: 'var(--text-secondary)'
         }}>
           <p style={{ fontSize: '18px' }}>No works match your filters</p>
         </div>
@@ -301,7 +301,7 @@ function PublicGallery() {
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   borderRadius: '8px',
                   overflow: 'hidden',
-                  background: 'white',
+                  background: 'var(--bg-surface)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}
                 onMouseEnter={(e) => {
@@ -357,14 +357,14 @@ function PublicGallery() {
                     margin: '0 0 8px 0',
                     fontSize: '18px',
                     fontWeight: '500',
-                    color: '#2c3e50'
+                    color: 'var(--text-primary)'
                   }}>
                     {work.title || 'Untitled'}
                   </h3>
                   
                   <div style={{ 
                     fontSize: '13px', 
-                    color: '#7f8c8d',
+                    color: 'var(--text-secondary)',
                     marginBottom: '4px'
                   }}>
                     {work.type === 'artwork' && work.medium}

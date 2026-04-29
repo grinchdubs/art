@@ -138,7 +138,14 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div style={{ marginBottom: '40px' }}>
-        <h3 style={{ marginBottom: '24px', color: '#e2e2e2', fontSize: '18px', fontFamily: 'var(--font-display)', fontWeight: 500 }}>Analytics</h3>
+        <h3 style={{ marginBottom: '24px', color: 'var(--text-primary)', fontSize: '18px', fontFamily: 'var(--font-display)', fontWeight: 500 }}>Analytics</h3>
+
+        {worksOverTime.length === 0 && worksByMedium.length === 0 && priceRanges.length === 0 && (
+          <div className="stat-card" style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>
+            <div style={{ fontSize: '40px', opacity: 0.3, marginBottom: '16px' }}>📊</div>
+            <p style={{ fontSize: '14px', margin: 0 }}>Charts will appear once you add works to your catalog</p>
+          </div>
+        )}
 
         {/* Works Over Time */}
         {worksOverTime.length > 0 && (

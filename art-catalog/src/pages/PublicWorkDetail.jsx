@@ -47,7 +47,7 @@ function PublicWorkDetail() {
       <div style={{ 
         textAlign: 'center', 
         padding: '60px 20px',
-        color: '#7f8c8d'
+        color: 'var(--text-secondary)'
       }}>
         <p style={{ fontSize: '18px', marginBottom: '16px' }}>Work not found</p>
         <button 
@@ -88,7 +88,7 @@ function PublicWorkDetail() {
           cursor: 'pointer',
           marginBottom: '24px',
           fontSize: '14px',
-          color: '#2c3e50'
+          color: 'var(--text-primary)'
         }}
       >
         ← Back to Gallery
@@ -196,7 +196,7 @@ function PublicWorkDetail() {
             fontSize: '36px', 
             fontWeight: '300', 
             marginBottom: '16px',
-            color: '#2c3e50'
+            color: 'var(--text-primary)'
           }}>
             {work.title || 'Untitled'}
           </h1>
@@ -204,7 +204,7 @@ function PublicWorkDetail() {
           {work.series_name && (
             <div style={{ 
               fontSize: '16px', 
-              color: '#7f8c8d',
+              color: 'var(--text-secondary)',
               fontStyle: 'italic',
               marginBottom: '24px'
             }}>
@@ -256,7 +256,7 @@ function PublicWorkDetail() {
                 <div style={{ 
                   fontSize: '14px', 
                   fontWeight: '600', 
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   marginBottom: '8px'
                 }}>
                   Tags
@@ -286,14 +286,14 @@ function PublicWorkDetail() {
               <div style={{ 
                 marginTop: '32px',
                 padding: '20px',
-                background: '#f8f9fa',
+                background: 'var(--bg-elevated)',
                 borderRadius: '8px',
                 borderLeft: '4px solid #3498db'
               }}>
                 <div style={{ 
                   fontSize: '14px', 
                   fontWeight: '600', 
-                  color: '#2c3e50',
+                  color: 'var(--text-primary)',
                   marginBottom: '8px'
                 }}>
                   About
@@ -325,7 +325,7 @@ function InfoRow({ label, value }) {
       <div style={{ 
         width: '140px', 
         fontWeight: '600', 
-        color: '#2c3e50',
+        color: 'var(--text-primary)',
         flexShrink: 0
       }}>
         {label}:

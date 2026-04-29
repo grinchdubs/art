@@ -248,8 +248,8 @@ function ExhibitionDetail() {
           </div>
 
           {artworks.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>No artworks in this exhibition yet</p>
+            <div style={{ textAlign: 'center', padding: '40px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No artworks in this exhibition yet</p>
               <button className="btn btn-primary btn-sm" onClick={() => setShowAddArtwork(true)}>
                 Add First Artwork
               </button>
@@ -298,7 +298,7 @@ function ExhibitionDetail() {
             zIndex: 1000,
           }}>
             <div style={{
-              background: 'white',
+              background: 'var(--bg-surface)',
               padding: '30px',
               borderRadius: '8px',
               maxWidth: '600px',
@@ -308,7 +308,7 @@ function ExhibitionDetail() {
             }}>
               <h3 style={{ marginBottom: '20px' }}>Add Artwork to Exhibition</h3>
               {availableArtworks.length === 0 ? (
-                <p style={{ color: '#7f8c8d' }}>All artworks are already in this exhibition</p>
+                <p style={{ color: 'var(--text-secondary)' }}>All artworks are already in this exhibition</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {availableArtworks.map((artwork) => (
@@ -319,13 +319,13 @@ function ExhibitionDetail() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         padding: '12px',
-                        background: '#f8f9fa',
+                        background: 'var(--bg-elevated)',
                         borderRadius: '6px',
                       }}
                     >
                       <div>
                         <div style={{ fontWeight: '500' }}>{artwork.title}</div>
-                        <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                           {artwork.inventory_number}
                         </div>
                       </div>
@@ -358,8 +358,8 @@ function ExhibitionDetail() {
           </div>
 
           {digitalWorks.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', background: '#f8f9fa', borderRadius: '8px' }}>
-              <p style={{ color: '#7f8c8d' }}>No digital works in this exhibition yet</p>
+            <div style={{ textAlign: 'center', padding: '40px', background: 'var(--bg-elevated)', borderRadius: '8px' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>No digital works in this exhibition yet</p>
               <button className="btn btn-primary btn-sm" onClick={() => setShowAddDigitalWork(true)}>
                 Add First Digital Work
               </button>
@@ -408,7 +408,7 @@ function ExhibitionDetail() {
             zIndex: 1000,
           }}>
             <div style={{
-              background: 'white',
+              background: 'var(--bg-surface)',
               padding: '30px',
               borderRadius: '8px',
               maxWidth: '600px',
@@ -418,7 +418,7 @@ function ExhibitionDetail() {
             }}>
               <h3 style={{ marginBottom: '20px' }}>Add Digital Work to Exhibition</h3>
               {availableDigitalWorks.length === 0 ? (
-                <p style={{ color: '#7f8c8d' }}>All digital works are already in this exhibition</p>
+                <p style={{ color: 'var(--text-secondary)' }}>All digital works are already in this exhibition</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {availableDigitalWorks.map((work) => (
@@ -429,13 +429,13 @@ function ExhibitionDetail() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         padding: '12px',
-                        background: '#f8f9fa',
+                        background: 'var(--bg-elevated)',
                         borderRadius: '6px',
                       }}
                     >
                       <div>
                         <div style={{ fontWeight: '500' }}>{work.title}</div>
-                        <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                           {work.inventory_number} • {work.file_format}
                         </div>
                       </div>
