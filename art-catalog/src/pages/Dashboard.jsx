@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyticsAPI } from '../utils/api';
-import { useDarkMode } from '../App';
 import {
   LineChart,
   Line,
@@ -21,7 +20,6 @@ import {
 const COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#34495e', '#e67e22'];
 
 function Dashboard() {
-  const { darkMode } = useDarkMode();
   const [summary, setSummary] = useState(null);
   const [worksOverTime, setWorksOverTime] = useState([]);
   const [worksByMedium, setWorksByMedium] = useState([]);
@@ -101,49 +99,37 @@ function Dashboard() {
         >
           <div className="stat-card">
             <div className="stat-label">Total Artworks</div>
-            <div className="stat-value" style={{ color: '#3498db' }}>
-              {summary?.total_artworks || 0}
-            </div>
+            <div className="stat-value">{summary?.total_artworks || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">Digital Works</div>
-            <div className="stat-value" style={{ color: '#9b59b6' }}>
-              {summary?.total_digital_works || 0}
-            </div>
+            <div className="stat-value">{summary?.total_digital_works || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">Exhibitions</div>
-            <div className="stat-value" style={{ color: '#2ecc71' }}>
-              {summary?.total_exhibitions || 0}
-            </div>
+            <div className="stat-value">{summary?.total_exhibitions || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">Gallery Images</div>
-            <div className="stat-value" style={{ color: '#f39c12' }}>
-              {summary?.total_images || 0}
-            </div>
+            <div className="stat-value">{summary?.total_images || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">Artworks Sold</div>
-            <div className="stat-value" style={{ color: '#e74c3c' }}>
-              {summary?.artworks_sold || 0}
-            </div>
+            <div className="stat-value" style={{ color: 'var(--danger)' }}>{summary?.artworks_sold || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">NFTs Minted</div>
-            <div className="stat-value" style={{ color: '#1abc9c' }}>
-              {summary?.digital_works_minted || 0}
-            </div>
+            <div className="stat-value">{summary?.digital_works_minted || 0}</div>
           </div>
 
           <div className="stat-card">
             <div className="stat-label">Total Value</div>
-            <div className="stat-value" style={{ color: '#27ae60' }}>
+            <div className="stat-value" style={{ color: 'var(--accent)' }}>
               ${parseFloat(summary?.total_artwork_value || 0).toLocaleString()}
             </div>
           </div>
@@ -152,32 +138,32 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div style={{ marginBottom: '40px' }}>
-        <h3 style={{ marginBottom: '24px', color: darkMode ? '#e0e0e0' : '#2c3e50', fontSize: '20px' }}>Analytics</h3>
-        
+        <h3 style={{ marginBottom: '24px', color: '#e2e2e2', fontSize: '18px', fontFamily: 'var(--font-display)', fontWeight: 500 }}>Analytics</h3>
+
         {/* Works Over Time */}
         {worksOverTime.length > 0 && (
-          <div style={{ marginBottom: '40px', background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Works Created Over Time</h4>
+          <div className="stat-card" style={{ marginBottom: '24px' }}>
+            <h4 style={{ marginBottom: '16px', color: '#888', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Works Created Over Time</h4>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={worksOverTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#ccc'} />
-                <XAxis dataKey="month" stroke={darkMode ? '#e0e0e0' : '#666'} />
-                <YAxis stroke={darkMode ? '#e0e0e0' : '#666'} />
-                <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
-                <Legend wrapperStyle={{ color: darkMode ? '#e0e0e0' : '#666' }} />
-                <Line type="monotone" dataKey="physical" stroke="#3498db" strokeWidth={2} name="Physical Artworks" />
-                <Line type="monotone" dataKey="digital" stroke="#9b59b6" strokeWidth={2} name="Digital Works" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#272727" />
+                <XAxis dataKey="month" stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: '#181818', border: '1px solid #363636', color: '#e2e2e2', borderRadius: '6px' }} />
+                <Legend wrapperStyle={{ color: '#888', fontSize: 13 }} />
+                <Line type="monotone" dataKey="physical" stroke="#c9a86c" strokeWidth={2} name="Physical Artworks" dot={false} />
+                <Line type="monotone" dataKey="digital" stroke="#888" strokeWidth={2} name="Digital Works" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         )}
 
         {/* Two column layout for medium and price */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '20px' }}>
           {/* Works By Medium */}
           {worksByMedium.length > 0 && (
-            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Works by Medium</h4>
+            <div className="stat-card">
+              <h4 style={{ marginBottom: '16px', color: '#888', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Works by Medium</h4>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -193,7 +179,7 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#181818', border: '1px solid #363636', color: '#e2e2e2', borderRadius: '6px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -201,15 +187,15 @@ function Dashboard() {
 
           {/* Price Ranges */}
           {priceRanges.length > 0 && (
-            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Price Distribution</h4>
+            <div className="stat-card">
+              <h4 style={{ marginBottom: '16px', color: '#888', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Price Distribution</h4>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={priceRanges}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#444' : '#ccc'} />
-                  <XAxis dataKey="range" stroke={darkMode ? '#e0e0e0' : '#666'} />
-                  <YAxis stroke={darkMode ? '#e0e0e0' : '#666'} />
-                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
-                  <Bar dataKey="count" fill="#2ecc71" name="Artworks" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#272727" />
+                  <XAxis dataKey="range" stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                  <YAxis stroke="#888" tick={{ fill: '#888', fontSize: 12 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#181818', border: '1px solid #363636', color: '#e2e2e2', borderRadius: '6px' }} />
+                  <Bar dataKey="count" fill="#c9a86c" name="Artworks" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -217,10 +203,10 @@ function Dashboard() {
         </div>
 
         {/* Status Distribution */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
           {statusDistribution.physical?.length > 0 && (
-            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Physical Artwork Status</h4>
+            <div className="stat-card">
+              <h4 style={{ marginBottom: '16px', color: '#888', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Physical Artwork Status</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -237,15 +223,15 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#181818', border: '1px solid #363636', color: '#e2e2e2', borderRadius: '6px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           )}
 
           {statusDistribution.digital?.length > 0 && (
-            <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '24px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h4 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Digital Work Status</h4>
+            <div className="stat-card">
+              <h4 style={{ marginBottom: '16px', color: '#888', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Digital Work Status</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -262,7 +248,7 @@ function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: darkMode ? '#1e1e1e' : 'white', border: `1px solid ${darkMode ? '#444' : '#ccc'}`, color: darkMode ? '#e0e0e0' : '#333' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#181818', border: '1px solid #363636', color: '#e2e2e2', borderRadius: '6px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -271,8 +257,8 @@ function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div style={{ background: darkMode ? '#2d2d2d' : 'white', padding: '32px', borderRadius: '8px', boxShadow: darkMode ? '0 2px 4px rgba(0,0,0,0.4)' : '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-        <h3 style={{ marginBottom: '16px', color: darkMode ? '#e0e0e0' : '#2c3e50' }}>Quick Actions</h3>
+      <div className="stat-card" style={{ textAlign: 'center' }}>
+        <h3 style={{ marginBottom: '16px', color: '#e2e2e2', fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '18px' }}>Quick Actions</h3>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button className="btn btn-primary" onClick={() => navigate('/artworks/new')}>
             Add New Artwork

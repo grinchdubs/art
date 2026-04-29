@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { salesAPI, artworkAPI, digitalWorkAPI, exhibitionAPI } from '../utils/api';
-import { useDarkMode } from '../App';
-
 function Reports() {
-  const { darkMode } = useDarkMode();
   const [loading, setLoading] = useState(true);
   const [reportType, setReportType] = useState('sales');
   const [salesData, setSalesData] = useState([]);
@@ -256,7 +253,7 @@ function Reports() {
         <div style={{ 
           marginBottom: '30px', 
           padding: '15px', 
-          backgroundColor: darkMode ? '#2d2d2d' : '#f8f9fa',
+          backgroundColor: 'var(--bg-surface)',
           borderRadius: '8px',
           display: 'flex',
           gap: '15px',

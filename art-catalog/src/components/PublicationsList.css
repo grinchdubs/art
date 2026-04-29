@@ -1,49 +1,52 @@
 .publications-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .empty-publications {
   text-align: center;
   padding: 40px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  color: #7f8c8d;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .publication-card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: border-color var(--transition);
 }
 
 .publication-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--border-mid);
 }
 
 .publication-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 14px 16px;
   cursor: pointer;
-  gap: 16px;
+  gap: 12px;
 }
 
 .publication-main {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
 }
 
 .publication-icon {
-  font-size: 24px;
+  font-size: 20px;
   flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .publication-title-section {
@@ -52,92 +55,89 @@
 }
 
 .publication-name {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .article-title {
-  font-size: 14px;
-  color: #7f8c8d;
-  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .publication-date {
-  font-size: 14px;
-  color: #7f8c8d;
+  font-size: 12px;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
 .expand-button {
   background: none;
   border: none;
-  font-size: 14px;
-  color: #7f8c8d;
+  font-size: 13px;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px 8px;
-  transition: color 0.2s;
+  transition: color var(--transition);
 }
 
 .expand-button:hover {
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .publication-details {
-  padding: 0 16px 16px 16px;
-  border-top: 1px solid #f0f0f0;
-  animation: slideDown 0.2s ease-out;
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.15s ease-out;
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .publication-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   margin: 12px 0;
   align-items: center;
 }
 
 .publication-type-badge {
   display: inline-block;
-  padding: 4px 12px;
-  background: #3498db;
-  color: white;
-  border-radius: 16px;
-  font-size: 12px;
+  padding: 3px 10px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(201, 168, 108, 0.2);
+  border-radius: 99px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: capitalize;
+  letter-spacing: 0.04em;
 }
 
 .publication-author,
 .publication-page {
-  font-size: 14px;
-  color: #7f8c8d;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .publication-link {
-  margin: 12px 0;
+  margin: 10px 0;
 }
 
 .publication-link a {
-  color: #3498db;
+  color: var(--accent);
   text-decoration: none;
+  font-size: 13px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -149,69 +149,76 @@
 }
 
 .publication-notes {
-  margin: 12px 0;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 4px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .publication-notes strong {
   display: block;
-  margin-bottom: 8px;
-  color: #2c3e50;
-  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .publication-notes p {
   margin: 0;
-  color: #34495e;
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
   white-space: pre-wrap;
 }
 
 .publication-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border);
 }
 
 .btn-edit,
 .btn-delete {
-  padding: 6px 16px;
-  border-radius: 4px;
-  border: none;
-  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+  font-family: var(--font-ui);
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition);
+  background: transparent;
 }
 
 .btn-edit {
-  background: #3498db;
-  color: white;
+  color: var(--text-secondary);
 }
 
 .btn-edit:hover {
-  background: #2980b9;
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+  background: var(--bg-elevated);
 }
 
 .btn-delete {
-  background: #e74c3c;
-  color: white;
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .btn-delete:hover {
-  background: #c0392b;
+  background: var(--danger);
+  color: white;
 }
 
 @media (max-width: 768px) {
   .publication-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
   }
 
   .publication-date {
