@@ -20,6 +20,7 @@ import PublicWorkDetail from './pages/PublicWorkDetail';
 import SalesList from './pages/SalesList';
 import BackupRestore from './pages/BackupRestore';
 import Reports from './pages/Reports';
+import SpreadsheetEditor from './pages/SpreadsheetEditor';
 import MigrationPanel from './components/MigrationPanel';
 
 function Sidebar() {
@@ -94,6 +95,7 @@ function AppContent() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/artworks" element={<ArtworkList />} />
           <Route path="/artworks/new" element={<ArtworkForm />} />
+          <Route path="/artworks/spreadsheet" element={<SpreadsheetEditor />} />
           <Route path="/artworks/edit/:id" element={<ArtworkForm />} />
           <Route path="/artworks/:id" element={<ArtworkDetail />} />
           <Route path="/exhibitions" element={<ExhibitionList />} />

@@ -580,6 +580,9 @@ function ArtworkList() {
               </button>
             </div>
           )}
+          <button className="btn btn-secondary" onClick={() => navigate('/artworks/spreadsheet')}>
+            Spreadsheet
+          </button>
           <button className="btn btn-primary" onClick={() => navigate('/artworks/new')}>
             Add New Work
           </button>
