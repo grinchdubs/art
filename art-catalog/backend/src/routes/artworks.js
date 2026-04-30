@@ -222,8 +222,8 @@ router.post('/', async (req, res) => {
         edition_number, edition_total, current_owner, acquisition_date
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
-    `, [inventory_number, title, creation_date, medium, dimensions,
-        series_id || null, sale_status || 'available', price, location, notes,
+    `, [inventory_number || null, title || null, creation_date || null, medium || null, dimensions || null,
+        series_id || null, sale_status || 'available', price || null, location || null, notes || null,
         req.body.is_public !== undefined ? req.body.is_public : true,
         edition_number || null, edition_total || null, current_owner || null, acquisition_date || null]);
 
@@ -280,8 +280,8 @@ router.put('/:id', async (req, res) => {
           edition_number = $12, edition_total = $13, current_owner = $14, acquisition_date = $15
       WHERE id = $16
       RETURNING *
-    `, [inventory_number, title, creation_date, medium, dimensions,
-        series_id || null, sale_status, price, location, notes,
+    `, [inventory_number || null, title || null, creation_date || null, medium || null, dimensions || null,
+        series_id || null, sale_status || 'available', price || null, location || null, notes || null,
         req.body.is_public !== undefined ? req.body.is_public : true,
         edition_number || null, edition_total || null, current_owner || null, acquisition_date || null, id]);
 
