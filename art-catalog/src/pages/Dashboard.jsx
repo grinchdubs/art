@@ -61,9 +61,12 @@ function Dashboard() {
       });
       setWorksOverTime(Array.from(timeMap.values()));
 
-      setWorksByMedium(mediumData);
-      setStatusDistribution(statusData);
-      setPriceRanges(priceData);
+      setWorksByMedium(mediumData.map(d => ({ ...d, count: parseInt(d.count) })));
+      setStatusDistribution({
+        physical: (statusData.physical || []).map(d => ({ ...d, count: parseInt(d.count) })),
+        digital: (statusData.digital || []).map(d => ({ ...d, count: parseInt(d.count) })),
+      });
+      setPriceRanges(priceData.map(d => ({ ...d, count: parseInt(d.count) })));
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
