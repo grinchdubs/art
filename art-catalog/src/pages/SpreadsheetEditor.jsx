@@ -101,7 +101,7 @@ function SpreadsheetEditor() {
     for (const id of ids) {
       try {
         if (id.startsWith('new-')) {
-          await artworkAPI.create({ sale_status: 'available', ...changes[id] });
+          await artworkAPI.create({ title: 'Untitled', sale_status: 'available', ...changes[id] });
         } else {
           const artwork = artworks.find(a => a.id === parseInt(id));
           await artworkAPI.update(id, { ...artwork, ...changes[id] });
