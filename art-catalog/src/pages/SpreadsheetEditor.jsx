@@ -16,6 +16,7 @@ const COLUMNS = [
 
 function SpreadsheetEditor() {
   const [artworks, setArtworks] = useState([]);
+  const [newRows, setNewRows] = useState([]);   // blank rows pending creation
   const [changes, setChanges] = useState({});   // { [id]: { field: value } }
   const [editingCell, setEditingCell] = useState(null); // { rowId, col }
   const [loading, setLoading] = useState(true);
@@ -45,9 +46,16 @@ function SpreadsheetEditor() {
     }
   }
 
-  function getCellValue(artwork, col) {
-    const changed = changes[artwork.id]?.[col];
-    return changed !== undefined ? changed : (artwork[col] ?? '');
+  function addNewRow() {
+    const id = 'new-' + Date.now();
+    setNewRows(prev => [...prev, { id, sale_status: 'available' }]);
+    setEditingCell({ rowId: id, col: COLUMNS[0].key });
+  }
+
+  function getCellValue(row, col) {
+    const changed = changes[row.id]?.[col];
+    if (changed !== undefined) return changed;
+    return row[col] ?? '';
   }
 
   function handleCellChange(rowId, col, value) {
@@ -88,14 +96,19 @@ function SpreadsheetEditor() {
     let count = 0;
     for (const id of ids) {
       try {
-        const artwork = artworks.find(a => a.id === parseInt(id));
-        await artworkAPI.update(id, { ...artwork, ...changes[id] });
+        if (id.startsWith('new-')) {
+          await artworkAPI.create({ sale_status: 'available', ...changes[id] });
+        } else {
+          const artwork = artworks.find(a => a.id === parseInt(id));
+          await artworkAPI.update(id, { ...artwork, ...changes[id] });
+        }
         count++;
       } catch (err) {
         console.error(`Error saving artwork ${id}:`, err);
       }
     }
     await loadArtworks();
+    setNewRows([]);
     setChanges({});
     setSaving(false);
     setSavedCount(count);
@@ -103,21 +116,25 @@ function SpreadsheetEditor() {
   }
 
   function discardChanges() {
+    setNewRows([]);
     setChanges({});
     setEditingCell(null);
   }
 
   const dirtyCount = Object.keys(changes).length;
 
-  const filtered = artworks.filter(a => {
-    if (!searchTerm) return true;
-    const s = searchTerm.toLowerCase();
-    return (
-      a.title?.toLowerCase().includes(s) ||
-      a.inventory_number?.toLowerCase().includes(s) ||
-      a.medium?.toLowerCase().includes(s)
-    );
-  });
+  const filtered = [
+    ...artworks.filter(a => {
+      if (!searchTerm) return true;
+      const s = searchTerm.toLowerCase();
+      return (
+        a.title?.toLowerCase().includes(s) ||
+        a.inventory_number?.toLowerCase().includes(s) ||
+        a.medium?.toLowerCase().includes(s)
+      );
+    }),
+    ...newRows,
+  ];
 
   if (loading) return <div className="loading"><div className="loading-spinner" /></div>;
 
@@ -144,6 +161,9 @@ function SpreadsheetEditor() {
               </button>
             </>
           )}
+          <button className="btn btn-secondary btn-sm" onClick={addNewRow}>
+            + Add Row
+          </button>
           <button className="btn btn-secondary" onClick={() => navigate('/artworks')}>
             ← Back
           </button>
@@ -190,13 +210,22 @@ function SpreadsheetEditor() {
           </thead>
           <tbody>
             {filtered.map((artwork, rowIdx) => {
-              const isDirty = !!changes[artwork.id];
+              const isNew = String(artwork.id).startsWith('new-');
+              const isDirty = isNew || !!changes[artwork.id];
               return (
                 <tr
                   key={artwork.id}
                   style={{
-                    background: isDirty ? 'rgba(201, 168, 108, 0.05)' : (rowIdx % 2 === 0 ? 'var(--bg-base)' : 'var(--bg-surface)'),
-                    borderLeft: isDirty ? '2px solid var(--accent)' : '2px solid transparent',
+                    background: isNew
+                      ? 'rgba(46, 204, 113, 0.05)'
+                      : isDirty
+                        ? 'rgba(201, 168, 108, 0.05)'
+                        : (rowIdx % 2 === 0 ? 'var(--bg-base)' : 'var(--bg-surface)'),
+                    borderLeft: isNew
+                      ? '2px solid var(--success)'
+                      : isDirty
+                        ? '2px solid var(--accent)'
+                        : '2px solid transparent',
                   }}
                 >
                   {COLUMNS.map((col, colIdx) => {
