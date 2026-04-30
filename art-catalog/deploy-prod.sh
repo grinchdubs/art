@@ -23,7 +23,15 @@ echo "Waiting for database to be ready..."
 sleep 10
 
 echo "Running database migrations..."
-sudo docker compose exec -T db psql -U artcatalog -d artcatalog -f /docker-entrypoint-initdb.d/../../../backend/src/migrations/003_add_provenance_tracking.sql || echo "Migration may have already been applied"
+for migration in \
+  /app/src/migrations/002_add_tags.sql \
+  /app/src/migrations/003_add_provenance_tracking.sql \
+  /app/src/migrations/004_add_publications.sql \
+  /app/src/migrations/add-series-table.sql \
+  /app/src/migrations/add-is-public-column.sql; do
+  echo "  Applying $migration..."
+  sudo docker compose exec -T backend cat "$migration" | sudo docker compose exec -T db psql -U artcatalog -d artcatalog || echo "  (may already be applied, continuing)"
+done
 
 echo ""
 echo "Production containers status:"
