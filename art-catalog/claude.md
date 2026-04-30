@@ -3,27 +3,36 @@
 ## TODO List
 
 ### Phase 1 - Quick Wins
-- [ ] Sort options (date, price, title, recent)
-- [ ] Image zoom/lightbox modal
-- [ ] Tags/Categories system
-- [ ] Keyboard shortcuts (ESC, arrow keys)
+- [x] Sort options (date, price, title, recent)
+- [x] Image zoom/lightbox modal
+- [x] Tags/Categories system
+- [x] Keyboard shortcuts (ESC, arrow keys)
 
 ### Phase 2 - Core Features
-- [ ] Bulk operations (batch edit status, prices)
-- [ ] Series/Collections grouping
-- [ ] Public gallery view (read-only portfolio)
-- [ ] Advanced search filters (date ranges, price ranges)
+- [x] Bulk operations (batch edit status, prices)
+- [x] Series/Collections grouping
+- [x] Public gallery view (read-only portfolio)
+- [x] Advanced search filters (date ranges, price ranges)
 
 ### Phase 3 - Advanced Features
-- [ ] Dashboard charts and analytics
-- [ ] Sales tracking system
-- [ ] QR code generation for exhibitions
-- [ ] Database backup/restore functionality
+- [x] Dashboard charts and analytics
+- [x] Sales tracking system
+- [x] QR code generation for exhibitions
+- [x] Database backup/restore functionality
 - [ ] Print edition tracking
-- [ ] Provenance/history tracking
+- [x] Provenance/history tracking
 - [ ] Mobile responsive optimization
 - [ ] Dark mode toggle
 - [ ] Loading skeleton states
+
+### Bonus Features (added beyond original plan)
+- [x] Batch image upload (drag-and-drop multi-image → artwork stubs)
+- [x] Spreadsheet editor (inline grid editing + new row creation)
+- [x] Dark theme (CSS custom properties throughout)
+- [x] Publications/press tracking
+- [x] Immich photo library integration
+- [x] Reports page
+- [x] deploy-prod.sh (production deploy script with auto-migrations)
 
 ## Technical Stack
 
