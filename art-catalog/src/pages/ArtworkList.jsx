@@ -4,6 +4,7 @@ import { artworkAPI, galleryAPI, getImageURL, tagAPI } from '../utils/api';
 import { exportToCSV, exportToJSON, exportToText, exportStats } from '../utils/exportUtils';
 import { parseCSV, downloadTemplate } from '../utils/importUtils';
 import AdvancedSearch from '../components/AdvancedSearch';
+import BatchUpload from '../components/BatchUpload';
 
 function ArtworkList() {
   const [artworks, setArtworks] = useState([]);
@@ -11,6 +12,7 @@ function ArtworkList() {
   const [loading, setLoading] = useState(true);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showBatchUpload, setShowBatchUpload] = useState(false);
   const [importFile, setImportFile] = useState(null);
   const [parsedImport, setParsedImport] = useState(null);
   const [importErrors, setImportErrors] = useState([]);
@@ -461,9 +463,15 @@ function ArtworkList() {
         <div style={{ display: 'flex', gap: '12px', position: 'relative' }}>
           <button
             className="btn btn-secondary"
+            onClick={() => setShowBatchUpload(true)}
+          >
+            Batch Upload
+          </button>
+          <button
+            className="btn btn-secondary"
             onClick={() => setShowImportDialog(true)}
           >
-            Import
+            Import CSV
           </button>
           <button
             className="btn btn-secondary"
@@ -994,6 +1002,14 @@ function ArtworkList() {
             </div>
           )}
         </>
+      )}
+
+      {/* Batch Upload */}
+      {showBatchUpload && (
+        <BatchUpload
+          onComplete={() => { setShowBatchUpload(false); loadArtworks(); }}
+          onClose={() => setShowBatchUpload(false)}
+        />
       )}
 
       {/* Import Dialog */}
