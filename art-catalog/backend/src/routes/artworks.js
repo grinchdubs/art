@@ -253,7 +253,7 @@ router.post('/', async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error creating artwork:', error);
-    res.status(500).json({ error: 'Failed to create artwork' });
+    res.status(500).json({ error: error.message || 'Failed to create artwork' });
   } finally {
     client.release();
   }
