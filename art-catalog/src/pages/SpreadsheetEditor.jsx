@@ -22,6 +22,7 @@ function SpreadsheetEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedCount, setSavedCount] = useState(null);
+  const [saveError, setSaveError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const inputRef = useRef(null);
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ function SpreadsheetEditor() {
   function addNewRow() {
     const id = 'new-' + Date.now();
     setNewRows(prev => [...prev, { id, sale_status: 'available' }]);
+    setChanges(prev => ({ ...prev, [id]: { sale_status: 'available' } }));
     setEditingCell({ rowId: id, col: COLUMNS[0].key });
   }
 
@@ -93,7 +95,9 @@ function SpreadsheetEditor() {
     const ids = Object.keys(changes);
     if (ids.length === 0) return;
     setSaving(true);
+    setSaveError(null);
     let count = 0;
+    const errs = [];
     for (const id of ids) {
       try {
         if (id.startsWith('new-')) {
@@ -105,14 +109,19 @@ function SpreadsheetEditor() {
         count++;
       } catch (err) {
         console.error(`Error saving artwork ${id}:`, err);
+        errs.push(id.startsWith('new-') ? `New row: ${err.message}` : `ID ${id}: ${err.message}`);
       }
     }
     await loadArtworks();
     setNewRows([]);
     setChanges({});
     setSaving(false);
-    setSavedCount(count);
-    setTimeout(() => setSavedCount(null), 2500);
+    if (errs.length) {
+      setSaveError(`${errs.length} row(s) failed to save: ${errs.join('; ')}`);
+    } else {
+      setSavedCount(count);
+      setTimeout(() => setSavedCount(null), 2500);
+    }
   }
 
   function discardChanges() {
@@ -146,6 +155,11 @@ function SpreadsheetEditor() {
           {savedCount !== null && (
             <span style={{ fontSize: '13px', color: 'var(--success)' }}>
               ✓ Saved {savedCount} work{savedCount !== 1 ? 's' : ''}
+            </span>
+          )}
+          {saveError && (
+            <span style={{ fontSize: '13px', color: 'var(--danger)' }}>
+              ✕ {saveError}
             </span>
           )}
           {dirtyCount > 0 && (
