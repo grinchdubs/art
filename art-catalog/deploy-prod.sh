@@ -28,7 +28,8 @@ for migration in \
   /app/src/migrations/003_add_provenance_tracking.sql \
   /app/src/migrations/004_add_publications.sql \
   /app/src/migrations/add-series-table.sql \
-  /app/src/migrations/add-is-public-column.sql; do
+  /app/src/migrations/add-is-public-column.sql \
+  /app/src/migrations/005_add_artist_statements.sql; do
   echo "  Applying $migration..."
   sudo docker compose exec -T backend cat "$migration" | sudo docker compose exec -T db psql -U artcatalog -d artcatalog || echo "  (may already be applied, continuing)"
 done

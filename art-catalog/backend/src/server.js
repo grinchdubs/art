@@ -30,6 +30,8 @@ const salesRoutes = require('./routes/sales');
 const backupRoutes = require('./routes/backup');
 const provenanceRoutes = require('./routes/provenance');
 const publicationsRoutes = require('./routes/publications');
+const statementsRoutes = require('./routes/statements');
+const portfolioRoutes = require('./routes/portfolio');
 
 // Use routes
 app.use('/api/artworks', artworksRoutes);
@@ -45,6 +47,8 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/provenance', provenanceRoutes);
 app.use('/api/publications', publicationsRoutes);
+app.use('/api/statements', statementsRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

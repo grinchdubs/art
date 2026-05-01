@@ -21,6 +21,8 @@ import SalesList from './pages/SalesList';
 import BackupRestore from './pages/BackupRestore';
 import Reports from './pages/Reports';
 import SpreadsheetEditor from './pages/SpreadsheetEditor';
+import Statements from './pages/Statements';
+import PortfolioBuilder from './pages/PortfolioBuilder';
 import MigrationPanel from './components/MigrationPanel';
 
 function Sidebar() {
@@ -67,6 +69,12 @@ function Sidebar() {
         </Link>
         <Link to="/reports" className={`nav-link ${isActive('/reports') ? 'active' : ''}`}>
           Reports & Analytics
+        </Link>
+        <Link to="/statements" className={`nav-link ${isActive('/statements') ? 'active' : ''}`}>
+          Artist Statements
+        </Link>
+        <Link to="/portfolio" className={`nav-link ${isActive('/portfolio') ? 'active' : ''}`}>
+          Portfolio Builder
         </Link>
 
         <div className="nav-group-label">System</div>
@@ -116,6 +124,8 @@ function AppContent() {
           <Route path="/backup" element={<BackupRestore />} />
           <Route path="/public" element={<PublicGallery />} />
           <Route path="/public/:type/:id" element={<PublicWorkDetail />} />
+          <Route path="/statements" element={<Statements />} />
+          <Route path="/portfolio" element={<PortfolioBuilder />} />
         </Routes>
       </main>
     </div>

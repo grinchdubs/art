@@ -12,7 +12,8 @@
     "pg": "^8.11.3",
     "cors": "^2.8.5",
     "multer": "^2.0.0-rc.4",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "pdfkit": "^0.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

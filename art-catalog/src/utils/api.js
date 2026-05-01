@@ -473,6 +473,36 @@ export const publicationsAPI = {
   },
 };
 
+// Statements API
+export const statementAPI = {
+  getAll: async () => apiCall('/api/statements'),
+  getById: async (id) => apiCall(`/api/statements/${id}`),
+  create: async (data) => apiCall('/api/statements', { method: 'POST', body: JSON.stringify(data) }),
+  update: async (id, data) => apiCall(`/api/statements/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: async (id) => apiCall(`/api/statements/${id}`, { method: 'DELETE' }),
+};
+
+// Portfolio PDF generator — triggers a file download
+export async function generatePortfolioPDF(data) {
+  const url = `${API_BASE_URL}/api/portfolio/generate`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to generate PDF');
+  }
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = `${data.portfolio_title || 'portfolio'}.pdf`;
+  a.click();
+  URL.revokeObjectURL(blobUrl);
+}
+
 // Helper to generate full image URLs
 export function getImageURL(filePath) {
   if (!filePath) return null;
