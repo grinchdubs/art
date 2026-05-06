@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(ssh grnchserver \"cd /opt/art/art-catalog && sudo git pull origin main && chmod +x deploy-dev.sh && ./deploy-dev.sh\")",
+      "Read(///GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/**)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/src/App.css //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/src/App.css)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/src/pages/ArtworkList.jsx //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/src/pages/ArtworkList.jsx)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/src/pages/ArtworkDetail.jsx //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/src/pages/ArtworkDetail.jsx)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/src/pages/ArtworkForm.jsx //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/src/pages/ArtworkForm.jsx)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/src/pages/DigitalWorkList.jsx //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/src/pages/DigitalWorkList.jsx)",
+      "Bash(ssh grnchserver *)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/backend/src/migrations/005_add_artist_statements.sql //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/backend/src/migrations/005_add_artist_statements.sql)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/backend/src/routes/statements.js //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/backend/src/routes/statements.js)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/backend/src/routes/portfolio.js //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/backend/src/routes/portfolio.js)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/backend/package.json //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/backend/package.json)",
+      "Bash(cp d:/Users/PC/Documents/GitHub/art-catalog/backend/src/server.js //GRNCHNAS/Andromeda/backup/cuban/OneDrive/Desktop/art/art-catalog/backend/src/server.js)"
+    ]
+  }
+}
