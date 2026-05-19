@@ -7,6 +7,7 @@ import ProvenanceTimeline from '../components/ProvenanceTimeline';
 import TransferForm from '../components/TransferForm';
 import PublicationsList from '../components/PublicationsList';
 import PublicationForm from '../components/PublicationForm';
+import EditionGrid from '../components/EditionGrid';
 import { publicationsAPI } from '../utils/api';
 
 function ArtworkDetail() {
@@ -423,6 +424,18 @@ function ArtworkDetail() {
                 </div>
               </div>
             </div>
+
+            {artwork.edition_total ? (
+              <div className="detail-section">
+                <h3>Edition Copies</h3>
+                <EditionGrid
+                  workType="artwork"
+                  workId={artwork.id}
+                  work={artwork}
+                  onChange={loadArtwork}
+                />
+              </div>
+            ) : null}
 
             <div className="detail-section">
               <h3>Metadata</h3>

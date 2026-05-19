@@ -19,7 +19,7 @@
 - [x] Sales tracking system
 - [x] QR code generation for exhibitions
 - [x] Database backup/restore functionality
-- [ ] Print edition tracking
+- [x] Print edition tracking
 - [x] Provenance/history tracking
 - [ ] Mobile responsive optimization
 - [ ] Dark mode toggle

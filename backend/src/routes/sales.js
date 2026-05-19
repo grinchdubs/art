@@ -86,10 +86,12 @@ router.get('/digital-work/:digitalWorkId', async (req, res) => {
 
 // Create new sale
 router.post('/', async (req, res) => {
+  const client = await pool.connect();
   try {
     const {
       artwork_id,
       digital_work_id,
+      edition_id,
       sale_date,
       sale_price,
       buyer_name,
@@ -100,8 +102,8 @@ router.post('/', async (req, res) => {
 
     // Validate that exactly one of artwork_id or digital_work_id is provided
     if ((!artwork_id && !digital_work_id) || (artwork_id && digital_work_id)) {
-      return res.status(400).json({ 
-        error: 'Must provide either artwork_id or digital_work_id, but not both' 
+      return res.status(400).json({
+        error: 'Must provide either artwork_id or digital_work_id, but not both'
       });
     }
 
@@ -118,12 +120,14 @@ router.post('/', async (req, res) => {
       }
     }
 
-    const result = await pool.query(`
+    await client.query('BEGIN');
+
+    const result = await client.query(`
       INSERT INTO sales (
         artwork_id, digital_work_id, sale_date, sale_price,
-        buyer_name, buyer_email, platform, notes
+        buyer_name, buyer_email, platform, notes, edition_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `, [
       artwork_id || null,
@@ -133,26 +137,47 @@ router.post('/', async (req, res) => {
       buyer_name || null,
       buyer_email || null,
       platform || null,
-      notes || null
+      notes || null,
+      edition_id || null
     ]);
+    const sale = result.rows[0];
 
-    // Update the artwork or digital work status to 'sold'
-    if (artwork_id) {
-      await pool.query(
-        `UPDATE artworks SET sale_status = 'sold', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [artwork_id]
+    if (edition_id) {
+      // Editioned sale: mark this specific copy sold; let the helper decide
+      // whether the parent work is fully sold out.
+      await client.query(
+        `UPDATE print_editions
+         SET status = 'sold', sale_id = $1, owner_name = COALESCE($2, owner_name),
+             price = COALESCE($3, price), updated_at = CURRENT_TIMESTAMP
+         WHERE id = $4`,
+        [sale.id, buyer_name || null, cleanedPrice, edition_id]
       );
-    } else if (digital_work_id) {
-      await pool.query(
-        `UPDATE digital_works SET sale_status = 'sold', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [digital_work_id]
-      );
+      const { recomputeWorkStatus } = require('./editions');
+      if (artwork_id) await recomputeWorkStatus(client, 'artwork', artwork_id);
+      else if (digital_work_id) await recomputeWorkStatus(client, 'digital_work', digital_work_id);
+    } else {
+      // Non-editioned sale: mark the work itself sold (legacy behavior)
+      if (artwork_id) {
+        await client.query(
+          `UPDATE artworks SET sale_status = 'sold', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [artwork_id]
+        );
+      } else if (digital_work_id) {
+        await client.query(
+          `UPDATE digital_works SET sale_status = 'sold', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [digital_work_id]
+        );
+      }
     }
 
-    res.status(201).json(result.rows[0]);
+    await client.query('COMMIT');
+    res.status(201).json(sale);
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error creating sale:', error);
     res.status(500).json({ error: 'Failed to create sale' });
+  } finally {
+    client.release();
   }
 });
 
@@ -196,38 +221,64 @@ router.put('/:id', async (req, res) => {
 
 // Delete sale
 router.delete('/:id', async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
-    
+
     // Get the sale first to know which item to update
-    const saleResult = await pool.query('SELECT * FROM sales WHERE id = $1', [id]);
-    
+    const saleResult = await client.query('SELECT * FROM sales WHERE id = $1', [id]);
+
     if (saleResult.rows.length === 0) {
       return res.status(404).json({ error: 'Sale not found' });
     }
 
     const sale = saleResult.rows[0];
-    
-    // Delete the sale
-    await pool.query('DELETE FROM sales WHERE id = $1', [id]);
 
-    // Update the item status back to 'available'
-    if (sale.artwork_id) {
-      await pool.query(
-        `UPDATE artworks SET sale_status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [sale.artwork_id]
-      );
-    } else if (sale.digital_work_id) {
-      await pool.query(
-        `UPDATE digital_works SET sale_status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [sale.digital_work_id]
+    await client.query('BEGIN');
+
+    // If this sale was tied to a specific edition copy, free that copy first
+    // (sales.edition_id has ON DELETE SET NULL but the copy still points at the
+    // sale via print_editions.sale_id and remains in 'sold' status — fix both).
+    if (sale.edition_id) {
+      await client.query(
+        `UPDATE print_editions
+         SET status = 'available', sale_id = NULL, owner_name = NULL,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1`,
+        [sale.edition_id]
       );
     }
 
+    await client.query('DELETE FROM sales WHERE id = $1', [id]);
+
+    if (sale.edition_id) {
+      // Editioned: recompute parent so 'sold' rolls back to 'available' if needed
+      const { recomputeWorkStatus } = require('./editions');
+      if (sale.artwork_id) await recomputeWorkStatus(client, 'artwork', sale.artwork_id);
+      else if (sale.digital_work_id) await recomputeWorkStatus(client, 'digital_work', sale.digital_work_id);
+    } else {
+      // Non-editioned: revert the work directly
+      if (sale.artwork_id) {
+        await client.query(
+          `UPDATE artworks SET sale_status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [sale.artwork_id]
+        );
+      } else if (sale.digital_work_id) {
+        await client.query(
+          `UPDATE digital_works SET sale_status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [sale.digital_work_id]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
     res.json({ message: 'Sale deleted successfully' });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error deleting sale:', error);
     res.status(500).json({ error: 'Failed to delete sale' });
+  } finally {
+    client.release();
   }
 });
 

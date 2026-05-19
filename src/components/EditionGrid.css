@@ -1,0 +1,190 @@
+.edition-grid {
+  margin-top: 16px;
+}
+
+.edition-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.edition-grid-summary {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.edition-grid-summary strong {
+  color: var(--text-primary);
+}
+
+.edition-grid-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.edition-grid-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.edition-tile {
+  background: var(--bg-elevated);
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 78px;
+}
+
+.edition-tile:hover {
+  transform: translateY(-1px);
+  border-color: var(--text-secondary);
+}
+
+.edition-tile.status-sold {
+  background: rgba(120, 50, 50, 0.25);
+  border-color: rgba(200, 100, 100, 0.4);
+}
+
+.edition-tile.status-reserved {
+  background: rgba(140, 110, 30, 0.25);
+  border-color: rgba(220, 180, 80, 0.4);
+}
+
+.edition-tile.status-destroyed,
+.edition-tile.status-archived {
+  opacity: 0.5;
+}
+
+.edition-tile.read-only {
+  cursor: default;
+}
+
+.edition-tile.read-only:hover {
+  transform: none;
+  border-color: var(--text-muted);
+}
+
+.edition-tile-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.edition-tile-status {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.edition-tile-owner {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.edition-tile-type-badge {
+  align-self: flex-start;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  border: 1px solid var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.edition-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.edition-modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--text-muted);
+  border-radius: 8px;
+  padding: 24px;
+  width: min(480px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.edition-modal h3 {
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+}
+
+.edition-modal .form-row {
+  margin-bottom: 12px;
+}
+
+.edition-modal label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.edition-modal input,
+.edition-modal select,
+.edition-modal textarea {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--text-muted);
+  color: var(--text-primary);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.edition-modal textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.edition-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.edition-modal-sale-info {
+  background: var(--bg-base);
+  border: 1px solid var(--text-muted);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.edition-modal-sale-info strong {
+  color: var(--text-primary);
+}

@@ -250,6 +250,12 @@ router.post('/', async (req, res) => {
       }
     }
 
+    // Generate edition copies if this is a limited edition
+    if (edition_total && parseInt(edition_total) > 0) {
+      const { ensureRegularCopies } = require('./editions');
+      await ensureRegularCopies(client, 'digital_work', digitalWork.id);
+    }
+
     await client.query('COMMIT');
     res.status(201).json(digitalWork);
   } catch (error) {
@@ -309,6 +315,12 @@ router.put('/:id', async (req, res) => {
           `, [id, image.id, image.is_primary || false, i]);
         }
       }
+    }
+
+    // Generate any missing edition copies (idempotent — won't disturb existing ones)
+    if (edition_total && parseInt(edition_total) > 0) {
+      const { ensureRegularCopies } = require('./editions');
+      await ensureRegularCopies(client, 'digital_work', id);
     }
 
     await client.query('COMMIT');

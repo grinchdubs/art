@@ -7,6 +7,7 @@ import ImageLightbox from '../components/ImageLightbox';
 import QRCodeGenerator from '../components/QRCodeGenerator';
 import ProvenanceTimeline from '../components/ProvenanceTimeline';
 import TransferForm from '../components/TransferForm';
+import EditionGrid from '../components/EditionGrid';
 
 function DigitalWorkDetail() {
   const { id } = useParams();
@@ -541,6 +542,18 @@ function DigitalWorkDetail() {
             )}
           </div>
         </div>
+
+        {work.edition_total ? (
+          <div style={{ marginTop: '30px' }}>
+            <h3 style={{ margin: '0 0 16px 0' }}>Edition Copies</h3>
+            <EditionGrid
+              workType="digital_work"
+              workId={work.id}
+              work={work}
+              onChange={loadWork}
+            />
+          </div>
+        ) : null}
 
         {/* Provenance & Ownership */}
         <div style={{ marginTop: '30px' }}>

@@ -32,6 +32,7 @@ const provenanceRoutes = require('./routes/provenance');
 const publicationsRoutes = require('./routes/publications');
 const statementsRoutes = require('./routes/statements');
 const portfolioRoutes = require('./routes/portfolio');
+const editionsRoutes = require('./routes/editions');
 
 // Use routes
 app.use('/api/artworks', artworksRoutes);
@@ -49,6 +50,7 @@ app.use('/api/provenance', provenanceRoutes);
 app.use('/api/publications', publicationsRoutes);
 app.use('/api/statements', statementsRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/editions', editionsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

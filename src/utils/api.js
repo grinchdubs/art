@@ -482,6 +482,29 @@ export const statementAPI = {
   delete: async (id) => apiCall(`/api/statements/${id}`, { method: 'DELETE' }),
 };
 
+// Editions API (per-copy print edition tracking)
+export const editionAPI = {
+  getByArtwork: async (artworkId) => apiCall(`/api/editions/artwork/${artworkId}`),
+  getByDigitalWork: async (digitalWorkId) => apiCall(`/api/editions/digital-work/${digitalWorkId}`),
+  ensureArtwork: async (artworkId) =>
+    apiCall(`/api/editions/artwork/${artworkId}/ensure`, { method: 'POST' }),
+  ensureDigitalWork: async (digitalWorkId) =>
+    apiCall(`/api/editions/digital-work/${digitalWorkId}/ensure`, { method: 'POST' }),
+  addArtworkCopy: async (artworkId, data) =>
+    apiCall(`/api/editions/artwork/${artworkId}/copies`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  addDigitalWorkCopy: async (digitalWorkId, data) =>
+    apiCall(`/api/editions/digital-work/${digitalWorkId}/copies`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: async (id, data) =>
+    apiCall(`/api/editions/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: async (id) => apiCall(`/api/editions/${id}`, { method: 'DELETE' }),
+};
+
 // Portfolio PDF generator — triggers a file download
 export async function generatePortfolioPDF(data) {
   const url = `${API_BASE_URL}/api/portfolio/generate`;
