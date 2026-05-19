@@ -24,13 +24,15 @@ sleep 10
 
 echo "Running database migrations..."
 for migration in \
+  /app/src/migrations/001_add_sales.sql \
   /app/src/migrations/002_add_tags.sql \
   /app/src/migrations/003_add_provenance_tracking.sql \
   /app/src/migrations/004_add_publications.sql \
   /app/src/migrations/add-series-table.sql \
   /app/src/migrations/add-is-public-column.sql \
   /app/src/migrations/005_add_artist_statements.sql \
-  /app/src/migrations/006_add_print_editions.sql; do
+  /app/src/migrations/006_add_print_editions.sql \
+  /app/src/migrations/007_drop_sales_edition_number.sql; do
   echo "  Applying $migration..."
   sudo docker compose exec -T backend cat "$migration" | sudo docker compose exec -T db psql -U artcatalog -d artcatalog || echo "  (may already be applied, continuing)"
 done
