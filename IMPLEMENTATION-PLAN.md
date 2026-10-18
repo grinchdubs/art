@@ -449,7 +449,7 @@ CREATE TABLE IF NOT EXISTS statement_artworks (
 ```
 Client (React + Vite) → API (Express) → Database (PostgreSQL)
          ↓                    ↓
-    Port 3333           Port 3001
+    Port 3333           Port 3002
     (nginx proxy)
 ```
 
@@ -503,7 +503,7 @@ Client (React + Vite) → API (Express) → Database (PostgreSQL)
    git push origin main
    
    # SSH to server
-   ssh grnchserver
+   ssh grnchai
    cd /opt/art/art-catalog
    sudo git pull origin main
    sudo docker compose down
@@ -512,7 +512,7 @@ Client (React + Vite) → API (Express) → Database (PostgreSQL)
    ```
 
 4. **Verify Production**
-   - Check http://grnchserver:3333/
+   - Check http://grnchai:3333/
    - Run test transactions
    - Check docker logs: `sudo docker compose logs -f`
 

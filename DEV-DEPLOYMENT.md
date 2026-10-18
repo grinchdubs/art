@@ -6,13 +6,13 @@ The development environment runs alongside production without interfering with i
 ### Port Mappings
 
 **Production Environment:**
-- Frontend: http://grnchserver:3333
-- Backend: http://grnchserver:3002 
+- Frontend: http://grnchai:3333
+- Backend: http://grnchai:3002 
 - Database: localhost:5432
 
 **Development Environment:**
-- Frontend: http://grnchserver:3334 (nginx)
-- Backend: http://grnchserver:3003 (Express API)
+- Frontend: http://grnchai:3334 (nginx)
+- Backend: http://grnchai:3003 (Express API)
 - Database: localhost:5433 (PostgreSQL)
 
 ## Deployment Instructions
@@ -29,7 +29,7 @@ The development environment runs alongside production without interfering with i
 
 2. **SSH to server and run deployment:**
    ```bash
-   ssh grnchserver
+   ssh grnchai
    cd /opt/art/art-catalog
    chmod +x deploy-dev.sh
    ./deploy-dev.sh
@@ -38,7 +38,7 @@ The development environment runs alongside production without interfering with i
 ### From Server Directly
 
 ```bash
-ssh grnchserver
+ssh grnchai
 cd /opt/art/art-catalog
 sudo git pull origin main
 sudo docker compose -f docker-compose.dev.yml down
@@ -51,7 +51,7 @@ sudo docker compose -f docker-compose.dev.yml up -d
 ### Manual Migration
 ```bash
 # SSH to server
-ssh grnchserver
+ssh grnchai
 
 # Run migration
 sudo docker compose -f docker-compose.dev.yml exec db-dev psql -U artcatalog -d artcatalog_dev -f /app/backend/src/migrations/003_add_provenance_tracking.sql
@@ -68,16 +68,16 @@ sudo docker compose -f docker-compose.dev.yml exec db-dev psql -U artcatalog -d 
 
 ### Check API Health
 ```bash
-curl http://grnchserver:3003/api/health
+curl http://grnchai:3003/api/health
 ```
 
 ### Test Provenance Endpoints
 ```bash
 # Get ownership history for artwork ID 1
-curl http://grnchserver:3003/api/provenance/artwork/1/history
+curl http://grnchai:3003/api/provenance/artwork/1/history
 
 # Get all transfers
-curl http://grnchserver:3003/api/provenance/all
+curl http://grnchai:3003/api/provenance/all
 ```
 
 ### View Logs
@@ -208,7 +208,7 @@ After testing in dev:
    ```
 
 4. **Verify production**
-   - Check http://grnchserver:3333
+   - Check http://grnchai:3333
    - Test critical features
    - Monitor logs for errors
 

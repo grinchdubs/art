@@ -15,7 +15,7 @@ COPY . .
 RUN mkdir -p uploads
 
 # Expose port
-EXPOSE 3001
+EXPOSE 3002
 
 # Start the server
 CMD ["node", "src/server.js"]

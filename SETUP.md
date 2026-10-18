@@ -22,7 +22,7 @@ Your art catalog application has been upgraded with a PostgreSQL backend to ensu
 
    This will start:
    - PostgreSQL database (port 5432)
-   - Backend API server (port 3001)
+   - Backend API server (port 3002)
    - Frontend application (port 3333)
 
 3. **Access the application**:
@@ -94,7 +94,7 @@ npm install
 npm run dev
 ```
 
-Backend will run on http://localhost:3001
+Backend will run on http://localhost:3002
 
 #### Frontend
 
@@ -172,7 +172,7 @@ docker exec -it art-catalog-db psql -U artcatalog artcatalog
 ### Access Uploaded Images
 
 Images are stored in `backend/uploads/` directory and accessible via:
-http://localhost:3001/uploads/filename.jpg
+http://localhost:3002/uploads/filename.jpg
 
 ## Troubleshooting
 
@@ -182,7 +182,7 @@ http://localhost:3001/uploads/filename.jpg
 2. Check if ports are already in use:
    ```bash
    # Windows
-   netstat -ano | findstr :3001
+   netstat -ano | findstr :3002
    netstat -ano | findstr :3333
    netstat -ano | findstr :5432
    ```
@@ -193,7 +193,7 @@ http://localhost:3001/uploads/filename.jpg
 
 1. Check backend is running:
    ```bash
-   curl http://localhost:3001/api/artworks
+   curl http://localhost:3002/api/artworks
    ```
 
 2. Check backend logs:
@@ -225,14 +225,14 @@ http://localhost:3001/uploads/filename.jpg
 ### Backend (.env)
 ```env
 DATABASE_URL=postgresql://artcatalog:artcatalog123@db:5432/artcatalog
-PORT=3001
+PORT=3002
 NODE_ENV=production
 ```
 
 ### Frontend
 Add to frontend if needed:
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3002
 ```
 
 ## API Documentation

@@ -1,3 +1,5 @@
+name: art-catalog-dev
+
 services:
   db-dev:
     image: postgres:15-alpine
@@ -55,3 +57,5 @@ services:
 
 volumes:
   postgres_data_dev:
+    # Explicit name so the volume survives the compose project being renamed.
+    name: art-catalog_postgres_data_dev

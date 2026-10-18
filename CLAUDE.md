@@ -34,6 +34,15 @@
 - [x] Reports page
 - [x] deploy-prod.sh (production deploy script with auto-migrations)
 
+### Deployment & Infrastructure
+- [x] Migrated hosting from `grnchserver` to `grnchai` (all docs/scripts updated)
+- [x] Committed the grnchai DB port fix (prod maps `5434:5432`; 5432 is Nextcloud's Postgres)
+- [x] Split the Compose projects so prod and dev no longer share a namespace
+      (`art-catalog-prod` vs `art-catalog-dev`, pinned volume names)
+- [ ] Add a `schema_migrations` table so deploys stop re-running every migration
+- [ ] Stop swallowing migration errors in the deploy scripts (`|| echo "may already be applied"`)
+- [ ] Decide whether the Gitea mirror (`origin` → grnchnas) stays or the repo is GitHub-only
+
 ## Technical Stack
 
 ### Frontend (Already in Use)
@@ -328,6 +337,23 @@ CREATE TABLE sales (
 
 ---
 
+## Deployment Environment
+
+The app is self-hosted on **`grnchai`** under `/opt/art/art-catalog`. It runs two isolated stacks:
+
+| | Compose file | Project name | Frontend | Backend | DB (host) |
+|---|---|---|---|---|---|
+| **Production** | `docker-compose.yml` | `art-catalog-prod` | `grnchai:3333` | `grnchai:3002` | `grnchai:5434` |
+| **Development** | `docker-compose.dev.yml` | `art-catalog-dev` | `grnchai:3334` | `grnchai:3003` | `grnchai:5433` |
+
+Notes:
+- Prod DB binds **5434** on the host because `5432` belongs to Nextcloud's Postgres on grnchai.
+- Compose volume names are **pinned** (`art-catalog_postgres_data`, `art-catalog_postgres_data_dev`)
+  so renaming a project never orphans the database.
+- The server's git `origin` is `github.com:grinchdubs/art.git`.
+- Deploy from the repo root on grnchai with `./deploy-prod.sh` or `./deploy-dev.sh`
+  (they pull, rebuild, and run migrations).
+
 ## Development Workflow
 
 ### For each feature:
@@ -361,8 +387,9 @@ CREATE TABLE sales (
    git merge feature/sort-options
    git push origin main
    
-   # Deploy to server
-   wsl ssh -t grnchserver "cd /opt/art && sudo git pull origin main && cd art-catalog && sudo docker compose down && sudo docker compose build && sudo docker compose up -d"
+   # Deploy to grnchai (pulls, rebuilds, runs migrations)
+   ssh grnchai "cd /opt/art/art-catalog && ./deploy-dev.sh"   # test in dev first
+   ssh grnchai "cd /opt/art/art-catalog && ./deploy-prod.sh"  # then promote to prod
    ```
 
 6. **Test on production**
@@ -385,12 +412,17 @@ CREATE TABLE sales (
 ## Current Stack Status
 
 ✅ **Working:**
-- PostgreSQL database with artworks, digital_works, exhibitions
-- Gallery image management
-- CSV import/export
-- Video URL imports (Vimeo/YouTube)
-- NFT metadata matching
-- Docker deployment
-- Nginx reverse proxy
+- Phases 1–3 complete (sort, lightbox, tags, bulk ops, series, public gallery, advanced search,
+  dashboard charts, sales, QR codes, backup/restore, print editions, provenance)
+- Bonus features (batch upload, spreadsheet editor, dark theme, publications, Immich, reports)
+- Artist statements + portfolio builder (PDF)
+- PostgreSQL with 84 artworks / 54 digital works in production
+- Docker deployment on grnchai (prod + dev stacks), nginx reverse proxy
 
-🔧 **Next to implement:** Phase 1 features starting with sort options
+🔧 **Next to implement:**
+- Mobile responsive optimization
+- Dark mode toggle (dark theme exists; needs a light/dark switch)
+- Loading skeleton states
+- Migration bookkeeping (`schema_migrations`) so deploys stop re-running every migration
+- Phase 4+ from `IMPLEMENTATION-PLAN.md` (certificates of authenticity, cost/time tracking,
+  insurance docs, watermarking, tax exports)

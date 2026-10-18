@@ -22,7 +22,7 @@ npm install
 2. Create a `.env` file (or copy from `.env.example`):
 ```env
 DATABASE_URL=postgresql://artcatalog:artcatalog123@localhost:5432/artcatalog
-PORT=3001
+PORT=3002
 NODE_ENV=development
 ```
 
@@ -41,7 +41,7 @@ psql -d artcatalog -f src/init-db.sql
 npm run dev
 ```
 
-The server will run on http://localhost:3001
+The server will run on http://localhost:3002
 
 ### Docker Deployment
 
@@ -53,7 +53,7 @@ docker-compose up -d
 
 This will start:
 - PostgreSQL database on port 5432
-- Backend API on port 3001
+- Backend API on port 3002
 - Frontend on port 3333
 
 ## API Endpoints
@@ -127,5 +127,5 @@ The migration will:
 ## Environment Variables
 
 - `DATABASE_URL` - PostgreSQL connection string
-- `PORT` - Server port (default: 3001)
+- `PORT` - Server port (default: 3002)
 - `NODE_ENV` - Environment (development/production)

@@ -1,3 +1,5 @@
+name: art-catalog-prod
+
 services:
   db:
     image: postgres:15-alpine
@@ -11,7 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/src/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
-      - "5432:5432"
+      - "5434:5432"  # grnchai: 5432 is used by Nextcloud's postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U artcatalog"]
       interval: 10s
@@ -52,3 +54,5 @@ services:
 
 volumes:
   postgres_data:
+    # Explicit name so the volume survives the compose project being renamed.
+    name: art-catalog_postgres_data

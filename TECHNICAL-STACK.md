@@ -25,7 +25,7 @@
 Full-stack web application for art catalog management with professional documentation capabilities.
 
 ### Server Information
-- **Production URL**: http://grnchserver:3333/
+- **Production URL**: http://grnchai:3333/
 - **Architecture**: Monolithic with separate frontend/backend containers
 - **Deployment**: Docker Compose orchestration
 - **Reverse Proxy**: nginx
@@ -120,7 +120,7 @@ Full-stack web application for art catalog management with professional document
 ```
 
 #### API Structure
-- **Port**: 3001 (internal), proxied through nginx to 3333
+- **Port**: 3002 (internal), proxied through nginx to 3333
 - **Base Path**: `/api`
 - **Response Format**: JSON
 - **Error Handling**: Centralized error middleware
@@ -181,7 +181,7 @@ services:
     
   backend:
     image: node:20-alpine
-    ports: "3001:3001"
+    ports: "3002:3002"
     volume: ./backend:/app
     depends_on: db
     
@@ -209,12 +209,12 @@ upstream frontend {
 }
 
 upstream backend {
-    server backend:3001;
+    server backend:3002;
 }
 
 server {
     listen 80;
-    server_name grnchserver;
+    server_name grnchai;
     
     location / {
         proxy_pass http://frontend;
@@ -234,7 +234,7 @@ server {
 - **Upload Directory**: `backend/uploads/`
 - **Volume Mount**: Persistent Docker volume
 - **Access**: Static file serving via Express
-- **URL Pattern**: `http://grnchserver:3333/uploads/{filename}`
+- **URL Pattern**: `http://grnchai:3333/uploads/{filename}`
 
 ---
 
@@ -243,7 +243,7 @@ server {
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         User Browser                         │
-│                  http://grnchserver:3333                     │
+│                  http://grnchai:3333                     │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            ▼
@@ -257,7 +257,7 @@ server {
        ┌─────────────────┐    ┌──────────────────┐
        │  React Frontend │    │  Express Backend │
        │  Vite Dev/Build │    │    Node.js       │
-       │   Port 3000     │    │   Port 3001      │
+       │   Port 3000     │    │   Port 3002      │
        └─────────────────┘    └────────┬─────────┘
                                        │
                               ┌────────┴────────┐
@@ -626,7 +626,7 @@ DB_USER=artadmin
 DB_PASSWORD=your_secure_password
 
 # Server
-PORT=3001
+PORT=3002
 NODE_ENV=development
 
 # File Upload
@@ -640,8 +640,8 @@ IMMICH_API_KEY=your_api_key
 
 **Frontend (.env)**
 ```env
-VITE_API_URL=http://grnchserver:3333/api
-VITE_PUBLIC_URL=http://grnchserver:3333
+VITE_API_URL=http://grnchai:3333/api
+VITE_PUBLIC_URL=http://grnchai:3333
 ```
 
 #### Local Development Commands
@@ -944,7 +944,7 @@ git push origin main
 ### SSH Deployment
 ```bash
 # Connect to server
-ssh grnchserver
+ssh grnchai
 
 # Navigate to project
 cd /opt/art/art-catalog
