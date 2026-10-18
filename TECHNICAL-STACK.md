@@ -660,9 +660,10 @@ docker compose logs -f db
 
 **Run migrations:**
 ```bash
-docker compose exec backend node src/migrations/run.js
-# Or manually
-docker compose exec db psql -U artadmin -d art_catalog -f /migrations/003_add_provenance.sql
+# Idempotent, tracked in schema_migrations (prod; use -f docker-compose.dev.yml + backend-dev for dev)
+docker compose exec -T backend node src/migrate.js
+# One-time baseline of an already-migrated database:
+docker compose exec -T backend node src/migrate.js --baseline
 ```
 
 **Backup database:**
@@ -967,16 +968,13 @@ sudo docker compose ps
 ### Database Operations
 ```bash
 # Connect to database
-docker compose exec db psql -U artadmin art_catalog
+docker compose exec db psql -U artcatalog artcatalog
 
 # Backup database
-docker compose exec db pg_dump -U artadmin art_catalog > backup.sql
+docker compose exec db pg_dump -U artcatalog artcatalog > backup.sql
 
 # Restore database
-docker compose exec -T db psql -U artadmin art_catalog < backup.sql
-
-# Run specific migration
-docker compose exec db psql -U artadmin art_catalog -f /path/to/migration.sql
+docker compose exec -T db psql -U artcatalog artcatalog < backup.sql
 ```
 
 ---

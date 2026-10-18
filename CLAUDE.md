@@ -39,9 +39,9 @@
 - [x] Committed the grnchai DB port fix (prod maps `5434:5432`; 5432 is Nextcloud's Postgres)
 - [x] Split the Compose projects so prod and dev no longer share a namespace
       (`art-catalog-prod` vs `art-catalog-dev`, pinned volume names)
-- [ ] Add a `schema_migrations` table so deploys stop re-running every migration
-- [ ] Stop swallowing migration errors in the deploy scripts (`|| echo "may already be applied"`)
-- [ ] Decide whether the Gitea mirror (`origin` → grnchnas) stays or the repo is GitHub-only
+- [x] Idempotent migrations via `schema_migrations` table + `backend/src/migrate.js` runner
+- [x] Deploy scripts fail loudly on migration errors (no more `|| echo "may already be applied"`)
+- [ ] Decide whether the Gitea mirror (`origin` → grnchnas, read-only) stays or the repo is GitHub-only
 
 ## Technical Stack
 
@@ -353,6 +353,11 @@ Notes:
 - The server's git `origin` is `github.com:grinchdubs/art.git`.
 - Deploy from the repo root on grnchai with `./deploy-prod.sh` or `./deploy-dev.sh`
   (they pull, rebuild, and run migrations).
+- **Migrations** are idempotent and tracked in a `schema_migrations` table. The runner is
+  `backend/src/migrate.js`. Deploys call `docker compose exec <svc> node src/migrate.js` and
+  abort on failure. Baseline an existing DB once with `node src/migrate.js --baseline`
+  (marks the manifest as applied without running it). Adding a migration = drop a `.sql` file in
+  `backend/src/migrations/` and append its filename to the `MIGRATIONS` array in `migrate.js`.
 
 ## Development Workflow
 

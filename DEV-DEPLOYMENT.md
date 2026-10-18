@@ -48,21 +48,37 @@ sudo docker compose -f docker-compose.dev.yml up -d
 
 ## Running Database Migrations
 
-### Manual Migration
-```bash
-# SSH to server
-ssh grnchai
+Migrations are idempotent and tracked in a `schema_migrations` table. The runner is
+`backend/src/migrate.js`. Deploys run it automatically; run it manually with:
 
-# Run migration
-sudo docker compose -f docker-compose.dev.yml exec db-dev psql -U artcatalog -d artcatalog_dev -f /app/backend/src/migrations/003_add_provenance_tracking.sql
+```bash
+# Dev
+sudo docker compose -f docker-compose.dev.yml exec -T backend-dev node src/migrate.js
+
+# Production
+sudo docker compose exec -T backend node src/migrate.js
 ```
 
-### Or execute SQL directly
-```bash
-sudo docker compose -f docker-compose.dev.yml exec db-dev psql -U artcatalog -d artcatalog_dev
+The runner:
+- creates `schema_migrations` if missing,
+- applies only *pending* migrations (in a transaction, recording each one),
+- exits non-zero on failure instead of silently skipping.
 
-# Inside psql, paste the migration SQL
+### Adding a migration
+
+1. Add a `.sql` file to `backend/src/migrations/`.
+2. Append its filename to the `MIGRATIONS` array in `backend/src/migrate.js` (order matters).
+
+### Adopting an existing (already-migrated) database
+
+If a database was migrated before the runner existed, baseline it once — this records the
+manifest as applied **without** running the SQL:
+
+```bash
+sudo docker compose exec -T backend node src/migrate.js --baseline
 ```
+
+Only baseline a database you have verified is already up to date.
 
 ## Testing the Dev Environment
 
@@ -202,9 +218,9 @@ After testing in dev:
    sudo docker compose down
    sudo docker compose build
    sudo docker compose up -d
-   
-   # Run migrations on production
-   sudo docker compose exec db psql -U artcatalog artcatalog -f /app/backend/src/migrations/003_add_provenance_tracking.sql
+
+   # Run migrations on production (idempotent)
+   sudo docker compose exec -T backend node src/migrate.js
    ```
 
 4. **Verify production**
