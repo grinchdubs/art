@@ -43,9 +43,23 @@ const upload = multer({
 // Get all gallery images
 router.get('/', async (req, res) => {
   try {
+    const { unassigned } = req.query;
+    const filter = unassigned === 'true'
+      ? `WHERE NOT (
+          EXISTS (SELECT 1 FROM artwork_images ai WHERE ai.image_id = gi.id)
+          OR EXISTS (SELECT 1 FROM digital_work_images dwi WHERE dwi.image_id = gi.id)
+        )`
+      : '';
+
     const result = await pool.query(`
-      SELECT * FROM gallery_images
-      ORDER BY uploaded_at DESC
+      SELECT gi.*,
+        (
+          EXISTS (SELECT 1 FROM artwork_images ai WHERE ai.image_id = gi.id)
+          OR EXISTS (SELECT 1 FROM digital_work_images dwi WHERE dwi.image_id = gi.id)
+        ) AS is_assigned
+      FROM gallery_images gi
+      ${filter}
+      ORDER BY gi.uploaded_at DESC
     `);
     res.json(result.rows);
   } catch (error) {
@@ -106,7 +120,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 });
 
 // Batch upload multiple images
-router.post('/upload/batch', upload.array('images', 50), async (req, res) => {
+router.post('/upload/batch', upload.array('images', 500), async (req, res) => {
   const client = await pool.connect();
   try {
     if (!req.files || req.files.length === 0) {

@@ -223,8 +223,9 @@ export const seriesAPI = {
 
 // Gallery API
 export const galleryAPI = {
-  getAll: async () => {
-    return await apiCall('/api/gallery');
+  getAll: async (unassigned = false) => {
+    const query = unassigned ? '?unassigned=true' : '';
+    return await apiCall(`/api/gallery${query}`);
   },
 
   getById: async (id) => {
@@ -288,6 +289,16 @@ export const galleryAPI = {
 
   getDigitalWorkImages: async (digitalWorkId) => {
     return await apiCall(`/api/gallery/digital-work/${digitalWorkId}`);
+  },
+};
+
+// Import API (bulk media import)
+export const importAPI = {
+  attach: async (attachments) => {
+    return await apiCall('/api/import/attach', {
+      method: 'POST',
+      body: JSON.stringify({ attachments }),
+    });
   },
 };
 

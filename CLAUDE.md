@@ -421,6 +421,7 @@ Notes:
   dashboard charts, sales, QR codes, backup/restore, print editions, provenance)
 - Bonus features (batch upload, spreadsheet editor, dark theme, publications, Immich, reports)
 - Artist statements + portfolio builder (PDF)
+- Bulk photo import (auto-match by filename → attach to works; unmatched → unassigned queue)
 - PostgreSQL with 84 artworks / 54 digital works in production
 - Docker deployment on grnchai (prod + dev stacks), nginx reverse proxy
 

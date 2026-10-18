@@ -10,14 +10,19 @@ function Gallery() {
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
+  const [showUnassigned, setShowUnassigned] = useState(false);
 
   useEffect(() => {
     loadImages();
   }, []);
 
+  useEffect(() => {
+    loadImages();
+  }, [showUnassigned]);
+
   async function loadImages() {
     try {
-      const data = await galleryAPI.getAll();
+      const data = await galleryAPI.getAll(showUnassigned);
       setImages(data);
     } catch (error) {
       console.error('Error loading images:', error);
@@ -106,6 +111,21 @@ function Gallery() {
       <div className="page-header">
         <h1>Image Gallery</h1>
         <p>Upload and manage images for your artworks</p>
+      </div>
+
+      {/* Unassigned filter */}
+      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <button
+          className={showUnassigned ? 'btn btn-primary btn-sm' : 'btn btn-sm'}
+          onClick={() => setShowUnassigned(!showUnassigned)}
+        >
+          {showUnassigned ? '✓ Showing unassigned only' : 'Show unassigned only'}
+        </button>
+        {showUnassigned && (
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            Photos not yet attached to any work
+          </span>
+        )}
       </div>
 
       {/* Upload Section */}

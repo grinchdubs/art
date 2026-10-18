@@ -12,6 +12,7 @@ import DigitalWorkList from './pages/DigitalWorkList';
 import DigitalWorkForm from './pages/DigitalWorkForm';
 import DigitalWorkDetail from './pages/DigitalWorkDetail';
 import Gallery from './pages/Gallery';
+import ImportPhotos from './pages/ImportPhotos';
 import SeriesList from './pages/SeriesList';
 import SeriesForm from './pages/SeriesForm';
 import SeriesDetail from './pages/SeriesDetail';
@@ -61,6 +62,9 @@ function Sidebar() {
         <div className="nav-group-label">Media</div>
         <Link to="/gallery" className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}>
           Image Gallery
+        </Link>
+        <Link to="/import" className={`nav-link ${isActive('/import') ? 'active' : ''}`}>
+          Import Photos
         </Link>
 
         <div className="nav-group-label">Business</div>
@@ -119,6 +123,7 @@ function AppContent() {
           <Route path="/digital-works/edit/:id" element={<DigitalWorkForm />} />
           <Route path="/digital-works/:id" element={<DigitalWorkDetail />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/import" element={<ImportPhotos />} />
           <Route path="/sales" element={<SalesList />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/backup" element={<BackupRestore />} />
