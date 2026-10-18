@@ -70,11 +70,15 @@ export function matchPhoto(filename, works) {
     }
 
     // Fallbacks: containment / prefix, only when no structural match above.
+    // Longer keys rank higher so "Sunset Over Water" beats "Sunset".
     if (score === 0) {
       for (const key of [w.invKey, w.titleKey]) {
         if (!key || key.length < 3) continue;
-        if (name.includes(key) || key.includes(name)) score = Math.max(score, 55);
-        else if (name.startsWith(key)) score = Math.max(score, 50);
+        if (name.includes(key) || key.includes(name)) {
+          score = Math.max(score, 55 + Math.min(key.length, 20));
+        } else if (name.startsWith(key)) {
+          score = Math.max(score, 50);
+        }
       }
     }
 
